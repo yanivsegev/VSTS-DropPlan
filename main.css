@@ -1,0 +1,109 @@
+.taskColumn {
+}
+.taskStart {
+    margin-left: 5px;
+    border-left: 6px solid #f2cb1d;
+    border-right: solid #c8c8c8;
+    border-top: solid #c8c8c8;
+    border-bottom: solid #c8c8c8;
+    
+    position: absolute !important;
+}
+
+.task {
+    height: 65px;
+    background: white;
+}
+
+.taskDiv
+{
+    height: 70px;
+   margin-bottom: 5px;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+.taskTable{
+    
+}
+.taskTd
+{
+    vertical-align: top;
+}
+
+.taskTr{
+}
+
+.taskTrSpace{
+    height: 5px;
+}
+
+.taskTrContent{
+    background: rgb(242, 242, 242)
+}
+
+
+
+.taskTdDiv{
+    background: #dadada;
+    margin-right: 10px;
+    padding-bottom: 10px;
+    padding-top: 1px;
+}
+
+.taskTitle{
+    word-wrap: break-word;
+    overflow: hidden;
+    height: 50px;
+    padding-left: 6px;
+    padding-right: 2px;
+    padding-top: 2px;
+}
+
+.taskTitle:hover{
+    text-decoration: underline;
+    cursor:pointer;
+}
+
+.taskDayOff{
+    background:repeating-linear-gradient(  15deg,  #dadada,  rgb(242, 242, 242) 10px,  rgb(242, 242, 242) 10px,  #dadada 20px)
+}
+
+
+.taskOverDue{
+    background: rgb(255, 121, 121);
+}
+
+.taskBlocked{
+    background: orange;
+}
+
+.taskDone{
+    background: lightgreen;
+}
+
+.taskRemainingWork{
+    font-weight: bold;
+    text-align: right;
+    position: absolute;
+    right: 1px;
+    bottom: -1px;
+    padding: 2px;
+}
+
+.sameParent{
+
+    background: bisque;
+}
+
+.taskToday{
+    background: #fff4ce;
+}
+
+.assignedToAvatar{
+    height: 30px;
+    width: 30px;
+}
+
+.assignToColumn{
+    width: 100px;
+}

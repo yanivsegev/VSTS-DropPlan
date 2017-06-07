@@ -1,0 +1,84 @@
+{
+    "manifestVersion": 1,
+    "id": "Drop-plan-extension-test",
+    "version": "1.0.38",
+    "name": "Sprint Drop Plan-test",
+    "description": "Plan and track your sprint with a calendar based view.",
+    "publisher": "yanivsegev",
+    "public": false,
+    "icons": {
+        "default": "images/logo.png"
+    },
+  "tags": [
+    "Plan",
+    "Sprint",
+    "Backlog",
+    "Collaborate"
+  ],
+  "categories": [
+    "Plan and track"
+  ],
+  "content": {
+    "details": {
+      "path": "README.md"
+    }
+  },
+  
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "DropPlanTest",
+            "type": "ms.vss-web.tab",
+            "description": "Adds Drop Plan to the Work hub group",
+            "targets": [
+                "ms.vss-work-web.iteration-backlog-tabs"
+            ],
+            "properties": {
+                "name": "Drop plan test",
+                "order": 99,
+                "uri": "index.html"
+            }
+        }
+    ],
+    "files": [
+        {
+            "path": "index.html",
+            "addressable": true
+        },
+        {
+            "path": "sdk/scripts",
+            "addressable": true
+        },
+        {
+            "path": "DropPlanHelper.js",
+            "addressable": true
+        },
+        {
+            "path": "DropPlanVSS.js",
+            "addressable": true
+        },
+        {
+            "path": "main.css",
+            "addressable": true
+        },
+        {
+            "path": "images/logo.png",
+            "addressable": true
+        },
+        {
+            "path": "images/dropplan.png",
+            "addressable": true
+        },
+        {
+            "path": "images/DropPlanWithHelp.png",
+            "addressable": true
+        }
+    ],
+    "scopes": [
+        "vso.work","vso.work_write"
+    ]
+}
