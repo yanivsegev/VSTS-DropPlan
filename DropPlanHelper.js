@@ -188,7 +188,7 @@ function isDayInRange(range, date){
     var inRange = false;
     $.each(range, function( index2, value2 ) {
         $.each( getDates(value2.start, value2.end), function( index2, value3 ) {
-            if (value3.yyyymmdd() == date) inRange = true;
+            if (value3.getGMT().yyyymmdd() == date) inRange = true;
         });
     });
     return inRange;

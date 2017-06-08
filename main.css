@@ -99,6 +99,10 @@
     background: #fff4ce;
 }
 
+.taskToday.taskDayOff{
+    background:repeating-linear-gradient(  15deg,  #dadada,  #fff4ce 10px,  #fff4ce 10px,  #dadada 20px)
+}
+
 .assignedToAvatar{
     height: 30px;
     width: 30px;
