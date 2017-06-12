@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "Drop-plan-extension",
-    "version": "1.0.21",
+    "version": "1.0.23",
     "name": "Sprint Drop Plan",
     "description": "Plan and track your sprint with a calendar based view.",
     "publisher": "yanivsegev",
@@ -50,31 +50,15 @@
             "addressable": true
         },
         {
-            "path": "sdk/scripts",
+            "path": "scripts",
             "addressable": true
         },
         {
-            "path": "DropPlanHelper.js",
+            "path": "styles",
             "addressable": true
         },
         {
-            "path": "DropPlanVSS.js",
-            "addressable": true
-        },
-        {
-            "path": "main.css",
-            "addressable": true
-        },
-        {
-            "path": "images/logo.png",
-            "addressable": true
-        },
-        {
-            "path": "images/dropplan.png",
-            "addressable": true
-        },
-        {
-            "path": "images/DropPlanWithHelp.png",
+            "path": "images",
             "addressable": true
         }
     ],

@@ -3,18 +3,23 @@
 
 <head>
 
-    <link href="main.css" rel="stylesheet"></link>
-    <script src="https://code.jquery.com/jquery-1.12.1.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> 
-    <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
-    <script src="sdk/scripts/VSS.SDK.js"></script>
-    <script src="DropPlanHelper.js"></script>
-    <script src="DropPlanVSS.js"></script>
+    <link href="styles/main.css" rel="stylesheet"></link>
+    <link href="styles/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+    <script src="scripts/jquery-1.12.1.min.js"></script>
+    <script src="scripts/jquery-ui.min.js"></script> 
+    <script src="scripts/VSS.SDK.min.js"></script>
+
+    <script src="scripts/DateHealpers.js"></script>
+	<script src="scripts/DropPlanHelper.js"></script>
+    <script src="scripts/DropPlanVSS.js"></script>
     
 </head>
 
-<body style="margin: 5px; overflow:visible;">
-    <div id="grid-container" >       
+<body style="margin: 5px; overflow:scroll;">
+    <div id="grid-container" >   
+		<h1>Please wait while loding data ...</h1>
+        <div id='loading'></div>
     </div>
 </body>
 

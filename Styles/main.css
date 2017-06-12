@@ -1,4 +1,5 @@
 .taskColumn {
+    background: white;
 }
 .taskStart {
     margin-left: 5px;
@@ -110,4 +111,10 @@
 
 .assignToColumn{
     width: 100px;
+}
+
+
+.mainBody{
+    margin: 5px;
+    overflow: scroll;
 }
