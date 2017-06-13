@@ -22,35 +22,41 @@ function BuildDropPlan()
 {
     VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient", "TFS/WorkItemTracking/Services"],
         function (VSS_Service, TFS_Wit_WebApi, TFS_Work, TFS_Wit_Services) {
+        try{
 
-        printToScreen("VSS loaded.");
+            printToScreen("VSS loaded.");
 
-        var context = VSS.getWebContext();
-        var workClient = TFS_Work.getClient()
-        var teamContext = { projectId: context.project.id, teamId: context.team.id, project: "", team: "" }; 
-        
-        _witServices = TFS_Wit_Services;
-        _iterationId = VSS.getConfiguration().iterationId;
-        _projectId = context.project.id;
-        _witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
+            var context = VSS.getWebContext();
+            var workClient = TFS_Work.getClient()
+            var teamContext = { projectId: context.project.id, teamId: context.team.id, project: "", team: "" }; 
+            
+            _witServices = TFS_Wit_Services;
+            _iterationId = VSS.getConfiguration().iterationId;
+            _projectId = context.project.id;
+            _witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
 
-        var serverAnswer = Promise.all([
-            workClient.getTeamDaysOff(teamContext, _iterationId),
-            workClient.getTeamSettings(teamContext),
-            workClient.getCapacities(teamContext, _iterationId),
-            workClient.getTeamIteration(teamContext, _iterationId),
-            workClient.getTeamFieldValues(teamContext)
-        ]).then(values => {
+            var serverAnswer = Promise.all([
+                workClient.getTeamDaysOff(teamContext, _iterationId),
+                workClient.getTeamSettings(teamContext),
+                workClient.getCapacities(teamContext, _iterationId),
+                workClient.getTeamIteration(teamContext, _iterationId),
+                workClient.getTeamFieldValues(teamContext)
+            ]).then(function(values) {
 
-            printToScreen("Team data loaded.");
-        
-            _daysOff = values[0];
-            _teamSettings = values[1];
-            _teamMemberCapacities = values[2];
-            _iteration = values[3];
-            _teamValues = values[4];
-            queryAndRenderWit();
-        }, failToCallVss);
+                printToScreen("Team data loaded.");
+            
+                _daysOff = values[0];
+                _teamSettings = values[1];
+                _teamMemberCapacities = values[2];
+                _iteration = values[3];
+                _teamValues = values[4];
+                queryAndRenderWit();
+            }, failToCallVss);
+        }
+        catch (e) {
+            $("#grid-container")[0].innerHTML = "<h1>Browser is not supported.</h1>";
+            VSS.notifyLoadSucceeded();
+        }
     });
 }
 
@@ -152,7 +158,7 @@ function updateWorkItemInVSS(workItemIdhtml)
         }]
         //console.log( 'updateWorkItemInVSS - ' + workItem.id + ' ' + workItem.fields["Microsoft.VSTS.Scheduling.StartDate"] + ' ' + workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]  )
         processWorkItems(workItems, true);
-        _witClient.updateWorkItem(wijson, workItem.id).then(x => {
+        _witClient.updateWorkItem(wijson, workItem.id).then(function(x) {
             queryAndRenderWit();
         }, failToCallVss);
     }, failToCallVss);

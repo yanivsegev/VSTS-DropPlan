@@ -128,9 +128,12 @@ function isDayOff(name, date, day){
         } 
     });
 
-     if (isDayInRange(_daysOff, date)) dayOff = true;
-     if (!_teamSettings.workingDays.includes(day)) dayOff = true;
-    
+    if (isDayInRange(_daysOff, date)) dayOff = true;
+
+    $.each(_teamSettings.workingDays, function( index2, value3 ) {
+        if (value3 == day) dayOff = true;
+    });
+
     return dayOff;
 }
 
@@ -144,15 +147,15 @@ function getMemberImage(name){
 
 function attachEvents(){
 
-    $(".taskStart").hover(In => 
+    $(".taskStart").hover(function(In) 
     {
         var current = $(In.target).closest(".taskStart");
         var witParentId = current.attr("witParentId");
-        $("div[witParentId=" + witParentId + "]").each((x,other) => {
+        $("div[witParentId=" + witParentId + "]").each(function(x,other) {
             if (!current.is(other)) $(other).addClass("sameParent");
         });
     },
-    Out => {
+    function(Out) {
         $(".sameParent").removeClass("sameParent");
         var current = $(Out.target).closest(".taskStart");
     });
