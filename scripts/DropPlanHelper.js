@@ -70,11 +70,11 @@ function process(isGMT){
                     var parentId;
                     task.workItem.relations.forEach(function(item,index) { 
                         if (item.rel == "System.LinkTypes.Hierarchy-Reverse"){
-                            parentId = task.workItem.relations[0].url.substring(task.workItem.relations[0].url.lastIndexOf("/") + 1)
+                            parentId = item.url.substring(item.url.lastIndexOf("/") + 1)
                         }
                     })
 
-                    result = result + "<div workItemId=" + task.id + " witParentId=" + parentId + " class='task ";
+                    result = result + "<div witId=" + task.workItem.id + " workItemId=" + task.id + " witParentId=" + parentId + " class='task ";
                     
                     if (task.endDate < new Date(new Date().yyyy_mm_dd() )) result = result + "taskOverDue "
                     
@@ -181,6 +181,7 @@ function attachEvents(){
         containment: ".mainTable", 
         start: function(event, ui) {
             $(this).find(".taskTitle").addClass('noclick');
+            clearRelations();
         },
         stop: function( event, ui ) {
             var changeDays = (Math.round((ui.position.left - ui.originalPosition.left)/colWidth) );
@@ -200,18 +201,24 @@ function attachEvents(){
 
     
     $( ".taskStart" ).resizable({
-      grid: colWidth,
-      containment: ".mainTable",
-      minWidth: 60,
-      handles: 'e', 
-      stop: function( event, ui ) { 
-          var workItemId = ui.element.attr("workItemId");
-          var changeDays = (Math.round((ui.size.width - ui.originalSize.width)/colWidth) );
-          updateWorkItemDates(workItemId, 0, changeDays);
-          updateWorkItemInVSS(workItemId);
-     }
+        grid: colWidth,
+        containment: ".mainTable",
+        minWidth: 60,
+        handles: 'e', 
+        stop: function( event, ui ) { 
+            var workItemId = ui.element.attr("workItemId");
+            var changeDays = (Math.round((ui.size.width - ui.originalSize.width)/colWidth) );
+            updateWorkItemDates(workItemId, 0, changeDays);
+            updateWorkItemInVSS(workItemId);
+        }, 
+        start: function(event, ui) {
+            $(this).find(".taskTitle").addClass('noclick');
+            clearRelations();
+        },
     }); 
 }
+
+
 
 function updateWorkItemDates(workItemId, changeStartDays, changeEndDays){
     var workItem = workItems[workItemId];

@@ -118,3 +118,29 @@
     margin: 5px;
     overflow: scroll;
 }
+
+.alertBadge {
+    background-color: red;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+
+    display: inline-block;
+    min-width: 10px;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    border-radius: 10px;
+}
+
+#canvas1 {
+    z-index: 10;
+    position: absolute;
+    pointer-events: none;
+}
+    

@@ -13,18 +13,13 @@ VSS.init({
     usePlatformScripts: true
 });
 
-function printToScreen(msg){
-    $("#loading").innerHTML = $("#loading").innerHTML + msg + "<br/>";
-    console.log(msg);
-}
-
 function BuildDropPlan()
 {
     VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient", "TFS/WorkItemTracking/Services"],
         function (VSS_Service, TFS_Wit_WebApi, TFS_Work, TFS_Wit_Services) {
         try{
 
-            printToScreen("VSS loaded.");
+            console.log("VSS loaded.");
 
             var context = VSS.getWebContext();
             var workClient = TFS_Work.getClient()
@@ -43,7 +38,7 @@ function BuildDropPlan()
                 workClient.getTeamFieldValues(teamContext)
             ]).then(function(values) {
 
-                printToScreen("Team data loaded.");
+                console.log("Team data loaded.");
             
                 _daysOff = values[0];
                 _teamSettings = values[1];
@@ -94,7 +89,7 @@ function queryAndRenderWit(){
     _witClient.queryByWiql(query, _projectId).then(
     function (result) {
 
-        printToScreen("Iteration data loaded.");
+        console.log("Iteration data loaded.");
         
         //console.log("queryByWiql loaded");
         // Generate an array of all open work item ID's
@@ -122,13 +117,14 @@ function queryAndRenderWit(){
 
 function processWorkItems(workItems, isGMT) {
     
-    printToScreen("Work items data loaded.");
+    console.log("Work items data loaded.");
         
     var t = document.getElementById("grid-container");
     setData(t, workItems, _iteration.attributes.startDate, _iteration.attributes.finishDate);
 
     process(isGMT);
     attachEvents();
+    drawRelations();
     VSS.notifyLoadSucceeded();
 }
 

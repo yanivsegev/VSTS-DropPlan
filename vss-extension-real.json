@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "Drop-plan-extension",
-    "version": "1.0.24",
+    "version": "1.0.25",
     "name": "Sprint Drop Plan",
     "description": "Plan and track your sprint with a calendar based view.",
     "publisher": "yanivsegev",
@@ -9,21 +9,32 @@
     "icons": {
         "default": "images/logo.png"
     },
-  "tags": [
-    "Plan",
-    "Sprint",
-    "Backlog",
-    "Collaborate"
-  ],
-  "categories": [
-    "Plan and track"
-  ],
-  "content": {
-    "details": {
-      "path": "README.md"
-    }
-  },
-  
+    "tags": [
+        "Plan",
+        "Sprint",
+        "Backlog",
+        "Collaborate"
+    ],
+    "categories": [
+        "Plan and track"
+    ],
+    "content": {
+        "details": {
+            "path": "README.md"
+        },
+        "license": {
+            "path": "LICENSE"
+        }
+    },
+    "links": {
+        "support": {
+            "uri": "https://github.com/yanivsegev/VSTS-DropPlan/issues"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yanivsegev/VSTS-DropPlan"
+    },
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
@@ -63,6 +74,7 @@
         }
     ],
     "scopes": [
-        "vso.work","vso.work_write"
+        "vso.work",
+        "vso.work_write"
     ]
 }
