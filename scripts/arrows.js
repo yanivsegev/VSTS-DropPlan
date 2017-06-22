@@ -140,23 +140,24 @@ function drawRelations() {
     clearRelations();
     var pathslist = [];
     workItems.forEach(function(item1,index1) {
-         
-        item1.relations.forEach(function(item,index) { 
-            if (item.rel == "System.LinkTypes.Dependency-Forward"){
-                var seccesor = item.url.substring(item.url.lastIndexOf("/") + 1)
-                var seccesorDiv = $("div[witId=" + seccesor + "]");
-                var item2 = workItems[seccesorDiv.attr("workItemId")];
-                var fillStyle = "gray";
-                var start1 = new Date(item1.fields["Microsoft.VSTS.Scheduling.StartDate"]).getGMT();
-                var end2 = new Date(item2.fields["Microsoft.VSTS.Scheduling.FinishDate"]).getGMT();
-                if ( start1 > end2 ) 
-                {
-                    fillStyle = "red";
-                }
+        if (item1.fields["System.WorkItemType"] == 'Task'){
 
-                drawArrow($("div[witId=" + item1.id + "]"), seccesorDiv,fillStyle);
+            item1.relations.forEach(function(item,index) { 
+                if (item.rel == "System.LinkTypes.Dependency-Forward"){
+                    var seccesor = item.url.substring(item.url.lastIndexOf("/") + 1)
+                    var seccesorDiv = $("div[witId=" + seccesor + "]");
+                    var item2 = workItems[seccesorDiv.attr("workItemId")];
+                    var fillStyle = "gray";
+                    var start1 = new Date(item1.fields["Microsoft.VSTS.Scheduling.StartDate"]).getGMT();
+                    var end2 = new Date(item2.fields["Microsoft.VSTS.Scheduling.FinishDate"]).getGMT();
+                    if ( start1 > end2 ) 
+                    {
+                        fillStyle = "red";
+                    }
+                    drawArrow($("div[witId=" + item1.id + "]"), seccesorDiv,fillStyle);
+                }
+            });
         }
-        });
     });
 
 }

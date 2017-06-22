@@ -1,6 +1,7 @@
 var colWidth = 180;
 var workItems, startDate, endDate, container;
 var nameById = [];
+var _witToSave = [];
 
 function getColumns(startDate, stopDate) {
     var columnArray = new Array();
@@ -16,7 +17,40 @@ function getColumns(startDate, stopDate) {
 }
 
 function setData(Icontainer, IworkItems, IstartDate, IendDate){
-    workItems = IworkItems;
+    console.log("Setup items");
+    workItems = IworkItems.sort(function (a, b) {
+        
+        if (a.fields["System.WorkItemType"] == 'Task' && 
+            b.fields["System.WorkItemType"] == 'Task'){
+            
+            if (!a.fields["Microsoft.VSTS.Scheduling.StartDate"] && !b.fields["Microsoft.VSTS.Scheduling.StartDate"]){
+                var parentIda = getParentId(a);
+                var parentIdb = getParentId(b);
+                var pa = null,pb = null;
+
+                IworkItems.forEach(function(item,index) { 
+                    if (item.id == parentIda) pa = item.fields["Microsoft.VSTS.Common.BacklogPriority"] || 0;
+                    if (item.id == parentIdb) pb = item.fields["Microsoft.VSTS.Common.BacklogPriority"] || 0;
+                });
+
+                if ( (pa || 0) != 0 && (pb || 0) != 0 )
+                {
+                    return pa - pb;
+                }
+            } else if (!a.fields["Microsoft.VSTS.Scheduling.StartDate"] && b.fields["Microsoft.VSTS.Scheduling.StartDate"]) {
+                return 1;
+            } else if (a.fields["Microsoft.VSTS.Scheduling.StartDate"] && !b.fields["Microsoft.VSTS.Scheduling.StartDate"]) {
+                return -1;
+            } 
+
+
+        }
+
+        return a.id - b.id;
+    });
+
+    //workItems.forEach(function(item,index) { console.log(item.fields["System.WorkItemType"] + "(" + item.id + ")" + item.fields["System.Title"] + " " + item.fields["Microsoft.VSTS.Scheduling.StartDate"]) });
+
     startDate = IstartDate.getGMT();
     endDate = IendDate.getGMT();
     container = Icontainer;
@@ -67,12 +101,7 @@ function process(isGMT){
 
                 if (task.Type == 1 && task.part == 0){ 
 
-                    var parentId;
-                    task.workItem.relations.forEach(function(item,index) { 
-                        if (item.rel == "System.LinkTypes.Hierarchy-Reverse"){
-                            parentId = item.url.substring(item.url.lastIndexOf("/") + 1)
-                        }
-                    })
+                    var parentId = getParentId(task.workItem);
 
                     result = result + "<div witId=" + task.workItem.id + " workItemId=" + task.id + " witParentId=" + parentId + " class='task ";
                     
@@ -107,17 +136,35 @@ function process(isGMT){
     container.innerHTML = result;
 }
 
-function getDefaultDaysPerTask(name, remainingWork){
-    var result = 0;
+function getParentId(workItem){
+    var parentId;
+    workItem.relations.forEach(function(item,index) { 
+        if (item.rel == "System.LinkTypes.Hierarchy-Reverse"){
+            parentId = item.url.substring(item.url.lastIndexOf("/") + 1)
+        }
+    })
+    return parentId;
+}
+
+function getFirstAvailableDate(days, remainingWork, globalDates){
+    return 0;
+}
+
+
+function getCapacity(name){
+    var result = 6;
     $.each(_teamMemberCapacities, function( index, value ) {
         if (value.teamMember.displayName == name ){
             if (value.activities.length > 0 && value.activities[0].capacityPerDay > 0)
             {
-                result = Math.ceil(remainingWork / value.activities[0].capacityPerDay) - 1;
+                result = value.activities[0].capacityPerDay || 6;
             }
         } 
     });
     return result;
+}
+function getDefaultDaysPerTask(remainingWork, capacity){
+     return Math.ceil(remainingWork / capacity) - 1;
 }
 
 function isDayOff(name, date, day){
@@ -248,77 +295,130 @@ function getTable(workItems, startDate, endDate, isGMT){
         var workItem = workItems[i];
         var assignedTo = workItem.fields["System.AssignedTo"] || "";
         
-        if (!names[assignedTo]) {
-            names[assignedTo] = result.length + 1;
-            var newName = {Name: assignedTo};
-            for (var colIndex = 0; colIndex < globalDates.length; colIndex++){
-                newName[globalDates[colIndex].yyyymmdd()] = [];
+        if (workItem.fields["System.WorkItemType"] == 'Task')
+        {
+            if (!names[assignedTo]) {
+                names[assignedTo] = {id:result.length, days: []};
+                var newName = {Name: assignedTo};
+                for (var colIndex = 0; colIndex < globalDates.length; colIndex++){
+                    newName[globalDates[colIndex].yyyymmdd()] = [];
+                }
+                result.push(newName);
+                nameById[names[assignedTo].id] =  {Name: assignedTo};
             }
-            result.push(newName);
-            nameById[names[assignedTo] - 1] =  {Name: assignedTo};
-        }
 
-        var personRow = result[names[assignedTo] - 1];
-        personRow.assignedTo = assignedTo;
-        personRow.assignedToId = names[assignedTo] - 1;
+            var personRow = result[names[assignedTo].id];
+            personRow.assignedTo = assignedTo;
+            personRow.assignedToId = names[assignedTo].id;
 
-        var witStartDate = new Date(workItem.fields["Microsoft.VSTS.Scheduling.StartDate"] || startDate);
-        if (!isGMT) witStartDate = witStartDate.getGMT();
+            var witStartDate = null;
+            var remainingWork = workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"];
+            var capacity = getCapacity(name);
+            var witChanged = false;
 
-        var witEndDate;
-
-        if (!workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"])
-        {
-            witEndDate = witStartDate.addDays(getDefaultDaysPerTask(personRow.assignedTo, workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"]));
-        }
-        else
-        {
-            witEndDate = new Date(workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"] || startDate);
-            if (!isGMT) witEndDate = witEndDate.getGMT();
-        
-        }
-        
-        if (witStartDate < startDate) witStartDate = startDate;
-        if (witEndDate > endDate) witEndDate = endDate;
-        if (witEndDate < witStartDate) witEndDate = witStartDate;
-
-        workItem.fields["Microsoft.VSTS.Scheduling.StartDate"] = witStartDate.yyyy_mm_dd();
-        workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = witEndDate.yyyy_mm_dd();
-
-   
-
-        if (witStartDate >= startDate && witEndDate <= endDate)
-        {
-            var dates = getDates(witStartDate, witEndDate);
-
-            var selectedRow = -1;
-            var found = false;
-            while(!found)
+            if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"])
             {
-                found = true;
-                selectedRow = selectedRow + 1;
-                for (var colIndex = 0; colIndex < dates.length; colIndex++){
-                    var date = dates[colIndex].yyyymmdd();
-                    if (personRow[date].length > selectedRow){
-                        if (personRow[date][selectedRow].Type != 0) {
-                        found = false;
+                witChanged = true;
+                globalDates.forEach(function(item, index) {
+                    var tasksPerDay = names[assignedTo].days[item.yyyymmdd()] || 0;
+                    if (tasksPerDay < capacity && !witStartDate){
+                        witStartDate = item.getGMT();
+                    }
+                });
+                
+                //witStartDate = startDate.addDays(getFirstAvailableDate(names[assignedTo].days, remainingWork, globalDates));
+            }else{
+                witStartDate = new Date(workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]);
+            }
+            
+            if (!isGMT) witStartDate = witStartDate.getGMT();
+
+            var witEndDate = null;
+
+            if (!workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"])
+            {
+                witChanged = true;
+                var remainingWorkLeft = remainingWork;
+                var dates = getDates(witStartDate, endDate);
+                dates.forEach(function(item, index) {
+                    var tasksPerDay = names[assignedTo].days[item.yyyymmdd()] || 0;
+                    if (tasksPerDay < capacity && !witEndDate){
+
+                        var todayPart = remainingWorkLeft;
+                        if (tasksPerDay + todayPart > capacity){
+                            todayPart = capacity - tasksPerDay;
+                        }
+                        remainingWorkLeft = remainingWorkLeft - todayPart;
+
+                        if (remainingWorkLeft == 0){
+                            witEndDate = item.getGMT();
                         }
                     }
-                }    
+                });
+
+            }
+            else
+            {
+                witEndDate = new Date(workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"] || startDate);
+                if (!isGMT) witEndDate = witEndDate.getGMT();
+            
+            }
+            
+            if (witChanged){
+               _witToSave.push(i);
             }
 
-            for (var colIndex = 0; colIndex < globalDates.length; colIndex++){
-                var date = globalDates[colIndex].yyyymmdd();
-                personDateCell = personRow[date];
-                while(selectedRow >= personDateCell.length) personDateCell.push({Type:0});
-            }
+            if (witStartDate < startDate) witStartDate = startDate;
+            if (witEndDate > endDate) witEndDate = endDate;
+            if (witEndDate < witStartDate) witEndDate = witStartDate;
 
-            for (var colIndex = 0; colIndex < dates.length; colIndex++){
-                var date = dates[colIndex].yyyymmdd();
-                personDateCell = personRow[date];
-                personDateCell[selectedRow] = {Type:1, part: colIndex, total: dates.length, workItem:workItem, id:i, endDate: dates[dates.length - 1]};
-            }
+            workItem.fields["Microsoft.VSTS.Scheduling.StartDate"] = witStartDate.yyyy_mm_dd();
+            workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = witEndDate.yyyy_mm_dd();
 
+    
+
+            if (witStartDate >= startDate && witEndDate <= endDate)
+            {
+                var dates = getDates(witStartDate, witEndDate);
+
+                var selectedRow = -1;
+                var found = false;
+                while(!found)
+                {
+                    found = true;
+                    selectedRow = selectedRow + 1;
+                    for (var colIndex = 0; colIndex < dates.length; colIndex++){
+                        var date = dates[colIndex].yyyymmdd();
+                        if (personRow[date].length > selectedRow){
+                            if (personRow[date][selectedRow].Type != 0) {
+                            found = false;
+                            }
+                        }
+                    }    
+                }
+
+                for (var colIndex = 0; colIndex < globalDates.length; colIndex++){
+                    var date = globalDates[colIndex].yyyymmdd();
+                    personDateCell = personRow[date];
+                    while(selectedRow >= personDateCell.length) personDateCell.push({Type:0});
+                }
+
+                for (var colIndex = 0; colIndex < dates.length; colIndex++){
+                    var date = dates[colIndex].yyyymmdd();
+
+                    var todayTasks = (names[assignedTo].days[date] || 0);
+                    var todayPart = remainingWork;
+                    if (todayTasks + remainingWork > capacity){
+                        todayPart = capacity - todayTasks;
+                    }
+                    remainingWork = remainingWork - todayPart;
+                    names[assignedTo].days[date] = todayTasks + todayPart;
+
+                    personDateCell = personRow[date];
+                    personDateCell[selectedRow] = {Type:1, part: colIndex, total: dates.length, workItem:workItem, id:i, endDate: dates[dates.length - 1]};
+                }
+
+            }
         }
     } 
     return result.sort(function(a, b){return a.assignedTo.localeCompare(b.assignedTo)});
