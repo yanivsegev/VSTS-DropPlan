@@ -115,7 +115,7 @@
 
 
 .mainBody{
-    margin: 5px;
+    /*margin: 5px;*/
     overflow: scroll;
 }
 
@@ -144,3 +144,13 @@
     pointer-events: none;
 }
     
+.rowHeader{
+    background: rgb(242, 242, 242);
+    padding: 10px;
+    height: 100%;
+}
+
+.rowHeaderSpace{
+    background: white;
+    height: 100%;
+}

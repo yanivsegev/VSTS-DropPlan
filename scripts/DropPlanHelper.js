@@ -61,10 +61,10 @@ function process(isGMT){
     
 
     var result = "<table id='tasksTable' class='mainTable' cellpadding='0' cellspacing='0'><thead><tr>";
-    result = result + "<th><div class='taskColumn assignToColumn'></div></th>"
+    result = result + "<td class='locked_class_name'><div class='taskColumn assignToColumn rowHeaderSpace'></div></td>"
     
     for (var colIndex = 1; colIndex < cols.length; colIndex++){
-        result = result + "<th><div class='taskColumn' style='width:" + colWidth + "px'>" +  cols[colIndex].text + "<br>" + cols[colIndex].date + "</div></th>";
+        result = result + "<td class='column_class_name'><div class='taskColumn' style='width:" + colWidth + "px'>" +  cols[colIndex].text + "<br>" + cols[colIndex].date + "</div></td>";
     }
     result = result + "</tr><tbody>"
 
@@ -74,13 +74,13 @@ function process(isGMT){
     for (var nameIndex = 0; nameIndex < data.length; nameIndex++){
         var personRow = data[nameIndex];
         
-        result = result + "<tr class='taskTr taskTrSpace'><td colspan='" + (dates.length + 1) + "'/></tr>";
+        result = result + "<tr class='taskTr taskTrSpace'><td class='row_class_name'><div class='rowHeaderSpace'/></td><td colspan='" + (dates.length) + "'/></tr>";
         result = result + "<tr class='taskTr taskTrContent' >";
         
         if (personRow.assignedTo){
-            result = result + "<td assignedToId=" + personRow.assignedToId + "><img class='assignedToAvatar' src='" + getMemberImage(personRow.assignedTo) + "'/><div class='assignedToName'>" +  personRow.assignedTo + "</div></td>";
+            result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><img class='assignedToAvatar' src='" + getMemberImage(personRow.assignedTo) + "'/><div class='assignedToName'>" +  personRow.assignedTo + "</div></div></td>";
         } else {
-            result = result + "<td assignedToId=" + personRow.assignedToId + "><div class='assignedToName'>Unassigned</div></td>";
+            result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><div class='assignedToName'>Unassigned</div></div></td>";
         }
 
 
@@ -177,9 +177,7 @@ function isDayOff(name, date, day){
 
     if (isDayInRange(_daysOff, date)) dayOff = true;
 
-    $.each(_teamSettings.workingDays, function( index2, value3 ) {
-        if (value3 == day) dayOff = true;
-    });
+    if (!_teamSettings.workingDays.includes(day)) dayOff = true;
 
     return dayOff;
 }

@@ -147,14 +147,17 @@ function drawRelations() {
                     var seccesor = item.url.substring(item.url.lastIndexOf("/") + 1)
                     var seccesorDiv = $("div[witId=" + seccesor + "]");
                     var item2 = workItems[seccesorDiv.attr("workItemId")];
-                    var fillStyle = "gray";
-                    var start1 = new Date(item1.fields["Microsoft.VSTS.Scheduling.StartDate"]).getGMT();
-                    var end2 = new Date(item2.fields["Microsoft.VSTS.Scheduling.FinishDate"]).getGMT();
-                    if ( start1 > end2 ) 
+                    if (item2)
                     {
-                        fillStyle = "red";
+                        var fillStyle = "gray";
+                        var start1 = new Date(item1.fields["Microsoft.VSTS.Scheduling.StartDate"]).getGMT();
+                        var end2 = new Date(item2.fields["Microsoft.VSTS.Scheduling.FinishDate"]).getGMT();
+                        if ( start1 > end2 ) 
+                        {
+                            fillStyle = "red";
+                        }
+                        drawArrow($("div[witId=" + item1.id + "]"), seccesorDiv,fillStyle);
                     }
-                    drawArrow($("div[witId=" + item1.id + "]"), seccesorDiv,fillStyle);
                 }
             });
         }

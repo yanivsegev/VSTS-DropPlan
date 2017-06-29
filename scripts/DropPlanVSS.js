@@ -61,7 +61,7 @@ function queryAndRenderWit(){
             
     // Query object containing the WIQL query
     var query = {
-        query: "SELECT [System.Id] FROM WorkItem WHERE [System.State] NOT IN ('Removed') AND [System.IterationPath] UNDER '" + currentIterationPath + "' "
+        query: "SELECT [System.Id] FROM WorkItem WHERE [System.State] NOT IN ('Removed') AND [system.WorkItemType] IN ('Task', 'Product Backlog Item') AND [System.IterationPath] UNDER '" + currentIterationPath + "' "
     };
     if (_teamValues.values.length > 0)
     {
@@ -108,13 +108,27 @@ function queryAndRenderWit(){
         }
         else
         {
-            _witClient.getWorkItems(openWorkItems, undefined, undefined, 1).then( processWorkItems, failToCallVss );
+            var start = 0;
+            var end = 0;
+            var getWorkItemsPromises = [];
+            while (end < openWorkItems.length){
+                end = start + 200;
+                getWorkItemsPromises.push(_witClient.getWorkItems(openWorkItems.slice(start,end), undefined, undefined, 1));
+                start = end;
+            }
+            Promise.all(getWorkItemsPromises).then( processAllWorkItems, failToCallVss );
         }
 
     }, failToCallVss);
 
 }
 
+function processAllWorkItems(values){
+
+    var merged = [].concat.apply([], values);
+    processWorkItems(merged);
+
+}
 function processWorkItems(workItems, isGMT) {
     
     console.log("Work items data loaded.");
@@ -125,6 +139,9 @@ function processWorkItems(workItems, isGMT) {
     process(isGMT);
     attachEvents();
     drawRelations();
+
+    TableLock("tasksTable", "row_class_name", "column_class_name", "locked_class_name");
+
     VSS.notifyLoadSucceeded();
 }
 
