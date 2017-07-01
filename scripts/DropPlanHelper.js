@@ -175,7 +175,7 @@ function isDayOff(name, date, day){
         } 
     });
 
-    if (isDayInRange(_daysOff, date)) dayOff = true;
+    if (isDayInRange(_daysOff.daysOff, date)) dayOff = true;
 
     if (!_teamSettings.workingDays.includes(day)) dayOff = true;
 
