@@ -1,26 +1,24 @@
 
-var can = document.getElementById('canvas1');
-var ctx = can.getContext('2d');
-
-function drawArrowhead(locx, locy, angle, sizex, sizey, fillStyle) {
+function drawArrowhead(ctx, can, locx, locy, angle, sizex, sizey, fillStyle) {
     var hx = sizex / 2;
     var hy = sizey / 2;
-ctx.translate((locx ), (locy));
-ctx.rotate(angle);
-ctx.translate(-hx,-hy);
+
+    ctx.translate((locx ), (locy));
+    ctx.rotate(angle);
+    ctx.translate(-hx,-hy);
 
     ctx.beginPath();
-   ctx.fillStyle = fillStyle;
+    ctx.fillStyle = fillStyle;
 
-ctx.moveTo(0,0);
-ctx.lineTo(0,1*sizey);    
-ctx.lineTo(1*sizex,1*hy);
-ctx.closePath();
-ctx.fill();
+    ctx.moveTo(0,0);
+    ctx.lineTo(0,1*sizey);    
+    ctx.lineTo(1*sizex,1*hy);
+    ctx.closePath();
+    ctx.fill();
 
-ctx.translate(hx,hy);
-ctx.rotate(-angle);
-ctx.translate(-locx,-locy);
+    ctx.translate(hx,hy);
+    ctx.rotate(-angle);
+    ctx.translate(-locx,-locy);
 }
     
 
@@ -30,20 +28,21 @@ function findAngle(sx, sy, ex, ey) {
     return Math.atan((ey - sy) / (ex - sx));
 }
 
-function drawArrowByXY(sx,sy,c1x,c1y,c2x,c2y, ex,ey, fillStyle)
+function drawArrowByXY(ctx, can, sx,sy,c1x,c1y,c2x,c2y, ex,ey, fillStyle, includeArrow)
 {
     ctx.beginPath();
     ctx.strokeStyle = fillStyle;
     ctx.moveTo(sx, sy);
     ctx.bezierCurveTo(c1x,c1y,c2x,c2y, ex, ey);
     ctx.stroke();
-
-    var ang = findAngle(c2x,c2y, ex, ey);
-    ctx.fillRect(ex, ey, 2, 2);
-    drawArrowhead(ex, ey, ang, 20, 20, fillStyle);
+    if (includeArrow == true){
+        var ang = findAngle(c2x,c2y, ex, ey);
+        ctx.fillRect(ex, ey, 2, 2);
+        drawArrowhead(ctx, can, ex, ey, ang, 20, 20, fillStyle);
+    }
 }
 
-function drawArrow(elm1, elm2, fillStyle){
+function drawArrow(ctx, can, elm1, elm2, fillStyle, includeArrow){
     var sx = elm1.offset().left;
     var sy = elm1.offset().top;
     var ex = elm2.offset().left;
@@ -51,46 +50,9 @@ function drawArrow(elm1, elm2, fillStyle){
     var c1x,c1y,c2x,c2y;
     var distance = 30;
 
-    if (sy < ey) {
-        sy = sy + elm1.outerHeight() - 10;
-        ey = ey - 10;
-        sx = sx + elm1.outerWidth()/2;
-        ex = ex + elm2.outerWidth()/2;
-
-        distance = (ey - sy)/2
-
-        if (distance < 100 ){
-            distance = 100;
-        }
-
-        c1x = sx;
-        c1y = sy + distance;
+    if (sx < ex) {
         
-        c2x = ex;
-        c2y = ey - distance;
-    }
-    else if (sy > ey) {
-        ey = ey + elm2.outerHeight();
-        
-        sx = sx + elm1.outerWidth()/2;
-        ex = ex + elm2.outerWidth()/2;
-        
-        distance = (sy - ey)/2
-
-        if (distance < 100 ){
-            distance = 100;
-        }
-
-        c1x = sx;
-        c1y = sy - distance;
-        
-        c2x = ex;
-        c2y = ey + distance;
-    }
-    else if (sx < ex) {
-        
-        sx = sx + elm1.outerWidth() - 10;
-        ex = ex - 10;
+        sx = sx + elm1.outerWidth();
         sy = sy + elm1.outerHeight()/2;
         ey = ey + elm2.outerHeight()/2;
         
@@ -125,19 +87,69 @@ function drawArrow(elm1, elm2, fillStyle){
         c2x = ex + distance;
         c2y = ey;
     }
+    else if (sy < ey) {
+        sy = sy + elm1.outerHeight();
+        sx = sx + elm1.outerWidth()/2;
+        ex = ex + elm2.outerWidth()/2;
 
-    drawArrowByXY(sx, sy ,c1x,c1y,c2x,c2y, ex ,ey, fillStyle);
+        distance = (ey - sy)/2
+
+        if (distance < 100 ){
+            distance = 100;
+        }
+
+        c1x = sx;
+        c1y = sy + distance;
+        
+        c2x = ex;
+        c2y = ey - distance;
+    }
+    else if (sy > ey) {
+        ey = ey + elm2.outerHeight();
+        
+        sx = sx + elm1.outerWidth()/2;
+        ex = ex + elm2.outerWidth()/2;
+        
+        distance = (sy - ey)/2
+
+        if (distance < 100 ){
+            distance = 100;
+        }
+
+        c1x = sx;
+        c1y = sy - distance;
+        
+        c2x = ex;
+        c2y = ey + distance;
+    }
+    
+
+    drawArrowByXY(ctx, can, sx, sy ,c1x,c1y,c2x,c2y, ex ,ey, fillStyle, includeArrow);
 }
 
 function clearRelations(){
+
+    var can = document.getElementById('canvas1');
+    var ctx = can.getContext('2d');
+    clearRelationsInternal(ctx, can);
+
+    var can1 = document.getElementById('canvas2');
+    var ctx1 = can.getContext('2d');
+    clearRelationsInternal(ctx1, can1);
+}
+
+function clearRelationsInternal(ctx, can){
+    can.width = $("table").width();
+    can.height = $("table").height();
     ctx.clearRect(0,0,can.width,can.height);
 }
     
 function drawRelations() {
     console.log("Drawing Relations");
-    can.width = $("table").width();
-    can.height = $("table").height();
-    clearRelations();
+    var can = document.getElementById('canvas1');
+    var ctx = can.getContext('2d');
+    
+    clearRelations(ctx, can);
     var pathslist = [];
     workItems.forEach(function(item1,index1) {
         if (item1.fields["System.WorkItemType"] == 'Task'){
@@ -156,7 +168,7 @@ function drawRelations() {
                         {
                             fillStyle = "red";
                         }
-                        drawArrow($("div[witId=" + item1.id + "]"), seccesorDiv,fillStyle);
+                        drawArrow(ctx, can, $("div[witId=" + item1.id + "]"), seccesorDiv,fillStyle, true);
                     }
                 }
             });

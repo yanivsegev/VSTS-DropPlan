@@ -61,7 +61,7 @@ function queryAndRenderWit(){
             
     // Query object containing the WIQL query
     var query = {
-        query: "SELECT [System.Id] FROM WorkItem WHERE [System.State] NOT IN ('Removed') AND [system.WorkItemType] IN ('Task', 'Product Backlog Item') AND [System.IterationPath] UNDER '" + currentIterationPath + "' "
+        query: "SELECT [System.Id] FROM WorkItem WHERE [System.State] NOT IN ('Removed') AND [System.IterationPath] UNDER '" + currentIterationPath + "' "
     };
     if (_teamValues.values.length > 0)
     {

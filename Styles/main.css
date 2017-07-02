@@ -138,7 +138,7 @@
     border-radius: 10px;
 }
 
-#canvas1 {
+canvas {
     z-index: 10;
     position: absolute;
     pointer-events: none;
@@ -153,4 +153,62 @@
 .rowHeaderSpace{
     background: white;
     height: 100%;
+}
+
+.tooltip {
+    display: inline-block;
+}
+
+/* Tooltip text */
+.tooltiptext {
+    visibility: hidden;
+    width: calc(100% - 13px);
+    
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 5px;
+    background: white;
+    
+    border-right: solid #c8c8c8;
+    border-top: solid #c8c8c8;
+    border-bottom: solid #c8c8c8;
+    
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 1s;
+    margin-top: -30px;
+    margin-right: 27px;
+
+    height: 23px;
+    display:flex;
+    
+}
+
+.tooltiptextPBI{
+    border-left: 6px solid rgb(0, 156, 204);
+}
+
+.tooltiptextBUG{
+    border-left: 6px solid rgb(204, 41, 61);
+}
+
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.pbiText{
+    flex-grow: 1;
+    height: 100%;
+    width: calc(100% - 100px);
+}
+
+.pbiState{
+    padding-top: 2px;
+    padding-right: 3px;
+    padding-left: 3px; 
 }

@@ -3,6 +3,7 @@ var workItems, startDate, endDate, container;
 var nameById = [];
 var _witToSave = [];
 
+
 function getColumns(startDate, stopDate) {
     var columnArray = new Array();
     columnArray.push({ text: "", date:"", index: 0 });
@@ -102,8 +103,10 @@ function process(isGMT){
                 if (task.Type == 1 && task.part == 0){ 
 
                     var parentId = getParentId(task.workItem);
+                    var parentWit = workItems.find(function(element){ return element.id == parentId; }); 
+                    var partnerWorktemId = workItems.indexOf(parentWit);
 
-                    result = result + "<div witId=" + task.workItem.id + " workItemId=" + task.id + " witParentId=" + parentId + " class='task ";
+                    result = result + "<div witId=" + task.workItem.id + " workItemId=" + task.id + " witParentId=" + parentId + " class='task tooltip ";
                     
                     if (task.endDate < new Date(new Date().yyyy_mm_dd() )) result = result + "taskOverDue "
                     
@@ -118,6 +121,21 @@ function process(isGMT){
                     result = result + "taskStart "; 
                     
                     result = result + "' style='width:" + (colWidth * task.total - 26 )  + "px'>";
+                    
+                    var tooltiptextcls = 'tooltiptextPBI';
+                    if (parentWit){
+                        if (parentWit.fields["System.WorkItemType"] == "Bug"){
+                            tooltiptextcls = 'tooltiptextBUG';
+                        }
+                    }
+                    
+                    result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + " workItemId=" + partnerWorktemId + ">";
+                    if (parentWit){
+                        result = result + "<div class='taskTitle pbiText'>" + parentWit.fields["System.Title"] + "</div><div class='pbiState'>" + parentWit.fields["System.State"] + "</div>";
+                    }else{
+                        result = result + "<div class='taskTitle pbiText'>Open PBI</div>";
+                    }
+                    result = result + "</div>";
                     result = result + "<div class='taskTitle'>" + task.workItem.fields["System.Title"] + "</div>";
                     result = result + "<div class='taskRemainingWork'>" + (task.workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || "") + "</div>";
                     result = result + "</div>";     
@@ -195,27 +213,39 @@ function attachEvents(){
     $(".taskStart").hover(function(In) 
     {
         var current = $(In.target).closest(".taskStart");
-        var witParentId = current.attr("witParentId");
-        $("div[witParentId=" + witParentId + "]").each(function(x,other) {
-            if (!current.is(other)) $(other).addClass("sameParent");
-        });
+        var can1 = document.getElementById('canvas2');
+        var ctx1 = can1.getContext('2d');
+        var fillStyle = "gray";
+                        
+        if (!current.find(".taskTitle").hasClass('noclick')) {
+            var witParentId = current.attr("witParentId");
+            $("div[witParentId=" + witParentId + "]").each(function(x,other) {
+                if (!current.is(other)) {
+                    $(other).addClass("sameParent");
+
+                    drawArrow(ctx1, can1, $(current), $(other),fillStyle, false);
+                }
+            });
+        }
     },
     function(Out) {
         $(".sameParent").removeClass("sameParent");
-        var current = $(Out.target).closest(".taskStart");
+            
+        var can1 = document.getElementById('canvas2');
+        var ctx1 = can1.getContext('2d');
+        clearRelationsInternal(ctx1, can1);
     });
 
 
     $( ".taskTitle" ).click(function() {
+        var witId = $(this).parent().attr("witId");
+            
         if ($(this).hasClass('noclick')) {
             $(this).removeClass('noclick');
         }
         else {
-            var workItemId = $(this).parent().attr("workItemId");
-            var workItem = workItems[workItemId];
-        
             _witServices.WorkItemFormNavigationService.getService().then(function (workItemNavSvc) {
-                workItemNavSvc.openWorkItem(workItem.id);
+                workItemNavSvc.openWorkItem(witId);
             });
         }
     });
@@ -225,8 +255,7 @@ function attachEvents(){
         opacity: 0.7, 
         containment: ".mainTable", 
         start: function(event, ui) {
-            $(this).find(".taskTitle").addClass('noclick');
-            clearRelations();
+            SetNoClick(this);
         },
         stop: function( event, ui ) {
             var changeDays = (Math.round((ui.position.left - ui.originalPosition.left)/colWidth) );
@@ -257,12 +286,16 @@ function attachEvents(){
             updateWorkItemInVSS(workItemId);
         }, 
         start: function(event, ui) {
-            $(this).find(".taskTitle").addClass('noclick');
-            clearRelations();
+            SetNoClick(this);
         },
     }); 
 }
 
+function SetNoClick(obj){
+    $(".sameParent").removeClass("sameParent");
+    $(obj).find(".taskTitle").addClass('noclick');
+    clearRelations();
+}
 
 
 function updateWorkItemDates(workItemId, changeStartDays, changeEndDays){
