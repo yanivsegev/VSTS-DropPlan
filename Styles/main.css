@@ -212,3 +212,9 @@ canvas {
     padding-right: 3px;
     padding-left: 3px; 
 }
+
+#canvas2{
+    opacity: 0;
+    transition: opacity 1s;
+
+}

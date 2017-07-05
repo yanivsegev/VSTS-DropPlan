@@ -129,13 +129,15 @@ function process(isGMT){
                         }
                     }
                     
-                    result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + " workItemId=" + partnerWorktemId + ">";
-                    if (parentWit){
-                        result = result + "<div class='taskTitle pbiText'>" + parentWit.fields["System.Title"] + "</div><div class='pbiState'>" + parentWit.fields["System.State"] + "</div>";
-                    }else{
-                        result = result + "<div class='taskTitle pbiText'>Open PBI</div>";
+                    if (parentId != -1){
+                        result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + " workItemId=" + partnerWorktemId + ">";
+                        if (parentWit){
+                            result = result + "<div class='taskTitle pbiText'>" + parentWit.fields["System.Title"] + "</div><div class='pbiState'>" + parentWit.fields["System.State"] + "</div>";
+                        }else{
+                            result = result + "<div class='taskTitle pbiText'>Open PBI</div>";
+                        }
+                        result = result + "</div>";
                     }
-                    result = result + "</div>";
                     result = result + "<div class='taskTitle'>" + task.workItem.fields["System.Title"] + "</div>";
                     result = result + "<div class='taskRemainingWork'>" + (task.workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || "") + "</div>";
                     result = result + "</div>";     
@@ -155,12 +157,14 @@ function process(isGMT){
 }
 
 function getParentId(workItem){
-    var parentId;
-    workItem.relations.forEach(function(item,index) { 
-        if (item.rel == "System.LinkTypes.Hierarchy-Reverse"){
-            parentId = item.url.substring(item.url.lastIndexOf("/") + 1)
-        }
-    })
+    var parentId = -1;
+    if (workItem.relations){
+        workItem.relations.forEach(function(item,index) { 
+            if (item.rel == "System.LinkTypes.Hierarchy-Reverse"){
+                parentId = item.url.substring(item.url.lastIndexOf("/") + 1)
+            }
+        });
+    }
     return parentId;
 }
 
@@ -219,13 +223,15 @@ function attachEvents(){
                         
         if (!current.find(".taskTitle").hasClass('noclick')) {
             var witParentId = current.attr("witParentId");
-            $("div[witParentId=" + witParentId + "]").each(function(x,other) {
-                if (!current.is(other)) {
-                    $(other).addClass("sameParent");
-
-                    drawArrow(ctx1, can1, $(current), $(other),fillStyle, false);
-                }
-            });
+            if (witParentId != -1){
+                $("div[witParentId=" + witParentId + "]").each(function(x,other) {
+                    if (!current.is(other)) {
+                        $(other).addClass("sameParent");
+                        can1.style.opacity = 1;
+                        drawArrow(ctx1, can1, $(current), $(other),fillStyle, false);
+                    }
+                });
+            }
         }
     },
     function(Out) {
@@ -233,6 +239,7 @@ function attachEvents(){
             
         var can1 = document.getElementById('canvas2');
         var ctx1 = can1.getContext('2d');
+        can1.style.opacity = 0;
         clearRelationsInternal(ctx1, can1);
     });
 
