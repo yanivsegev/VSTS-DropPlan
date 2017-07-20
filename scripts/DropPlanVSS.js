@@ -19,10 +19,13 @@ function BuildDropPlan()
         function (VSS_Service, TFS_Wit_WebApi, TFS_Work, TFS_Wit_Services) {
         try{
 
+            
+            loadThemes();
+
             console.log("VSS loaded.");
 
             var context = VSS.getWebContext();
-            var workClient = TFS_Work.getClient()
+            var workClient = TFS_Work.getClient();
             var teamContext = { projectId: context.project.id, teamId: context.team.id, project: "", team: "" }; 
             
             _witServices = TFS_Wit_Services;

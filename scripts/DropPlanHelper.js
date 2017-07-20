@@ -139,7 +139,10 @@ function process(isGMT){
                         result = result + "</div>";
                     }
                     result = result + "<div class='taskTitle'>" + task.workItem.fields["System.Title"] + "</div>";
-                    result = result + "<div class='taskRemainingWork'>" + (task.workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || "") + "</div>";
+
+                    var remain = (task.workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || "");
+                    if (remain != "") result = result + "<div class='taskRemainingWork'>" + remain + "</div>";
+
                     result = result + "</div>";     
                 }
                 
@@ -407,6 +410,7 @@ function getTable(workItems, startDate, endDate, isGMT){
             }
 
             if (witStartDate < startDate) witStartDate = startDate;
+            if (witStartDate > endDate) witStartDate = endDate;
             if (witEndDate > endDate) witEndDate = endDate;
             if (witEndDate < witStartDate) witEndDate = witStartDate;
 

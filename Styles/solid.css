@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css?family=Fresca|Indie+Flower');
+
+.taskStart{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border: 1px solid lightgray;
+    border-radius: 10px;
+}
+
+
+.tooltiptext{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border: 2px solid #73AD21;
+    border-radius: 10px;
+
+}
+
+.taskRemainingWork{
+    font-family: 'Indie Flower', cursive;
+    font-size: 120%;
+    border-radius: 50%;
+    background:lightblue;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.taskBlocked{
+    background:white;
+}
+
+
+.taskBlocked:after{
+    font-size: 110%;
+    content: "Blocked !";
+    position:absolute;
+    top:5px;
+    right:-5px;
+    padding-left:8px;
+    padding-right:8px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background:orange;
+    transform: rotate(25deg);
+}
+
+.taskOverDue {
+    background: rgb(255, 121, 121);
+}
+
+.taskDone{
+    background:lightgreen;
+}
+
+
+.sameParent{
+    background: bisque;
+}
+

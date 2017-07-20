@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css?family=Fresca|Indie+Flower');
+
+.taskTdDiv{
+    background: rgba(255, 255, 255,0.6);
+}
+
+.taskTrContent:nth-child(2){
+    background: orange;
+}
+
+.taskTrContent:nth-child(4){
+    background: lightblue;
+}
+
+.taskTrContent:nth-child(6){
+    background: lightskyblue;
+}
+
+.taskTrContent:nth-child(8){
+    background: lightseagreen;
+}
+
+.taskTrContent:nth-child(10){
+    background: lightsalmon;
+}
+
+.taskTrContent:nth-child(12){
+    background: lightslategrey;
+}
+
+.taskTrContent:nth-child(14){
+    background: lightblue;
+}
+
+.taskTrContent:nth-child(16){
+    background: lightskyblue;
+}
+
+.taskTrContent:nth-child(18){
+    background: lightseagreen;
+}
+
+.taskTrContent:nth-child(20){
+    background: lightsalmon;
+}
+
+.taskTrContent:nth-child(22){
+    background: lightslategrey;
+}
+
+.taskTrContent:nth-child(24){
+    background: lightblue;
+}
+
+.taskTrContent:nth-child(26){
+    background: lightskyblue;
+}
+
+.taskTrContent:nth-child(28){
+    background: lightseagreen;
+}
+
+.taskTrContent:nth-child(30){
+    background: lightsalmon;
+}
+
+.taskTrContent:nth-child(32){
+    background: lightslategrey;
+}
+
+.taskStart{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    
+}
+
+.taskTitle{
+    font-family: 'Fresca', sans-serif;
+    font-size: 120%;
+    text-align: center;  
+}
+
+.tooltiptext{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border: 2px solid #73AD21;
+    border-radius: 10px;
+
+}
+
+.taskRemainingWork{
+    font-family: 'Indie Flower', cursive;
+    font-size: 120%;
+    border-radius: 50%;
+    background:lightblue;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.taskBlocked{
+    background:white;
+}
+
+
+.taskBlocked:after{
+    font-size: 110%;
+    content: "Blocked !";
+    position:absolute;
+    top:5px;
+    right:-5px;
+    padding-left:8px;
+    padding-right:8px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background:orange;
+    transform: rotate(25deg);
+}
+
+.taskOverDue {
+    background: rgb(255, 121, 121);
+}
+
+.taskDone{
+    background:white;
+}
+
+
+.taskDone:after{
+    font-size: 150%;
+    text-align:center;
+    content: "Done";
+    position:absolute;
+    bottom:5px;
+    right:-5px;
+    width:70%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background:lightgreen;
+    transform: rotate(-5deg);
+}
+
+
+.sameParent{
+    background: bisque;
+}
+
+.taskToday{
+   background: rgba(250,0,0,0.3)
+}
+
+.taskToday.taskDayOff{
+    background:repeating-linear-gradient(  15deg,  #dadada,  #fff4ce 10px,  #fff4ce 10px,  #dadada 20px)
+}
+.taskDayOff{
+    background:repeating-linear-gradient(  15deg,  rgba(50,0,0,0.3),  rgba(0,0,0,0.0) 10px,  rgba(50,0,0,0.3) 10px,  rgba(0,0,0,0.0) 20px)
+}

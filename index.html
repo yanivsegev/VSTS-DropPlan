@@ -6,7 +6,7 @@
     <link href="styles/main.css" rel="stylesheet"></link>
     <link href="styles/jquery-ui.css" rel="stylesheet" type="text/css" />
 
-	<script src="scripts/Promise.js"></script>
+    <script src="scripts/Promise.js"></script>
     <script src="scripts/jquery-1.12.1.min.js"></script>
     <script src="scripts/jquery-ui.min.js"></script> 
     <script src="scripts/VSS.SDK.min.js"></script>    
@@ -16,7 +16,6 @@
 	<script src="scripts/DropPlanHelper.js"></script>
     <script src="scripts/DropPlanVSS.js"></script>
     
-
 </head>
 
 <body class='mainBody'>
@@ -25,8 +24,19 @@
     <div id="grid-container" >   
 		<h1>Please wait while loading data ...</h1>
     </div>
+    
+    <br/>
+    
+    <div>
+    Theme: 
+    <select id='themes' onchange="changeTheme(this.options[this.selectedIndex].value)">
+        <option value="">Classic</option>
+        <option value="styles/fun.css">Colorful</option>
+        <option value="styles/solid.css">Solid</option>
+    </select> 
+    </div>
 </body>
 <script src="scripts/arrows.js"></script>
-    
-<!-- v3 -->
+<script src="scripts/themes.js"></script>
+
 </html>
