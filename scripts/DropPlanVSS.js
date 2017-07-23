@@ -148,12 +148,15 @@ function processWorkItems(workItems, isGMT) {
     VSS.notifyLoadSucceeded();
 }
 
-function updateWorkItemInVSS(workItemIdhtml)
+function pushWitToSave(workItemIdhtml)
 {
     if (_witToSave.indexOf(parseInt(workItemIdhtml)) === -1){
         _witToSave.push(parseInt(workItemIdhtml));
     }
+}
 
+function updateWorkItemInVSS()
+{
     VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient"], 
         function (VSS_Service, TFS_Wit_WebApi, TFS_Work, TFS_Wit_Services) {
         _witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
@@ -176,7 +179,22 @@ function updateWorkItemInVSS(workItemIdhtml)
                 "op": "add",
                 "path": "/fields/System.AssignedTo",
                 "value": workItem.fields["System.AssignedTo"] || ""
-            }]
+            }];
+
+            if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]){
+                wijson = 
+                [{
+                "op": "remove",
+                "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
+                "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
+                },
+                {
+                "op": "remove",
+                "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
+                "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                }];
+            }
+
             promises.push(_witClient.updateWorkItem(wijson, workItem.id));
         });
         

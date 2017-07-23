@@ -116,6 +116,7 @@ function process(isGMT){
                     
                     switch(task.workItem.fields["System.State"]) {
                         case "Done": result = result + "taskDone "; break;
+                        case "Closed": result = result + "taskDone "; break;
                     }
 
                     result = result + "taskStart "; 
@@ -271,7 +272,7 @@ function attachEvents(){
             var changeDays = (Math.round((ui.position.left - ui.originalPosition.left)/colWidth) );
             var workItemId = ui.helper.attr("workItemId");
             updateWorkItemDates(workItemId, changeDays, changeDays);
-            updateWorkItemInVSS(workItemId);
+            updateWorkItemInVSS();
         }
     }));
 
@@ -279,7 +280,7 @@ function attachEvents(){
         drop: function( event, ui ) {
             var assignedTo = nameById[$(this).closest('tr')[0].cells[0].attributes["assignedtoid"].value].Name;
             var workItemId = ui.draggable.attr("workItemId");
-            updateWorkItemAssignTo(workItemId, assignedTo)
+            updateWorkItemAssignTo(workItemId, assignedTo);
         }
     });
 
@@ -311,17 +312,28 @@ function SetNoClick(obj){
 function updateWorkItemDates(workItemId, changeStartDays, changeEndDays){
     var workItem = workItems[workItemId];
     
-    workItem.fields["Microsoft.VSTS.Scheduling.StartDate"] = 
-        new Date(workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]).addDays(changeStartDays).yyyy_mm_dd();
+    if (workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]){
+        workItem.fields["Microsoft.VSTS.Scheduling.StartDate"] = 
+            new Date(workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]).addDays(changeStartDays).yyyy_mm_dd();
 
-    workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = 
-        new Date(workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]).addDays(changeEndDays).yyyy_mm_dd();
+        workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = 
+            new Date(workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]).addDays(changeEndDays).yyyy_mm_dd();
 
- 
+        if (changeStartDays != 0 || changeEndDays != 0)
+        {
+            pushWitToSave(workItemId);
+        }
+    }
 }
 
 function updateWorkItemAssignTo(workItemId, assignedTo){
     var workItem = workItems[workItemId];
+    
+    if (workItem.fields["System.AssignedTo"] != assignedTo)
+    {
+        pushWitToSave(workItemId);
+    }
+    
     workItem.fields["System.AssignedTo"] = assignedTo;
 
 }
@@ -373,7 +385,7 @@ function getTable(workItems, startDate, endDate, isGMT){
             }
             
             if (!isGMT) witStartDate = witStartDate.getGMT();
-
+            
             var witEndDate = null;
 
             if (!workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"])
@@ -408,7 +420,7 @@ function getTable(workItems, startDate, endDate, isGMT){
             if (witChanged){
                _witToSave.push(i);
             }
-
+            
             if (witStartDate < startDate) witStartDate = startDate;
             if (witStartDate > endDate) witStartDate = endDate;
             if (witEndDate > endDate) witEndDate = endDate;
@@ -416,7 +428,7 @@ function getTable(workItems, startDate, endDate, isGMT){
 
             workItem.fields["Microsoft.VSTS.Scheduling.StartDate"] = witStartDate.yyyy_mm_dd();
             workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = witEndDate.yyyy_mm_dd();
-
+            
     
 
             if (witStartDate >= startDate && witEndDate <= endDate)
@@ -433,12 +445,12 @@ function getTable(workItems, startDate, endDate, isGMT){
                         var date = dates[colIndex].yyyymmdd();
                         if (personRow[date].length > selectedRow){
                             if (personRow[date][selectedRow].Type != 0) {
-                            found = false;
+                                found = false;
                             }
                         }
                     }    
                 }
-
+                    
                 for (var colIndex = 0; colIndex < globalDates.length; colIndex++){
                     var date = globalDates[colIndex].yyyymmdd();
                     personDateCell = personRow[date];
