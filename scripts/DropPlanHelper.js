@@ -121,7 +121,24 @@ function process(isGMT){
 
                     result = result + "taskStart "; 
                     
-                    result = result + "' style='width:" + (colWidth * task.total - 26 )  + "px'>";
+                    result = result + "' style='width:" + (colWidth * task.total - 26 )  + "px;";
+
+                    var title = task.workItem.fields["System.Title"];
+                    var desc = task.workItem.fields["System.Description"];
+                    try {
+                        if (desc && desc.includes("DropPlanJson ")){
+                            var decodeDesc = $("<div>" + desc + "</div>")[0].innerText;
+                            var json = JSON.parse(decodeDesc.substring(decodeDesc.indexOf("DropPlanJson ") + 13));
+                            if (json.img){
+                                result = result + "background-image: url(" + json.img + ");";    
+                            }
+                            if (json.showTitle == "0"){
+                                title = "";
+                            }
+                        }
+                    } catch (error) {}
+
+                    result = result + "'>";
                     
                     var tooltiptextcls = 'tooltiptextPBI';
                     if (parentWit){
@@ -139,10 +156,13 @@ function process(isGMT){
                         }
                         result = result + "</div>";
                     }
-                    result = result + "<div class='taskTitle'>" + task.workItem.fields["System.Title"] + "</div>";
+
+                    result = result + "<div class='taskTitle'>" + title + "</div>";
 
                     var remain = (task.workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || "");
                     if (remain != "") result = result + "<div class='taskRemainingWork'>" + remain + "</div>";
+
+                    
 
                     result = result + "</div>";     
                 }

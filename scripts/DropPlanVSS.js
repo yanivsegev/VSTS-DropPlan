@@ -8,13 +8,20 @@ var _witServices;
 var _iterationId;
 var _teamValues;
 
+console.log("Stating."); 
+
 VSS.init({
     explicitNotifyLoaded: true,
     usePlatformScripts: true
 });
 
+VSS.ready(function () {
+            VSS.register(VSS.getContribution().id, {});
+});
+
 function BuildDropPlan()
 {
+    
     VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient", "TFS/WorkItemTracking/Services"],
         function (VSS_Service, TFS_Wit_WebApi, TFS_Work, TFS_Wit_Services) {
         try{
