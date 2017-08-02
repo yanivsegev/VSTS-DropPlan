@@ -44,14 +44,20 @@
     
     <br/>
     
-    <div>
-    Theme: 
-    <select id='themes' onchange="changeTheme(this.options[this.selectedIndex].value)">
-        <option value="">Classic</option>
-        <option value="styles/fun.css">Colorful</option>
-        <option value="styles/solid.css">Solid</option>
-    </select> 
-    </div>
+    <span id="options" style="display:none; margin-left: 10px;">
+        <div>
+        Theme: 
+        <select id='themes' onchange="changeTheme(this.options[this.selectedIndex].value)">
+            <option value="">Classic</option>
+            <option value="styles/fun.css">Colorful</option>
+            <option value="styles/solid.css">Solid</option>
+        </select> 
+        </div>
+        <div>
+            <input type="button" onclick="ResetTasks();" value="Rearrange tasks" style="margin-left: 10px;"/>
+        </div>
+    </span>
+
 </body>
 <script src="scripts/arrows.js"></script>
 <script src="scripts/themes.js"></script>

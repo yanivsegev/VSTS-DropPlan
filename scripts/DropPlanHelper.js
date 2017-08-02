@@ -29,10 +29,16 @@ function setData(Icontainer, IworkItems, IstartDate, IendDate){
                 var parentIdb = getParentId(b);
                 var pa = null,pb = null;
 
-                IworkItems.forEach(function(item,index) { 
-                    if (item.id == parentIda) pa = item.fields["Microsoft.VSTS.Common.BacklogPriority"] || 0;
-                    if (item.id == parentIdb) pb = item.fields["Microsoft.VSTS.Common.BacklogPriority"] || 0;
-                });
+                if (parentIda == parentIdb)
+                {
+                    pa = a.fields["Microsoft.VSTS.Common.BacklogPriority"] || 0;
+                    pb = b.fields["Microsoft.VSTS.Common.BacklogPriority"] || 0;
+                }else{
+                    IworkItems.forEach(function(item,index) { 
+                        if (item.id == parentIda) pa = item.fields["Microsoft.VSTS.Common.BacklogPriority"] || 0;
+                        if (item.id == parentIdb) pb = item.fields["Microsoft.VSTS.Common.BacklogPriority"] || 0;
+                    });
+                }
 
                 if ( (pa || 0) != 0 && (pb || 0) != 0 )
                 {
@@ -394,11 +400,14 @@ function getTable(workItems, startDate, endDate, isGMT){
                 witChanged = true;
                 globalDates.forEach(function(item, index) {
                     var tasksPerDay = names[assignedTo].days[item.yyyymmdd()] || 0;
-                    if (tasksPerDay < capacity && !witStartDate){
+                    if (tasksPerDay < capacity && !witStartDate && !isDayOff(assignedTo, item.yyyymmdd(), item.getDay())){
                         witStartDate = item.getGMT();
                     }
                 });
                 
+                if (!witStartDate) {
+                    witStartDate = globalDates[globalDates.length-1];
+                }
                 //witStartDate = startDate.addDays(getFirstAvailableDate(names[assignedTo].days, remainingWork, globalDates));
             }else{
                 witStartDate = new Date(workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]);
@@ -415,7 +424,8 @@ function getTable(workItems, startDate, endDate, isGMT){
                 var dates = getDates(witStartDate, endDate);
                 dates.forEach(function(item, index) {
                     var tasksPerDay = names[assignedTo].days[item.yyyymmdd()] || 0;
-                    if (tasksPerDay < capacity && !witEndDate){
+                    
+                    if (tasksPerDay < capacity && !isDayOff(assignedTo, item.yyyymmdd(), item.getDay()) && !witEndDate){
 
                         var todayPart = remainingWorkLeft;
                         if (tasksPerDay + todayPart > capacity){
@@ -428,6 +438,11 @@ function getTable(workItems, startDate, endDate, isGMT){
                         }
                     }
                 });
+
+                
+                if (!witEndDate) {
+                    witEndDate = globalDates[globalDates.length-1];
+                }
 
             }
             else
@@ -480,13 +495,15 @@ function getTable(workItems, startDate, endDate, isGMT){
                 for (var colIndex = 0; colIndex < dates.length; colIndex++){
                     var date = dates[colIndex].yyyymmdd();
 
-                    var todayTasks = (names[assignedTo].days[date] || 0);
-                    var todayPart = remainingWork;
-                    if (todayTasks + remainingWork > capacity){
-                        todayPart = capacity - todayTasks;
+                    if (!isDayOff(assignedTo, dates[colIndex].yyyymmdd(), dates[colIndex].getDay())) {
+                        var todayTasks = (names[assignedTo].days[date] || 0);
+                        var todayPart = remainingWork;
+                        if (todayTasks + remainingWork > capacity){
+                            todayPart = capacity - todayTasks;
+                        }
+                        remainingWork = remainingWork - todayPart;
+                        names[assignedTo].days[date] = todayTasks + todayPart;
                     }
-                    remainingWork = remainingWork - todayPart;
-                    names[assignedTo].days[date] = todayTasks + todayPart;
 
                     personDateCell = personRow[date];
                     personDateCell[selectedRow] = {Type:1, part: colIndex, total: dates.length, workItem:workItem, id:i, endDate: dates[dates.length - 1]};

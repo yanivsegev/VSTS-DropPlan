@@ -152,6 +152,8 @@ function processWorkItems(workItems, isGMT) {
 
     TableLock("tasksTable", "row_class_name", "column_class_name", "locked_class_name");
 
+    $("#options").css("display","flex");
+
     VSS.notifyLoadSucceeded();
 }
 
@@ -212,6 +214,18 @@ function updateWorkItemInVSS()
         }, failToCallVss);
 
     }, failToCallVss);
+}
+
+function ResetTasks(){
+
+    if (confirm("Are you sure you want to rearrange all tasks?")){
+        workItems.forEach(function(item,index) {
+            item.fields["Microsoft.VSTS.Scheduling.FinishDate"] = undefined;
+            item.fields["Microsoft.VSTS.Scheduling.StartDate"] = undefined;
+            pushWitToSave(index);
+        });
+        processWorkItems(workItems, true);
+    }
 }
 
 function failToCallVss() {
