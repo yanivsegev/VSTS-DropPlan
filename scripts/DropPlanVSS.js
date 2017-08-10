@@ -8,6 +8,7 @@ var _witServices;
 var _iterationId;
 var _teamValues;
 
+
 console.log("Stating."); 
 
 VSS.init({
@@ -25,10 +26,6 @@ function BuildDropPlan()
     VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient", "TFS/WorkItemTracking/Services"],
         function (VSS_Service, TFS_Wit_WebApi, TFS_Work, TFS_Wit_Services) {
         try{
-
-            
-            loadThemes();
-
             console.log("VSS loaded.");
 
             var context = VSS.getWebContext();
@@ -45,7 +42,8 @@ function BuildDropPlan()
                 workClient.getTeamSettings(teamContext),
                 workClient.getCapacities(teamContext, _iterationId),
                 workClient.getTeamIteration(teamContext, _iterationId),
-                workClient.getTeamFieldValues(teamContext)
+                workClient.getTeamFieldValues(teamContext),
+                VSS.getService(VSS.ServiceIds.ExtensionData)
             ]).then(function(values) {
 
                 console.log("Team data loaded.");
@@ -55,7 +53,11 @@ function BuildDropPlan()
                 _teamMemberCapacities = values[2];
                 _iteration = values[3];
                 _teamValues = values[4];
+                _dataService = values[5];
+                
                 queryAndRenderWit();
+                loadThemes();
+                
             }, failToCallVss);
         }
         catch (e) {
@@ -133,6 +135,11 @@ function queryAndRenderWit(){
 
 }
 
+function refreshPlan(){
+    $("#refreshPlanBtn").css('opacity','0');
+    queryAndRenderWit();
+}
+
 function processAllWorkItems(values){
 
     var merged = [].concat.apply([], values);
@@ -166,54 +173,49 @@ function pushWitToSave(workItemIdhtml)
 
 function updateWorkItemInVSS()
 {
-    VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient"], 
-        function (VSS_Service, TFS_Wit_WebApi, TFS_Work, TFS_Wit_Services) {
-        _witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
+    var promises = [];
+    _witToSave.forEach(function(item,index) {
+        var workItem = workItems[item];
+        var wijson = 
+        [{
+            "op": "add",
+            "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
+            "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
+            },
+            {
+            "op": "add",
+            "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
+            "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+            },
+            {
+            "op": "add",
+            "path": "/fields/System.AssignedTo",
+            "value": workItem.fields["System.AssignedTo"] || ""
+        }];
 
-        var promises = [];
-        _witToSave.forEach(function(item,index) {
-            var workItem = workItems[item];
-            var wijson = 
+        if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]){
+            wijson = 
             [{
-                "op": "add",
-                "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-                "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
-                },
-                {
-                "op": "add",
-                "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-                "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
-                },
-                {
-                "op": "add",
-                "path": "/fields/System.AssignedTo",
-                "value": workItem.fields["System.AssignedTo"] || ""
+            "op": "remove",
+            "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
+            "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
+            },
+            {
+            "op": "remove",
+            "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
+            "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
             }];
+        }
 
-            if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]){
-                wijson = 
-                [{
-                "op": "remove",
-                "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-                "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
-                },
-                {
-                "op": "remove",
-                "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-                "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
-                }];
-            }
-
-            promises.push(_witClient.updateWorkItem(wijson, workItem.id));
-        });
-        
-        processWorkItems(workItems, true);
-        _witToSave = [];
-        Promise.all(promises).then(function(x) {
-                queryAndRenderWit();
-        }, failToCallVss);
-
+        promises.push(_witClient.updateWorkItem(wijson, workItem.id));
+    });
+    
+    processWorkItems(workItems, true);
+    _witToSave = [];
+    Promise.all(promises).then(function(x) {
+            queryAndRenderWit();
     }, failToCallVss);
+
 }
 
 function ResetTasks(){

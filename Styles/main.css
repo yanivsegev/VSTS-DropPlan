@@ -218,3 +218,52 @@ canvas {
     transition: opacity 1s;
 
 }
+
+
+.refreshPlanBtn{
+
+    -webkit-animation: fadein 5s; /* Safari, Chrome and Opera > 12.1 */
+       -moz-animation: fadein 5s; /* Firefox < 16 */
+        -ms-animation: fadein 5s; /* Internet Explorer */
+         -o-animation: fadein 5s; /* Opera < 12.1 */
+            animation: fadein 5s;
+}
+
+@keyframes fadein {
+    0% { opacity: 0;    }
+    49% {        opacity: 0;    }
+    50% {        opacity: 1;    }
+    100% {        opacity: 1;    }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+    0% { opacity: 0;    }
+    49% {        opacity: 0;    }
+    50% {        opacity: 1;    }
+    100% {        opacity: 1;    }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+    0% { opacity: 0;    }
+    49% {        opacity: 0;    }
+    50% {        opacity: 1;    }
+    100% {        opacity: 1;    }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+    0% { opacity: 0;    }
+    49% {        opacity: 0;    }
+    50% {        opacity: 1;    }
+    100% {        opacity: 1;    }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadein {
+    0% { opacity: 0;    }
+    49% {        opacity: 0;    }
+    50% {        opacity: 1;    }
+    100% {        opacity: 1;    }
+}

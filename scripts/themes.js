@@ -1,22 +1,16 @@
+var _dataService;
+
 function SetValueInExtensionDataPerUser(key, value){
-    // Get data service
-    VSS.getService(VSS.ServiceIds.ExtensionData).then(function(dataService) {
-        // Set value in user scope
-        dataService.setValue(key, value, {scopeType: "User"});
-    });
+    _dataService.setValue(key, value, {scopeType: "User"});
 }
 
 function GetValueInExtensionDataPerUser(key){
     var res;
-    // Get data service
-    VSS.getService(VSS.ServiceIds.ExtensionData).then(function(dataService) {
-        // Get value in user scope
-        dataService.getValue(key, {scopeType: "User"}).then(function(c) {
-            if (c != "") {
-                $("#themes").val(c);
-                changeTheme(c);
-            }
-        });
+    _dataService.getValue(key, {scopeType: "User"}).then(function(c) {
+        if (c != "") {
+            $("#themes").val(c);
+            changeTheme(c);
+        }
     });
     return res;
 }
@@ -25,8 +19,7 @@ function GetValueInExtensionDataPerUser(key){
 
 function loadThemes()
 {
-    var c = GetValueInExtensionDataPerUser("DropPlanTheme");
-   
+    GetValueInExtensionDataPerUser("DropPlanTheme");
 }
 
 function changeTheme(css){

@@ -4,6 +4,27 @@ var nameById = [];
 var _witToSave = [];
 
 
+
+
+window.addEventListener("message", receiveMessage, false);
+
+function receiveMessage(event)
+{
+    try {
+        var result = JSON.parse(event.data);
+        if (result.result.fields){
+            console.log("Refresh."); 
+            queryAndRenderWit();
+        }
+
+    } catch (error) {
+        
+    }
+}
+
+
+
+
 function getColumns(startDate, stopDate) {
     var columnArray = new Array();
     columnArray.push({ text: "", date:"", index: 0 });
@@ -68,7 +89,7 @@ function process(isGMT){
     
 
     var result = "<table id='tasksTable' class='mainTable' cellpadding='0' cellspacing='0'><thead><tr>";
-    result = result + "<td class='locked_class_name'><div class='taskColumn assignToColumn rowHeaderSpace'></div></td>"
+    result = result + "<td class='locked_class_name'><div class='taskColumn assignToColumn rowHeaderSpace'><button class='refreshPlanBtn' onclick='refreshPlan();'>Refresh Plan</button></div></td>"
     
     for (var colIndex = 1; colIndex < cols.length; colIndex++){
         result = result + "<td class='column_class_name'><div class='taskColumn' style='width:" + colWidth + "px'>" +  cols[colIndex].text + "<br>" + cols[colIndex].date + "</div></td>";
@@ -136,7 +157,7 @@ function process(isGMT){
                             var decodeDesc = $("<div>" + desc + "</div>")[0].innerText;
                             var json = JSON.parse(decodeDesc.substring(decodeDesc.indexOf("DropPlanJson ") + 13));
                             if (json.img){
-                                result = result + "background-image: url(" + json.img + ");";    
+                                result = result + "background-image: url(" + json.img + "); background-size:100% 100%;";    
                             }
                             if (json.showTitle == "0"){
                                 title = "";
@@ -391,7 +412,7 @@ function getTable(workItems, startDate, endDate, isGMT){
             personRow.assignedToId = names[assignedTo].id;
 
             var witStartDate = null;
-            var remainingWork = workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"];
+            var remainingWork = workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || 0;
             var capacity = getCapacity(name);
             var witChanged = false;
 
