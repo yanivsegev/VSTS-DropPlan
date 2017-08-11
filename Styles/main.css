@@ -267,3 +267,7 @@ canvas {
     50% {        opacity: 1;    }
     100% {        opacity: 1;    }
 }
+
+.taskChanged {
+    z-index: 2000;
+}

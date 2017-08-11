@@ -143,10 +143,10 @@ function refreshPlan(){
 function processAllWorkItems(values){
 
     var merged = [].concat.apply([], values);
-    processWorkItems(merged);
+    processWorkItems(merged, false, true);
 
 }
-function processWorkItems(workItems, isGMT) {
+function processWorkItems(workItems, isGMT, allowChangeEvents) {
     
     console.log("Work items data loaded.");
         
@@ -154,7 +154,7 @@ function processWorkItems(workItems, isGMT) {
     setData(t, workItems, _iteration.attributes.startDate, _iteration.attributes.finishDate);
 
     process(isGMT);
-    attachEvents();
+    attachEvents(allowChangeEvents);
     drawRelations();
 
     TableLock("tasksTable", "row_class_name", "column_class_name", "locked_class_name");
@@ -210,7 +210,7 @@ function updateWorkItemInVSS()
         promises.push(_witClient.updateWorkItem(wijson, workItem.id));
     });
     
-    processWorkItems(workItems, true);
+    processWorkItems(workItems, true, false);
     _witToSave = [];
     Promise.all(promises).then(function(x) {
             queryAndRenderWit();
@@ -226,7 +226,7 @@ function ResetTasks(){
             item.fields["Microsoft.VSTS.Scheduling.StartDate"] = undefined;
             pushWitToSave(index);
         });
-        processWorkItems(workItems, true);
+        processWorkItems(workItems, true, true);
     }
 }
 

@@ -263,7 +263,7 @@ function getMemberImage(name){
     return img;
 }
 
-function attachEvents(){
+function attachEvents(allowChangeEvents){
 
     $(".taskStart").hover(function(In) 
     {
@@ -308,51 +308,55 @@ function attachEvents(){
         }
     });
 
+    if (allowChangeEvents){
+        $( ".taskStart" ).draggable(({
+            opacity: 0.7, 
+            containment: ".mainTable", 
+            cancel: ".taskChanged",
+            start: function(event, ui) {
+                SetNoClick(this);
+            },
+            stop: function( event, ui ) {
+                var changeDays = (Math.round((ui.position.left - ui.originalPosition.left)/colWidth) );
+                var workItemId = ui.helper.attr("workItemId");
+                updateWorkItemDates(workItemId, changeDays, changeDays);
+                updateWorkItemInVSS();
+            }
+        }));
 
-    $( ".taskStart" ).draggable(({
-        opacity: 0.7, 
-        containment: ".mainTable", 
-        start: function(event, ui) {
-            SetNoClick(this);
-        },
-        stop: function( event, ui ) {
-            var changeDays = (Math.round((ui.position.left - ui.originalPosition.left)/colWidth) );
-            var workItemId = ui.helper.attr("workItemId");
-            updateWorkItemDates(workItemId, changeDays, changeDays);
-            updateWorkItemInVSS();
-        }
-    }));
-
-    $( ".taskTrContent" ).droppable({
-        drop: function( event, ui ) {
-            var assignedTo = nameById[$(this).closest('tr')[0].cells[0].attributes["assignedtoid"].value].Name;
-            var workItemId = ui.draggable.attr("workItemId");
-            updateWorkItemAssignTo(workItemId, assignedTo);
-        }
-    });
+        $( ".taskTrContent" ).droppable({
+            drop: function( event, ui ) {
+                var assignedTo = nameById[$(this).closest('tr')[0].cells[0].attributes["assignedtoid"].value].Name;
+                var workItemId = ui.draggable.attr("workItemId");
+                updateWorkItemAssignTo(workItemId, assignedTo);
+            }
+        });
 
     
-    $( ".taskStart" ).resizable({
-        grid: colWidth,
-        containment: ".mainTable",
-        minWidth: 60,
-        handles: 'e', 
-        stop: function( event, ui ) { 
-            var workItemId = ui.element.attr("workItemId");
-            var changeDays = (Math.round((ui.size.width - ui.originalSize.width)/colWidth) );
-            updateWorkItemDates(workItemId, 0, changeDays);
-            updateWorkItemInVSS(workItemId);
-        }, 
-        start: function(event, ui) {
-            SetNoClick(this);
-        },
-    }); 
+        $( ".taskStart" ).resizable({
+            grid: colWidth,
+            containment: ".mainTable",
+            minWidth: 60,
+            handles: 'e', 
+            cancel: ".taskChanged",
+            stop: function( event, ui ) { 
+                var workItemId = ui.element.attr("workItemId");
+                var changeDays = (Math.round((ui.size.width - ui.originalSize.width)/colWidth) );
+                updateWorkItemDates(workItemId, 0, changeDays);
+                updateWorkItemInVSS(workItemId);
+            }, 
+            start: function(event, ui) {
+                SetNoClick(this);
+            },
+        }); 
+    }
 }
 
 function SetNoClick(obj){
     $(".sameParent").removeClass("sameParent");
     $(obj).find(".taskTitle").addClass('noclick');
     clearRelations();
+    $(obj).addClass("taskChanged");
 }
 
 
