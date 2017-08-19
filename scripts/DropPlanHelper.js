@@ -85,6 +85,7 @@ function setData(Icontainer, IworkItems, IstartDate, IendDate){
 }
 
 function process(isGMT){
+    console.log("Rendering");
     var cols = getColumns(startDate, endDate);
     
 
@@ -111,7 +112,6 @@ function process(isGMT){
             result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><div class='assignedToName'>Unassigned</div></div></td>";
         }
 
-
         for (var dateIndex = 0; dateIndex < dates.length; dateIndex++){
             var date = dates[dateIndex].yyyymmdd();
             var day = dates[dateIndex].getDay();
@@ -124,86 +124,81 @@ function process(isGMT){
         
             for (var taskIndex = 0; taskIndex < personDateCell.length; taskIndex++){
                 var task = personDateCell[taskIndex];
-                
                 result = result + "<div class='taskDiv'>";
 
                 if (task.Type == 1 && task.part == 0){ 
-
-                    var parentId = getParentId(task.workItem);
-                    var parentWit = workItems.find(function(element){ return element.id == parentId; }); 
-                    var partnerWorktemId = workItems.indexOf(parentWit);
-
-                    result = result + "<div witId=" + task.workItem.id + " workItemId=" + task.id + " witParentId=" + parentId + " class='task tooltip ";
-                    
-                    if (task.endDate < new Date(new Date().yyyy_mm_dd() )) result = result + "taskOverDue "
-                    
-                    switch(task.workItem.fields["Microsoft.VSTS.CMMI.Blocked"]) {
-                        case "Yes": result = result + "taskBlocked "; break;
-                    }
-                    
-                    switch(task.workItem.fields["System.State"]) {
-                        case "Done": result = result + "taskDone "; break;
-                        case "Closed": result = result + "taskDone "; break;
-                    }
-
-                    result = result + "taskStart "; 
-                    
-                    result = result + "' style='width:" + (colWidth * task.total - 26 )  + "px;";
-
-                    var title = task.workItem.fields["System.Title"];
-                    var desc = task.workItem.fields["System.Description"];
-                    try {
-                        if (desc && desc.includes("DropPlanJson ")){
-                            var decodeDesc = $("<div>" + desc + "</div>")[0].innerText;
-                            var json = JSON.parse(decodeDesc.substring(decodeDesc.indexOf("DropPlanJson ") + 13));
-                            if (json.img){
-                                result = result + "background-image: url(" + json.img + "); background-size:100% 100%;";    
-                            }
-                            if (json.showTitle == "0"){
-                                title = "";
-                            }
-                        }
-                    } catch (error) {}
-
-                    result = result + "'>";
-                    
-                    var tooltiptextcls = 'tooltiptextPBI';
-                    if (parentWit){
-                        if (parentWit.fields["System.WorkItemType"] == "Bug"){
-                            tooltiptextcls = 'tooltiptextBUG';
-                        }
-                    }
-                    
-                    if (parentId != -1){
-                        result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + " workItemId=" + partnerWorktemId + ">";
-                        if (parentWit){
-                            result = result + "<div class='taskTitle pbiText'><span class='openWit'>" + parentWit.fields["System.Title"] + "</div><div class='pbiState'>" + parentWit.fields["System.State"] + "</span></div>";
-                        }else{
-                            result = result + "<div class='taskTitle pbiText'><span class='openWit'>Open PBI</span></div>";
-                        }
-                        result = result + "</div>";
-                    }
-
-                    result = result + "<div class='taskTitle'><span class='openWit'>" + title + "</span></div>";
-
-                    var remain = (task.workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || "");
-                    if (remain != "") result = result + "<div class='taskRemainingWork'>" + remain + "</div>";
-
-                    
-
-                    result = result + "</div>";     
+                var parentId = getParentId(task.workItem);
+                var parentWit = jQuery.grep( workItems, function(element){ return element.id == parentId; })[0]; 
+                var partnerWorktemId = workItems.indexOf(parentWit);
+                result = result + "<div witId=" + task.workItem.id + " workItemId=" + task.id + " witParentId=" + parentId + " class='task tooltip ";
+                
+                if (task.endDate < new Date(new Date().yyyy_mm_dd() )) result = result + "taskOverDue "
+                
+                switch(task.workItem.fields["Microsoft.VSTS.CMMI.Blocked"]) {
+                    case "Yes": result = result + "taskBlocked "; break;
                 }
                 
-                result = result + "</div>";
+                switch(task.workItem.fields["System.State"]) {
+                    case "Done": result = result + "taskDone "; break;
+                    case "Closed": result = result + "taskDone "; break;
+                }
+
+                result = result + "taskStart "; 
                 
+                result = result + "' style='width:" + (colWidth * task.total - 26 )  + "px;";
+
+                var title = task.workItem.fields["System.Title"];
+                var desc = task.workItem.fields["System.Description"];
+                try {
+                    if (desc && desc.includes("DropPlanJson ")){
+                        var decodeDesc = $("<div>" + desc + "</div>")[0].innerText;
+                        var json = JSON.parse(decodeDesc.substring(decodeDesc.indexOf("DropPlanJson ") + 13));
+                        if (json.img){
+                            result = result + "background-image: url(" + json.img + "); background-size:100% 100%;";    
+                        }
+                        if (json.showTitle == "0"){
+                            title = "";
+                        }
+                    }
+                } catch (error) {}
+
+                result = result + "'>";
+                
+                var tooltiptextcls = 'tooltiptextPBI';
+                if (parentWit){
+                    if (parentWit.fields["System.WorkItemType"] == "Bug"){
+                        tooltiptextcls = 'tooltiptextBUG';
+                    }
+                }
+                if (parentId != -1){
+                    result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + " workItemId=" + partnerWorktemId + ">";
+                    if (parentWit){
+                        result = result + "<div class='taskTitle pbiText'><span class='openWit'>" + parentWit.fields["System.Title"] + "</div><div class='pbiState'>" + parentWit.fields["System.State"] + "</span></div>";
+                    }else{
+                        result = result + "<div class='taskTitle pbiText'><span class='openWit'>Open PBI</span></div>";
+                    }
+                    result = result + "</div>";
+                }
+
+                result = result + "<div class='taskTitle'><span class='openWit'>" + title + "</span></div>";
+
+                var remain = (task.workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || "");
+                if (remain != "") result = result + "<div class='taskRemainingWork'>" + remain + "</div>";
+
+                
+
+                result = result + "</div>";     
             }
-            result = result + "</div></td>";
-        }    
-        result = result + "</tr>";
-    }
+                
+            result = result + "</div>";
+            
+        }
+        result = result + "</div></td>";
+    }    
+    result = result + "</tr>";
+}
 
-    result = result + "</tbody></table>";
-
+result = result + "</tbody></table>";
     container.innerHTML = result;
 }
 
@@ -250,7 +245,7 @@ function isDayOff(name, date, day){
 
     if (isDayInRange(_daysOff.daysOff, date)) dayOff = true;
 
-    if (!_teamSettings.workingDays.includes(day)) dayOff = true;
+    if ($.inArray(day,_teamSettings.workingDays) == -1) dayOff = true;
 
     return dayOff;
 }
@@ -292,7 +287,7 @@ function DrawRelations(current){
 }
 
 function attachEvents(allowChangeEvents){
-
+    console.log("Attach events")
     $(".taskStart").hover(function(In) 
     {
         if (!$(".activeTask")[0]){
