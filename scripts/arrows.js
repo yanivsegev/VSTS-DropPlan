@@ -142,7 +142,8 @@ function clearRelationsInternal(ctx, can){
     can.width = $("table").width();
     can.height = $("table").height();
 
-    console.log("Drawing Relations");    ctx.clearRect(0,0,can.width,can.height);
+    console.log("Drawing Relations (" +  (performance.now() - t0) + " ms.)" ); 
+     ctx.clearRect(0,0,can.width,can.height);
 }
     
 function drawRelations() {

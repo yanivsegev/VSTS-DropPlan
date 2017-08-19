@@ -33,13 +33,13 @@ function getColumns(startDate, stopDate) {
 
     for (var colIndex = 0; colIndex < dates.length; colIndex++){
         var day = dates[colIndex].getDay();
-        columnArray.push({ text: days[day], date:dates[colIndex].mmdd(), index: colIndex+1 });
+        columnArray.push({ text: days[day], date: dates[colIndex].toLocaleDateString(), index: colIndex+1 });
     }
     return columnArray;
 }
 
 function setData(Icontainer, IworkItems, IstartDate, IendDate){
-    console.log("Setup items");
+    console.log("Setup items (" +  (performance.now() - t0) + " ms.)" ); 
     workItems = IworkItems.sort(function (a, b) {
         
         if (a.fields["System.WorkItemType"] == 'Task' && 
@@ -85,7 +85,7 @@ function setData(Icontainer, IworkItems, IstartDate, IendDate){
 }
 
 function process(isGMT){
-    console.log("Rendering");
+    console.log("Rendering. (" +  (performance.now() - t0) + " ms.)" ); 
     var cols = getColumns(startDate, endDate);
     
 

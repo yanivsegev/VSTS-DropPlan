@@ -7,149 +7,144 @@ var _projectId;
 var _witServices;
 var _iterationId;
 var _teamValues;
+var t0 = performance.now();
 
-
-console.log("Stating."); 
-
-VSS.init({
-    explicitNotifyLoaded: true,
-    usePlatformScripts: true
-});
-
-VSS.ready(function () {
-            VSS.register(VSS.getContribution().id, {});
-});
-
-function BuildDropPlan()
-{
+function BuildDropPlan() {
+    console.log("Stating. (" + (performance.now() - t0) + " ms.)");
+    
+    VSS.init({
+        explicitNotifyLoaded: true,
+        usePlatformScripts: false,
+        usePlatformStyles: true
+    });
+    
+    VSS.ready(function () {
+        VSS.register(VSS.getContribution().id, {});
+    });
+    
+    console.log("VSS init. (" + (performance.now() - t0) + " ms.)");
     
     VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient", "TFS/WorkItemTracking/Services"],
         function (VSS_Service, TFS_Wit_WebApi, TFS_Work, TFS_Wit_Services) {
-        try{
-            console.log("VSS loaded.");
+            try {
+                console.log("VSS loaded. (" + (performance.now() - t0) + " ms.)");
 
-            var context = VSS.getWebContext();
-            var workClient = TFS_Work.getClient();
-            var teamContext = { projectId: context.project.id, teamId: context.team.id, project: "", team: "" }; 
-            
-            _witServices = TFS_Wit_Services;
-            _iterationId = VSS.getConfiguration().iterationId;
-            _projectId = context.project.id;
-            _witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
+                var context = VSS.getWebContext();
+                var workClient = TFS_Work.getClient();
+                var teamContext = { projectId: context.project.id, teamId: context.team.id, project: "", team: "" };
 
-            var serverAnswer = Promise.all([
-                workClient.getTeamDaysOff(teamContext, _iterationId),
-                workClient.getTeamSettings(teamContext),
-                workClient.getCapacities(teamContext, _iterationId),
-                workClient.getTeamIteration(teamContext, _iterationId),
-                workClient.getTeamFieldValues(teamContext),
-                VSS.getService(VSS.ServiceIds.ExtensionData)
-            ]).then(function(values) {
+                _witServices = TFS_Wit_Services;
+                _iterationId = VSS.getConfiguration().iterationId;
+                _projectId = context.project.id;
+                _witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
 
-                console.log("Team data loaded.");
-            
-                _daysOff = values[0];
-                _teamSettings = values[1];
-                _teamMemberCapacities = values[2];
-                _iteration = values[3];
-                _teamValues = values[4];
-                _dataService = values[5];
-                
-                queryAndRenderWit();
-                loadThemes();
-                
-            }, failToCallVss);
-        }
-        catch (e) {
-            $("#grid-container")[0].innerHTML = "<h1>Browser is not supported.</h1>";
-            VSS.notifyLoadSucceeded();
-        }
-    });
+                var serverAnswer = Promise.all([
+                    workClient.getTeamDaysOff(teamContext, _iterationId),
+                    workClient.getTeamSettings(teamContext),
+                    workClient.getCapacities(teamContext, _iterationId),
+                    workClient.getTeamIteration(teamContext, _iterationId),
+                    workClient.getTeamFieldValues(teamContext),
+                    VSS.getService(VSS.ServiceIds.ExtensionData)
+                ]).then(function (values) {
+
+                    console.log("Team data loaded. (" + (performance.now() - t0) + " ms.)");
+
+                    _daysOff = values[0];
+                    _teamSettings = values[1];
+                    _teamMemberCapacities = values[2];
+                    _iteration = values[3];
+                    _teamValues = values[4];
+                    _dataService = values[5];
+
+                    queryAndRenderWit();
+                    loadThemes();
+
+                }, failToCallVss);
+            }
+            catch (e) {
+                console.log(e);
+                $("#grid-container")[0].innerHTML = "<h1>Browser is not supported.</h1>";
+                VSS.notifyLoadFailed();
+            }
+        });
 }
 
-function queryAndRenderWit(){
+function queryAndRenderWit() {
 
     var currentIterationPath = _iteration.path;
-            
+
     // Query object containing the WIQL query
     var query = {
         query: "SELECT [System.Id] FROM WorkItem WHERE [System.State] NOT IN ('Removed') AND [System.IterationPath] UNDER '" + currentIterationPath + "' "
     };
-    if (_teamValues.values.length > 0)
-    {
+    if (_teamValues.values.length > 0) {
         query.query = query.query + " AND (";
-        $.each(_teamValues.values, function (index, item){
-            if (index > 0){
+        $.each(_teamValues.values, function (index, item) {
+            if (index > 0) {
                 query.query = query.query + " OR ";
-            } 
+            }
             query.query = query.query + "[" + _teamValues.field.referenceName + "] ";
-            if (item.includeChildren == true)
-            {
+            if (item.includeChildren == true) {
                 query.query = query.query + "UNDER";
             }
-            else
-            {
+            else {
                 query.query = query.query + "=";
             }
 
             query.query = query.query + " '" + item.value + "'";
         });
-        
+
         query.query = query.query + " )";
     }
     // Executes the WIQL query against the active project
     _witClient.queryByWiql(query, _projectId).then(
-    function (result) {
+        function (result) {
 
-        console.log("Iteration data loaded.");
-        
-        //console.log("queryByWiql loaded");
-        // Generate an array of all open work item ID's
-        var openWorkItems = result.workItems.map(function (wi) { return wi.id });
+            console.log("Iteration data loaded. (" + (performance.now() - t0) + " ms.)");
 
-        var container = document.getElementById("grid-container");
-        if (openWorkItems == 0)
-        {
-            container.innerHTML = 'No items found';
-            VSS.notifyLoadSucceeded();
-        }
-        else if (!_iteration.attributes.startDate || !_iteration.attributes.finishDate)
-        {
-            container.innerHTML = 'Please set iteration dates';
-            VSS.notifyLoadSucceeded();
-        }
-        else
-        {
-            var start = 0;
-            var end = 0;
-            var getWorkItemsPromises = [];
-            while (end < openWorkItems.length){
-                end = start + 200;
-                getWorkItemsPromises.push(_witClient.getWorkItems(openWorkItems.slice(start,end), undefined, undefined, 1));
-                start = end;
+            // Generate an array of all open work item ID's
+            var openWorkItems = result.workItems.map(function (wi) { return wi.id });
+
+            var container = document.getElementById("grid-container");
+            if (openWorkItems == 0) {
+                container.innerHTML = 'No items found';
+                VSS.notifyLoadSucceeded();
             }
-            Promise.all(getWorkItemsPromises).then( processAllWorkItems, failToCallVss );
-        }
+            else if (!_iteration.attributes.startDate || !_iteration.attributes.finishDate) {
+                container.innerHTML = 'Please set iteration dates';
+                VSS.notifyLoadSucceeded();
+            }
+            else {
+                var start = 0;
+                var end = 0;
+                var getWorkItemsPromises = [];
+                while (end < openWorkItems.length) {
+                    end = start + 200;
+                    getWorkItemsPromises.push(_witClient.getWorkItems(openWorkItems.slice(start, end), undefined, undefined, 1));
+                    start = end;
+                }
+                Promise.all(getWorkItemsPromises).then(processAllWorkItems, failToCallVss);
+            }
 
-    }, failToCallVss);
+        }, failToCallVss);
 
 }
 
-function refreshPlan(){
-    $("#refreshPlanBtn").css('opacity','0');
+function refreshPlan() {
+    $("#refreshPlanBtn").css('opacity', '0');
     queryAndRenderWit();
 }
 
-function processAllWorkItems(values){
+function processAllWorkItems(values) {
 
     var merged = [].concat.apply([], values);
     processWorkItems(merged, false, true);
 
 }
 function processWorkItems(workItems, isGMT, allowChangeEvents) {
-    
-    console.log("Work items data loaded.");
-        
+
+    console.log("Work items data loaded. (" + (performance.now() - t0) + " ms.)");
+
     var t = document.getElementById("grid-container");
     setData(t, workItems, _iteration.attributes.startDate, _iteration.attributes.finishDate);
 
@@ -159,56 +154,54 @@ function processWorkItems(workItems, isGMT, allowChangeEvents) {
 
     TableLock("tasksTable", "row_class_name", "column_class_name", "locked_class_name");
 
-    $("#options").css("display","flex");
+    $("#options").css("display", "flex");
 
-    if ($('.taskToday')[0]){
-        $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width()/2);
+    if ($('.taskToday')[0]) {
+        $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width() / 2);
     }
     VSS.notifyLoadSucceeded();
 }
 
-function pushWitToSave(workItemIdhtml)
-{
-    if (_witToSave.indexOf(parseInt(workItemIdhtml)) === -1){
+function pushWitToSave(workItemIdhtml) {
+    if (_witToSave.indexOf(parseInt(workItemIdhtml)) === -1) {
         _witToSave.push(parseInt(workItemIdhtml));
     }
 }
 
-function updateWorkItemInVSS()
-{
-    if (_witToSave.length>0){
+function updateWorkItemInVSS() {
+    if (_witToSave.length > 0) {
         var promises = [];
-        _witToSave.forEach(function(item,index) {
+        _witToSave.forEach(function (item, index) {
             var workItem = workItems[item];
-            var wijson = 
-            [{
-                "op": "add",
-                "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-                "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
-                },
-                {
-                "op": "add",
-                "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-                "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
-                },
-                {
-                "op": "add",
-                "path": "/fields/System.AssignedTo",
-                "value": workItem.fields["System.AssignedTo"] || ""
-            }];
-
-            if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]){
-                wijson = 
+            var wijson =
                 [{
-                "op": "remove",
-                "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-                "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
+                    "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
                 },
                 {
-                "op": "remove",
-                "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-                "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
+                    "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                },
+                {
+                    "op": "add",
+                    "path": "/fields/System.AssignedTo",
+                    "value": workItem.fields["System.AssignedTo"] || ""
                 }];
+
+            if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]) {
+                wijson =
+                    [{
+                        "op": "remove",
+                        "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
+                        "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
+                    },
+                    {
+                        "op": "remove",
+                        "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
+                        "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                    }];
             }
 
             promises.push(_witClient.updateWorkItem(wijson, workItem.id));
@@ -216,21 +209,21 @@ function updateWorkItemInVSS()
     }
 
     processWorkItems(workItems, true, false);
-    
-    if (_witToSave.length>0){
+
+    if (_witToSave.length > 0) {
         _witToSave = [];
-        Promise.all(promises).then(function(x) {
-                queryAndRenderWit();
+        Promise.all(promises).then(function (x) {
+            queryAndRenderWit();
         }, failToCallVss);
     }
 }
 
-function ResetTasks(){
+function ResetTasks() {
 
-    if (confirm("Are you sure you want to rearrange all tasks?")){
+    if (confirm("Are you sure you want to rearrange all tasks?")) {
         console.log("Reset Tasks")
-        workItems.forEach(function(item,index) {
-            if (item.fields["System.WorkItemType"] == 'Task'){
+        workItems.forEach(function (item, index) {
+            if (item.fields["System.WorkItemType"] == 'Task') {
                 item.fields["Microsoft.VSTS.Scheduling.FinishDate"] = undefined;
                 item.fields["Microsoft.VSTS.Scheduling.StartDate"] = undefined;
                 pushWitToSave(index);
