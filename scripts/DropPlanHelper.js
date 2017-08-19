@@ -177,14 +177,14 @@ function process(isGMT){
                     if (parentId != -1){
                         result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + " workItemId=" + partnerWorktemId + ">";
                         if (parentWit){
-                            result = result + "<div class='taskTitle pbiText'>" + parentWit.fields["System.Title"] + "</div><div class='pbiState'>" + parentWit.fields["System.State"] + "</div>";
+                            result = result + "<div class='taskTitle pbiText'><span class='openWit'>" + parentWit.fields["System.Title"] + "</div><div class='pbiState'>" + parentWit.fields["System.State"] + "</span></div>";
                         }else{
-                            result = result + "<div class='taskTitle pbiText'>Open PBI</div>";
+                            result = result + "<div class='taskTitle pbiText'><span class='openWit'>Open PBI</span></div>";
                         }
                         result = result + "</div>";
                     }
 
-                    result = result + "<div class='taskTitle'>" + title + "</div>";
+                    result = result + "<div class='taskTitle'><span class='openWit'>" + title + "</span></div>";
 
                     var remain = (task.workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || "");
                     if (remain != "") result = result + "<div class='taskRemainingWork'>" + remain + "</div>";
@@ -263,43 +263,72 @@ function getMemberImage(name){
     return img;
 }
 
+function ResetRelations(){
+    $(".sameParent").removeClass("sameParent");
+            
+    var can1 = document.getElementById('canvas2');
+    var ctx1 = can1.getContext('2d');
+    can1.style.opacity = 0;
+    clearRelationsInternal(ctx1, can1);
+}
+
+function DrawRelations(current){
+    var can1 = document.getElementById('canvas2');
+    var ctx1 = can1.getContext('2d');
+    var fillStyle = "gray";
+                    
+    if (!current.find(".taskTitle").hasClass('noclick')) {
+        var witParentId = current.attr("witParentId");
+        if (witParentId != -1){
+            $("div[witParentId=" + witParentId + "]").each(function(x,other) {
+                if (!current.is(other)) {
+                    $(other).addClass("sameParent");
+                    can1.style.opacity = 1;
+                    drawArrow(ctx1, can1, $(current), $(other),fillStyle, false);
+                }
+            });
+        }
+    }
+}
+
 function attachEvents(allowChangeEvents){
 
     $(".taskStart").hover(function(In) 
     {
-        var current = $(In.target).closest(".taskStart");
-        var can1 = document.getElementById('canvas2');
-        var ctx1 = can1.getContext('2d');
-        var fillStyle = "gray";
-                        
-        if (!current.find(".taskTitle").hasClass('noclick')) {
-            var witParentId = current.attr("witParentId");
-            if (witParentId != -1){
-                $("div[witParentId=" + witParentId + "]").each(function(x,other) {
-                    if (!current.is(other)) {
-                        $(other).addClass("sameParent");
-                        can1.style.opacity = 1;
-                        drawArrow(ctx1, can1, $(current), $(other),fillStyle, false);
-                    }
-                });
-            }
+        if (!$(".activeTask")[0]){
+            var current = $(In.target).closest(".taskStart");
+            DrawRelations(current);
         }
     },
     function(Out) {
-        $(".sameParent").removeClass("sameParent");
-            
-        var can1 = document.getElementById('canvas2');
-        var ctx1 = can1.getContext('2d');
-        can1.style.opacity = 0;
-        clearRelationsInternal(ctx1, can1);
+        if (!$(".activeTask")[0]){
+            ResetRelations();
+        }
+    });
+
+    
+    $("body").click(function() {
+        ResetRelations();
+        $(".activeTask").removeClass("activeTask");
     });
 
 
-    $( ".taskTitle" ).click(function() {
-        var witId = $(this).parent().attr("witId");
+    $(".taskStart").click(function(event) {
+        event.stopPropagation();
+        ResetRelations();
+        $(this).toggleClass("activeTask");
+        $(".activeTask").not($(this)).removeClass("activeTask");
+        if ($(this).hasClass("activeTask")){
+            DrawRelations($(this));
+        }
+    });
+
+    $( ".openWit" ).click(function(event) {
+        event.stopPropagation();
+        var witId = $(this).parent().parent().attr("witId");
             
-        if ($(this).hasClass('noclick')) {
-            $(this).removeClass('noclick');
+        if ($(this).parent().hasClass('noclick')) {
+            $(this).parent().removeClass('noclick');
         }
         else {
             _witServices.WorkItemFormNavigationService.getService().then(function (workItemNavSvc) {

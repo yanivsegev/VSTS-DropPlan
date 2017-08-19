@@ -60,7 +60,7 @@
     padding-top: 2px;
 }
 
-.taskTitle:hover{
+.openWit:hover{
     text-decoration: underline;
     cursor:pointer;
 }
@@ -270,4 +270,11 @@ canvas {
 
 .taskChanged {
     z-index: 2000;
+}
+
+.activeTask{
+    border-left: 6px solid red;
+    border-right: solid red;
+    border-top: solid red;
+    border-bottom: solid red;
 }

@@ -54,3 +54,6 @@
     background: bisque;
 }
 
+.activeTask{
+    border: 1px solid red;
+}

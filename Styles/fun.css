@@ -152,3 +152,7 @@
 .taskDayOff{
     background:repeating-linear-gradient(  15deg,  rgba(50,0,0,0.3),  rgba(0,0,0,0.0) 10px,  rgba(50,0,0,0.3) 10px,  rgba(0,0,0,0.0) 20px)
 }
+
+.activeTask{
+    border: 1px solid red;
+}
