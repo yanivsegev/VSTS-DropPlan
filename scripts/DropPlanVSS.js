@@ -173,64 +173,72 @@ function pushWitToSave(workItemIdhtml)
 
 function updateWorkItemInVSS()
 {
-    var promises = [];
-    _witToSave.forEach(function(item,index) {
-        var workItem = workItems[item];
-        var wijson = 
-        [{
-            "op": "add",
-            "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-            "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
-            },
-            {
-            "op": "add",
-            "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-            "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
-            },
-            {
-            "op": "add",
-            "path": "/fields/System.AssignedTo",
-            "value": workItem.fields["System.AssignedTo"] || ""
-        }];
-
-        if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]){
-            wijson = 
+    if (_witToSave.length>0){
+        var promises = [];
+        _witToSave.forEach(function(item,index) {
+            var workItem = workItems[item];
+            var wijson = 
             [{
-            "op": "remove",
-            "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-            "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
-            },
-            {
-            "op": "remove",
-            "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-            "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                "op": "add",
+                "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
+                "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
+                },
+                {
+                "op": "add",
+                "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
+                "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                },
+                {
+                "op": "add",
+                "path": "/fields/System.AssignedTo",
+                "value": workItem.fields["System.AssignedTo"] || ""
             }];
-        }
 
-        promises.push(_witClient.updateWorkItem(wijson, workItem.id));
-    });
-    
+            if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]){
+                wijson = 
+                [{
+                "op": "remove",
+                "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
+                "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
+                },
+                {
+                "op": "remove",
+                "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
+                "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                }];
+            }
+
+            promises.push(_witClient.updateWorkItem(wijson, workItem.id));
+        });
+    }
+
     processWorkItems(workItems, true, false);
-    _witToSave = [];
-    Promise.all(promises).then(function(x) {
-            queryAndRenderWit();
-    }, failToCallVss);
-
+    
+    if (_witToSave.length>0){
+        _witToSave = [];
+        Promise.all(promises).then(function(x) {
+                queryAndRenderWit();
+        }, failToCallVss);
+    }
 }
 
 function ResetTasks(){
 
     if (confirm("Are you sure you want to rearrange all tasks?")){
+        console.log("Reset Tasks")
         workItems.forEach(function(item,index) {
-            item.fields["Microsoft.VSTS.Scheduling.FinishDate"] = undefined;
-            item.fields["Microsoft.VSTS.Scheduling.StartDate"] = undefined;
-            pushWitToSave(index);
+            if (item.fields["System.WorkItemType"] == 'Task'){
+                item.fields["Microsoft.VSTS.Scheduling.FinishDate"] = undefined;
+                item.fields["Microsoft.VSTS.Scheduling.StartDate"] = undefined;
+                pushWitToSave(index);
+            }
         });
         processWorkItems(workItems, true, true);
     }
 }
 
 function failToCallVss() {
+    console.log("Call to server failed! please refresh the page.")
     alert("Call to server failed! please refresh the page.");
 }
 

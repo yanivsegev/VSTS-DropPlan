@@ -141,11 +141,11 @@ function clearRelations(){
 function clearRelationsInternal(ctx, can){
     can.width = $("table").width();
     can.height = $("table").height();
-    ctx.clearRect(0,0,can.width,can.height);
+
+    console.log("Drawing Relations");    ctx.clearRect(0,0,can.width,can.height);
 }
     
 function drawRelations() {
-    console.log("Drawing Relations");
     var can = document.getElementById('canvas1');
     var ctx = can.getContext('2d');
     

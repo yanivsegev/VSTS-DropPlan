@@ -343,7 +343,7 @@ function attachEvents(allowChangeEvents){
                 var workItemId = ui.element.attr("workItemId");
                 var changeDays = (Math.round((ui.size.width - ui.originalSize.width)/colWidth) );
                 updateWorkItemDates(workItemId, 0, changeDays);
-                updateWorkItemInVSS(workItemId);
+                updateWorkItemInVSS();
             }, 
             start: function(event, ui) {
                 SetNoClick(this);
@@ -364,14 +364,14 @@ function updateWorkItemDates(workItemId, changeStartDays, changeEndDays){
     var workItem = workItems[workItemId];
     
     if (workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]){
-        workItem.fields["Microsoft.VSTS.Scheduling.StartDate"] = 
-            new Date(workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]).addDays(changeStartDays).yyyy_mm_dd();
-
-        workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = 
-            new Date(workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]).addDays(changeEndDays).yyyy_mm_dd();
-
         if (changeStartDays != 0 || changeEndDays != 0)
         {
+            workItem.fields["Microsoft.VSTS.Scheduling.StartDate"] = 
+                new Date(workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]).addDays(changeStartDays).yyyy_mm_dd();
+
+            workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = 
+                new Date(workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]).addDays(changeEndDays).yyyy_mm_dd();
+
             pushWitToSave(workItemId);
         }
     }
@@ -383,10 +383,8 @@ function updateWorkItemAssignTo(workItemId, assignedTo){
     if (workItem.fields["System.AssignedTo"] != assignedTo)
     {
         pushWitToSave(workItemId);
+        workItem.fields["System.AssignedTo"] = assignedTo;
     }
-    
-    workItem.fields["System.AssignedTo"] = assignedTo;
-
 }
 
 function getTable(workItems, startDate, endDate, isGMT){
@@ -478,7 +476,7 @@ function getTable(workItems, startDate, endDate, isGMT){
             }
             
             if (witChanged){
-               _witToSave.push(i);
+               pushWitToSave(i);
             }
             
             if (witStartDate < startDate) witStartDate = startDate;
