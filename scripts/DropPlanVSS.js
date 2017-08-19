@@ -161,6 +161,9 @@ function processWorkItems(workItems, isGMT, allowChangeEvents) {
 
     $("#options").css("display","flex");
 
+    if ($('.taskToday')[0]){
+        $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width()/2);
+    }
     VSS.notifyLoadSucceeded();
 }
 
@@ -243,3 +246,4 @@ function failToCallVss() {
 }
 
 BuildDropPlan();
+
