@@ -106,12 +106,13 @@ function queryAndRenderWit() {
             var openWorkItems = result.workItems.map(function (wi) { return wi.id });
 
             var container = document.getElementById("grid-container");
-            if (openWorkItems == 0) {
-                container.innerHTML = 'No items found';
+
+            if (openWorkItems.length == 0) {
+                container.innerHTML = '<h1>No items found.</h1>';
                 VSS.notifyLoadSucceeded();
             }
             else if (!_iteration.attributes.startDate || !_iteration.attributes.finishDate) {
-                container.innerHTML = 'Please set iteration dates';
+                container.innerHTML = '<h1>Please set iteration dates</h1>';
                 VSS.notifyLoadSucceeded();
             }
             else {
@@ -138,7 +139,16 @@ function refreshPlan() {
 function processAllWorkItems(values) {
 
     var merged = [].concat.apply([], values);
-    processWorkItems(merged, false, true);
+    var tasks = jQuery.grep(merged, function( elm, i ) { return elm.fields["System.WorkItemType"] == 'Task'; });
+
+    if (tasks.length == 0) {
+        var container = document.getElementById("grid-container");
+        container.innerHTML = '<h1>No items of type "Task" found.</h1>';
+        VSS.notifyLoadSucceeded();
+    }
+    else{
+        processWorkItems(merged, false, true);
+    }
 
 }
 function processWorkItems(workItems, isGMT, allowChangeEvents) {
