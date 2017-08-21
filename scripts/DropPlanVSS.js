@@ -108,11 +108,11 @@ function queryAndRenderWit() {
             var container = document.getElementById("grid-container");
 
             if (openWorkItems.length == 0) {
-                container.innerHTML = '<h1>No items found.</h1>';
+                container.innerHTML = '<h1>No work items found.</h1>';
                 VSS.notifyLoadSucceeded();
             }
             else if (!_iteration.attributes.startDate || !_iteration.attributes.finishDate) {
-                container.innerHTML = '<h1>Please set iteration dates</h1>';
+                container.innerHTML = '<h1>Please set iteration dates.</h1>';
                 VSS.notifyLoadSucceeded();
             }
             else {
@@ -143,7 +143,7 @@ function processAllWorkItems(values) {
 
     if (tasks.length == 0) {
         var container = document.getElementById("grid-container");
-        container.innerHTML = '<h1>No items of type "Task" found.</h1>';
+        container.innerHTML = '<h1>No work items of type "Task" found.</h1>';
         VSS.notifyLoadSucceeded();
     }
     else{

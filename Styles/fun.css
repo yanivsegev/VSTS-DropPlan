@@ -156,3 +156,8 @@
 .activeTask{
     border: 1px solid red;
 }
+
+
+.taskStart:before {
+     background:transparent;
+}
