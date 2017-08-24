@@ -42,8 +42,7 @@ function setData(Icontainer, IworkItems, IstartDate, IendDate){
     console.log("Setup items (" +  (performance.now() - t0) + " ms.)" ); 
     workItems = IworkItems.sort(function (a, b) {
         
-        if (a.fields["System.WorkItemType"] == 'Task' && 
-            b.fields["System.WorkItemType"] == 'Task'){
+        if (isTaskWit(a) && isTaskWit(b)){
             
             if (!a.fields["Microsoft.VSTS.Scheduling.StartDate"] && !b.fields["Microsoft.VSTS.Scheduling.StartDate"]){
                 var parentIda = getParentId(a);
@@ -77,7 +76,6 @@ function setData(Icontainer, IworkItems, IstartDate, IendDate){
         return a.id - b.id;
     });
 
-    //workItems.forEach(function(item,index) { console.log(item.fields["System.WorkItemType"] + "(" + item.id + ")" + item.fields["System.Title"] + " " + item.fields["Microsoft.VSTS.Scheduling.StartDate"]) });
 
     startDate = IstartDate.getGMT();
     endDate = IendDate.getGMT();
@@ -421,7 +419,7 @@ function getTable(workItems, startDate, endDate, isGMT){
         var workItem = workItems[i];
         var assignedTo = workItem.fields["System.AssignedTo"] || "";
         
-        if (workItem.fields["System.WorkItemType"] == 'Task')
+        if (isTaskWit(workItem))
         {
             if (!names[assignedTo]) {
                 names[assignedTo] = {id:result.length, days: []};

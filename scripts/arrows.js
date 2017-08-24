@@ -153,7 +153,7 @@ function drawRelations() {
     clearRelations(ctx, can);
     var pathslist = [];
     workItems.forEach(function(item1,index1) {
-        if (item1.fields["System.WorkItemType"] == 'Task' && item1.relations){
+        if (isTaskWit(item1) && item1.relations){
 
             item1.relations.forEach(function(item,index) { 
                 if (item.rel == "System.LinkTypes.Dependency-Forward"){

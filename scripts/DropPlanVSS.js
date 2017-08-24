@@ -7,6 +7,7 @@ var _projectId;
 var _witServices;
 var _iterationId;
 var _teamValues;
+var _backlogConfigurations;
 var t0 = performance.now();
 
 function BuildDropPlan() {
@@ -37,14 +38,15 @@ function BuildDropPlan() {
                 _iterationId = VSS.getConfiguration().iterationId;
                 _projectId = context.project.id;
                 _witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
-
+                
                 var serverAnswer = Promise.all([
                     workClient.getTeamDaysOff(teamContext, _iterationId),
                     workClient.getTeamSettings(teamContext),
                     workClient.getCapacities(teamContext, _iterationId),
                     workClient.getTeamIteration(teamContext, _iterationId),
                     workClient.getTeamFieldValues(teamContext),
-                    VSS.getService(VSS.ServiceIds.ExtensionData)
+                    VSS.getService(VSS.ServiceIds.ExtensionData),
+                    workClient.getBacklogConfigurations(teamContext)
                 ]).then(function (values) {
 
                     console.log("Team data loaded. (" + (performance.now() - t0) + " ms.)");
@@ -55,6 +57,7 @@ function BuildDropPlan() {
                     _iteration = values[3];
                     _teamValues = values[4];
                     _dataService = values[5];
+                    _backlogConfigurations = values[6];
 
                     queryAndRenderWit();
                     loadThemes();
@@ -131,6 +134,12 @@ function queryAndRenderWit() {
 
 }
 
+function isTaskWit(wit){
+
+    return jQuery.grep( _backlogConfigurations.taskBacklog.workItemTypes , function(element){ return element.name == wit.fields["System.WorkItemType"]; }).length > 0 
+
+}
+
 function refreshPlan() {
     $("#refreshPlanBtn").css('opacity', '0');
     queryAndRenderWit();
@@ -139,7 +148,7 @@ function refreshPlan() {
 function processAllWorkItems(values) {
 
     var merged = [].concat.apply([], values);
-    var tasks = jQuery.grep(merged, function( elm, i ) { return elm.fields["System.WorkItemType"] == 'Task'; });
+    var tasks = jQuery.grep(merged, function( elm, i ) { return isTaskWit(elm); });
 
     if (tasks.length == 0) {
         var container = document.getElementById("grid-container");
@@ -233,7 +242,7 @@ function ResetTasks() {
     if (confirm("Are you sure you want to rearrange all tasks?")) {
         console.log("Reset Tasks")
         workItems.forEach(function (item, index) {
-            if (item.fields["System.WorkItemType"] == 'Task') {
+            if (isTaskWit(item)) {
                 item.fields["Microsoft.VSTS.Scheduling.FinishDate"] = undefined;
                 item.fields["Microsoft.VSTS.Scheduling.StartDate"] = undefined;
                 pushWitToSave(index);
