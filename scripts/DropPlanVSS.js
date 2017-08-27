@@ -9,6 +9,7 @@ var _iterationId;
 var _teamValues;
 var _backlogConfigurations;
 var t0 = performance.now();
+var _scrollToToday = true;
 
 function BuildDropPlan() {
     console.log("Stating. (" + (performance.now() - t0) + " ms.)");
@@ -175,7 +176,8 @@ function processWorkItems(workItems, isGMT, allowChangeEvents) {
 
     $("#options").css("display", "flex");
 
-    if ($('.taskToday')[0]) {
+    if ($('.taskToday')[0] && _scrollToToday) {
+        _scrollToToday = false;
         $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width() / 2);
     }
     VSS.notifyLoadSucceeded();
@@ -188,7 +190,10 @@ function pushWitToSave(workItemIdhtml) {
 }
 
 function updateWorkItemInVSS() {
-    if (_witToSave.length > 0) {
+
+    var needSave = _witToSave.length > 0;
+
+    if (needSave) {
         var promises = [];
         _witToSave.forEach(function (item, index) {
             var workItem = workItems[item];
@@ -227,9 +232,9 @@ function updateWorkItemInVSS() {
         });
     }
 
-    processWorkItems(workItems, true, false);
+    processWorkItems(workItems, true, !needSave);
 
-    if (_witToSave.length > 0) {
+    if (needSave) {
         _witToSave = [];
         Promise.all(promises).then(function (x) {
             queryAndRenderWit();

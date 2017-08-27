@@ -158,6 +158,7 @@ canvas {
     background: rgb(242, 242, 242);
     padding: 10px;
     height: 100%;
+    z-index: 30;
 }
 
 .rowHeaderSpace{
@@ -172,27 +173,21 @@ canvas {
 /* Tooltip text */
 .tooltiptext {
     visibility: hidden;
-    width: calc(100% - 13px);
-    
-    /* Position the tooltip text */
+    width: calc(100% - 15px);
     position: absolute;
     z-index: 1;
     top: 100%;
-    left: 5px;
+    left: 10px;
     background: white;
-    
-    border-right: solid #c8c8c8;
-    border-top: solid #c8c8c8;
-    border-bottom: solid #c8c8c8;
-    
-    /* Fade in tooltip */
+    border-right: 1px solid #c8c8c8;
+    border-top: 1px solid #c8c8c8;
+    border-bottom: 1px solid #c8c8c8;
     opacity: 0;
     transition: opacity 1s;
-    margin-top: -30px;
+    margin-top: -26px;
     margin-right: 27px;
-
     height: 23px;
-    display:flex;
+    display: flex;
     
 }
 
@@ -279,13 +274,13 @@ canvas {
 }
 
 .taskChanged {
-    z-index: 2000;
+    z-index: 20;
 }
 
 .activeTask{
-    border-right: solid red;
-    border-top: solid red;
-    border-bottom: solid red;
+    border-right: 1px solid red;
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
 }
 
 .activeTask:before{
