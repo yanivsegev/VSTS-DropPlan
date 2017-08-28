@@ -171,6 +171,7 @@ function processWorkItems(workItems, isGMT, allowChangeEvents) {
     process(isGMT);
     attachEvents(allowChangeEvents);
     drawRelations();
+    AlignTitlesToView();
 
     TableLock("tasksTable", "row_class_name", "column_class_name", "locked_class_name");
 

@@ -171,14 +171,14 @@ function process(isGMT){
                 if (parentId != -1){
                     result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + " workItemId=" + partnerWorktemId + ">";
                     if (parentWit){
-                        result = result + "<div class='taskTitle pbiText'><span class='openWit'>" + parentWit.fields["System.Title"] + "</div><div class='pbiState'>" + parentWit.fields["System.State"] + "</span></div>";
+                        result = result + "<div class='taskTitle pbiText'><div class='openWit'>" + parentWit.fields["System.Title"] + "</div><div class='pbiState'>" + parentWit.fields["System.State"] + "</div></div>";
                     }else{
-                        result = result + "<div class='taskTitle pbiText'><span class='openWit'>Open PBI</span></div>";
+                        result = result + "<div class='taskTitle pbiText'><div class='openWit'>Open PBI</div></div>";
                     }
                     result = result + "</div>";
                 }
 
-                result = result + "<div class='taskTitle'><span class='openWit'>" + title + "</span></div>";
+                result = result + "<div class='taskTitle'><div class='openWit'>" + title + "</div></div>";
 
                 var remain = (task.workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || "");
                 if (remain != "") result = result + "<div class='taskRemainingWork'>" + remain + "</div>";
@@ -284,6 +284,21 @@ function DrawRelations(current){
     }
 }
 
+function AlignTitlesToView(){
+    $(".taskTitle").each(function(i,elm) {
+
+        var offset = 0 -( $(elm).offset().left - 100 - $(window).scrollLeft() );
+        var title = $(elm).find(".openWit");
+        if (offset > 0)
+        {
+            title.css("margin-left", (offset) + "px");
+        }else{
+            title.css("margin-left", "0px");
+        }
+        return true;
+    })
+}
+
 function attachEvents(allowChangeEvents){
     console.log("Attach events")
     $(".taskStart").hover(function(In) 
@@ -314,6 +329,10 @@ function attachEvents(allowChangeEvents){
         if ($(this).hasClass("activeTask")){
             DrawRelations($(this));
         }
+    });
+
+    $( window ).scroll(function(){
+        AlignTitlesToView();
     });
 
     $( ".openWit" ).click(function(event) {
