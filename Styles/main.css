@@ -286,3 +286,33 @@ canvas {
 .activeTask:before{
     background: red;
 }
+
+
+
+.visual-progress-container {
+    position: relative;
+    width: 100%;
+}
+
+.visual-progress-top-container {
+    padding-top: 10px;
+}
+
+.visual-progress-underallocated {
+    background-color: #107c10;
+    height: 18px;
+}
+
+.visual-progress-overallocated {
+    background-color: #da0a00;
+    height: 18px;
+}
+
+.visual-progress-total-unallocated {
+    background-color: #eaeaea
+}
+
+
+.visual-progress-total {
+    border-right: 4px solid #000
+}

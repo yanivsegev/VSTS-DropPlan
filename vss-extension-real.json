@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "Drop-plan-extension",
-    "version": "1.0.53",
+    "version": "1.0.56",
     "name": "Sprint Drop Plan",
     "description": "Plan and track your sprint with a calendar based view.",
     "publisher": "yanivsegev",
@@ -49,7 +49,7 @@
                 "ms.vss-work-web.iteration-backlog-tabs"
             ],
             "properties": {
-                "name": "Drop plan",
+                "name": "Drop Plan",
                 "order": 99,
                 "uri": "index.html"
             }

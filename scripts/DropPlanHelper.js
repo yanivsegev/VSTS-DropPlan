@@ -105,7 +105,21 @@ function process(isGMT){
         result = result + "<tr class='taskTr taskTrContent' >";
         
         if (personRow.assignedTo){
-            result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><img class='assignedToAvatar' src='" + getMemberImage(personRow.assignedTo) + "'/><div class='assignedToName'>" +  personRow.assignedTo + "</div></div></td>";
+
+            result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><img class='assignedToAvatar' src='" + getMemberImage(personRow.assignedTo) + "'/><div class='assignedToName'>" +  personRow.assignedTo + "</div>"
+            
+            if (personRow.TotalCapacity > 0 && personRow.TatalTasks > 0){
+                var cssClass = 'visual-progress-total visual-progress-overallocated';
+                var cssClassOut = 'visual-progress-current visual-progress-overallocated';
+                var precent =  personRow.TotalCapacity / personRow.TatalTasks * 100;
+                if (personRow.TotalCapacity >= personRow.TatalTasks){
+                    cssClass = ' visual-progress-underallocated';
+                    cssClassOut = 'visual-progress-total visual-progress-current visual-progress-total-unallocated';
+                    precent = personRow.TatalTasks / personRow.TotalCapacity * 100;
+                }
+
+                result = result + "<div class='visual-progress-top-container'><div class='visual-progress-container'><div class='" + cssClassOut + "' style='width: 100%;'><div class='" + cssClass + "' style='width: " + precent + "%;'></div></div></div><div class='progress-text'>(" + personRow.TatalTasks + " of " + personRow.TotalCapacity + "h)</div></div></div></td>";
+            }
         } else {
             result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><div class='assignedToName'>Unassigned</div></div></td>";
         }
@@ -215,7 +229,6 @@ function getParentId(workItem){
 function getFirstAvailableDate(days, remainingWork, globalDates){
     return 0;
 }
-
 
 function getCapacity(name){
     var result = 6;
@@ -442,21 +455,27 @@ function getTable(workItems, startDate, endDate, isGMT){
         {
             if (!names[assignedTo]) {
                 names[assignedTo] = {id:result.length, days: []};
-                var newName = {Name: assignedTo};
+                var newName = {Name: assignedTo, Capacity: getCapacity(name), TotalCapacity: 0, TatalTasks: 0};
                 for (var colIndex = 0; colIndex < globalDates.length; colIndex++){
-                    newName[globalDates[colIndex].yyyymmdd()] = [];
+                    var currentDate = globalDates[colIndex];
+                    newName[currentDate.yyyymmdd()] = [];
+                    if (currentDate >= new Date(new Date().yyyy_mm_dd()) && !isDayOff(assignedTo, currentDate.yyyymmdd(), currentDate.getDay())){
+                        newName.TotalCapacity = newName.TotalCapacity + newName.Capacity; 
+                    }
                 }
                 result.push(newName);
                 nameById[names[assignedTo].id] =  {Name: assignedTo};
             }
 
+            var remainingWork = workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || 0;
+            
             var personRow = result[names[assignedTo].id];
             personRow.assignedTo = assignedTo;
             personRow.assignedToId = names[assignedTo].id;
+            personRow.TatalTasks = personRow.TatalTasks + remainingWork;
 
             var witStartDate = null;
-            var remainingWork = workItem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || 0;
-            var capacity = getCapacity(name);
+            var capacity = personRow.Capacity;
             var witChanged = false;
 
             if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"])
