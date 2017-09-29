@@ -21,6 +21,7 @@
 
 }
 
+
 .task {
     height: 65px;
     background: white;
@@ -69,6 +70,9 @@
     padding-right: 2px;
     padding-top: 2px;
 }
+.openWit{
+    width: 95%;
+}
 
 .openWit:hover{
     text-decoration: underline;
@@ -101,10 +105,6 @@
     padding: 2px;
 }
 
-.sameParent{
-
-    background: bisque;
-}
 
 .taskToday{
     background: #fff4ce;
@@ -210,12 +210,16 @@ canvas {
     flex-grow: 1;
     height: 100%;
     width: calc(100% - 100px);
+    display: flex;
 }
 
 .pbiState{
-    padding-top: 2px;
     padding-right: 3px;
-    padding-left: 3px; 
+    width: 80px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-wrap: normal;
+    text-align: right;
 }
 
 #canvas2{
@@ -316,3 +320,35 @@ canvas {
 .visual-progress-total {
     border-right: 4px solid #000
 }
+
+
+
+.showareapath .taskAreaPath1 {
+    background:#4caf50; 
+}
+.showareapath .taskAreaPath2 {
+    background:#2196f3; 
+}
+.showareapath .taskAreaPath3 {
+    background:#9e9e9e; 
+}
+.showareapath .taskAreaPath4 {
+    background:#a80000; 
+}
+.showareapath .taskAreaPath5 {
+    background:#00bcd4; 
+}
+.showareapath .taskAreaPath6 {
+    background:#795548; 
+}
+.showareapath .taskAreaPath7 {
+    background:#ff5722; 
+}
+
+
+
+#tasksTable .sameParent{
+    
+        background: bisque;
+    }
+    

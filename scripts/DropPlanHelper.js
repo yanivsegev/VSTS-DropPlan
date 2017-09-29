@@ -155,7 +155,7 @@ function process(isGMT){
                     case "Closed": result = result + "taskDone "; break;
                 }
 
-                result = result + "taskStart "; 
+                result = result + "taskStart taskAreaPath" + task.areaPath.id + " "; 
                 
                 result = result + "' style='width:" + (colWidth * task.total - 26 )  + "px;";
 
@@ -445,14 +445,21 @@ function getTable(workItems, startDate, endDate, isGMT){
 
     var result = new Array();
     var names = {};
+    var areaPaths = {};
+    var areaPathsId = 1;
     var globalDates = getDates(startDate, endDate);
             
     for (var i = 0; i < workItems.length; i++){
         var workItem = workItems[i];
         var assignedTo = workItem.fields["System.AssignedTo"] || "";
+        var areaPath = workItem.fields["System.AreaPath"] || "";
         
         if (isTaskWit(workItem))
         {
+            if (!areaPaths[areaPath]){
+                areaPaths[areaPath] = {id:areaPathsId};
+                areaPathsId = areaPathsId + 1;
+            }
             if (!names[assignedTo]) {
                 names[assignedTo] = {id:result.length, days: []};
                 var newName = {Name: assignedTo, Capacity: getCapacity(name), TotalCapacity: 0, TatalTasks: 0};
@@ -473,7 +480,7 @@ function getTable(workItems, startDate, endDate, isGMT){
             personRow.assignedTo = assignedTo;
             personRow.assignedToId = names[assignedTo].id;
             personRow.TatalTasks = personRow.TatalTasks + remainingWork;
-
+            
             var witStartDate = null;
             var capacity = personRow.Capacity;
             var witChanged = false;
@@ -589,7 +596,7 @@ function getTable(workItems, startDate, endDate, isGMT){
                     }
 
                     personDateCell = personRow[date];
-                    personDateCell[selectedRow] = {Type:1, part: colIndex, total: dates.length, workItem:workItem, id:i, endDate: dates[dates.length - 1]};
+                    personDateCell[selectedRow] = {Type:1, part: colIndex, total: dates.length, workItem:workItem, id:i, endDate: dates[dates.length - 1], areaPath: areaPaths[areaPath]};
                 }
 
             }

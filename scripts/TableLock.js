@@ -139,8 +139,8 @@ The table is made up like this:
 
                 if (pos.x > tlt.max_x)
                     tlt.max_x = pos.x;
-           //     if (pos.y > tlt.max_y)
-             //       tlt.max_y = pos.y;
+                if (pos.y > tlt.max_y)
+                    tlt.max_y = pos.y;
 
                 for (var j = 0; j < node.attributes.length; j++) {
                     var n = node.attributes.item(j);
@@ -220,8 +220,8 @@ The table is made up like this:
                 var y = obj.y;
                 if (scroll_top > tlt.min_y)
                     y = scroll_top - tlt.min_y + y;
-               // if (y > tlt.max_y)
-               //     y = tlt.max_y;
+                if (y > tlt.max_y)
+                    y = tlt.max_y;
                 obj.node.style.top = y + "px";
             }
             for (var i = 0; i < tlt.lock_elements.length; i++) {
@@ -235,8 +235,8 @@ The table is made up like this:
                 var y = obj.y;
                 if (scroll_top > tlt.min_y)
                     y = scroll_top - tlt.min_y + y;
-            //    if (y > tlt.max_y)
-              //      y = tlt.max_y;
+               if (y > tlt.max_y)
+                    y = tlt.max_y;
                 obj.node.style.top = y + "px";
             }
         }
