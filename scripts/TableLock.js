@@ -159,6 +159,7 @@ The table is made up like this:
                                 catch (e) {
                                 }
                             }
+                            newNode.classList.add("staticCell");
                             newNode.innerHTML = node.innerHTML;
                             newNode.style.height = node.offsetHeight + "px";
                             newNode.style.width = node.offsetWidth + "px";

@@ -173,8 +173,9 @@ function processWorkItems(workItems, isGMT, allowChangeEvents) {
     drawRelations();
     AlignTitlesToView();
 
+    $(".staticCell").remove();
     TableLock("tasksTable", "row_class_name", "column_class_name", "locked_class_name");
-
+    
     $("#options").css("display", "flex");
 
     if ($('.taskToday')[0] && _scrollToToday) {
