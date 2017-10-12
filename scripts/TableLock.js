@@ -249,17 +249,18 @@ The table is made up like this:
 
             window.clearInterval(tlt.interval_id);
 
+            // Remove any old objects
             for (var i = 0; i < tlt.row_elements.length; i++) {
                 var obj = tlt.row_elements[i];
-                obj.node.remove();
+                document.body.removeChild(obj.node);
             }
             for (var i = 0; i < tlt.col_elements.length; i++) {
                 var obj = tlt.col_elements[i];
-                obj.node.remove();
+                document.body.removeChild(obj.node);
             }
             for (var i = 0; i < tlt.lock_elements.length; i++) {
                 var obj = tlt.lock_elements[i];
-                obj.node.remove();
+                document.body.removeChild(obj.node);
             }
         }
         TL_tables = new Array();
