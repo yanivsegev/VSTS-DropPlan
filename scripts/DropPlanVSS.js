@@ -8,6 +8,7 @@ var _witServices;
 var _iterationId;
 var _teamValues;
 var _backlogConfigurations;
+var _workItemTypes;
 var t0 = performance.now();
 var _scrollToToday = true;
 
@@ -39,16 +40,21 @@ function BuildDropPlan() {
                 _iterationId = VSS.getConfiguration().iterationId;
                 _projectId = context.project.id;
                 _witClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
-                
-                var serverAnswer = Promise.all([
+
+                var promisesList = [
                     workClient.getTeamDaysOff(teamContext, _iterationId),
                     workClient.getTeamSettings(teamContext),
                     workClient.getCapacities(teamContext, _iterationId),
                     workClient.getTeamIteration(teamContext, _iterationId),
                     workClient.getTeamFieldValues(teamContext),
-                    VSS.getService(VSS.ServiceIds.ExtensionData),
-                    workClient.getBacklogConfigurations(teamContext)
-                ]).then(function (values) {
+                    VSS.getService(VSS.ServiceIds.ExtensionData)
+                ];
+
+                if (workClient.getBacklogConfigurations){
+                    promisesList.push(workClient.getBacklogConfigurations(teamContext));
+                }
+                
+                var serverAnswer = Promise.all(promisesList).then(function (values) {
 
                     console.log("Team data loaded. (" + (performance.now() - t0) + " ms.)");
 
@@ -58,8 +64,12 @@ function BuildDropPlan() {
                     _iteration = values[3];
                     _teamValues = values[4];
                     _dataService = values[5];
-                    _backlogConfigurations = values[6];
-
+                    if (values.length > 6){
+                        _backlogConfigurations = values[6];
+                        _workItemTypes = _backlogConfigurations.taskBacklog.workItemTypes;
+                    }else{
+                        _workItemTypes = [{name: "Task"}];
+                    }
                     queryAndRenderWit();
                     loadThemes();
 
@@ -137,7 +147,7 @@ function queryAndRenderWit() {
 
 function isTaskWit(wit){
 
-    return jQuery.grep( _backlogConfigurations.taskBacklog.workItemTypes , function(element){ return element.name == wit.fields["System.WorkItemType"]; }).length > 0 
+    return jQuery.grep( _workItemTypes , function(element){ return element.name == wit.fields["System.WorkItemType"]; }).length > 0 
 
 }
 
