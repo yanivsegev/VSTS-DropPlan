@@ -157,19 +157,19 @@ function processAllWorkItems(values) {
         VSS.notifyLoadSucceeded();
     }
     else{
-        processWorkItems(merged, false, true);
+        processWorkItems(merged, false, false);
     }
 
 }
-function processWorkItems(workItems, isGMT, allowChangeEvents) {
+function processWorkItems(workItems, isGMT, isSaving) {
 
     console.log("Work items data loaded. (" + (performance.now() - t0) + " ms.)");
 
     var t = document.getElementById("grid-container");
     setData(t, workItems, _iteration.attributes.startDate, _iteration.attributes.finishDate);
 
-    process(isGMT);
-    attachEvents(allowChangeEvents);
+    process(isGMT, isSaving);
+    attachEvents();
     drawRelations();
     AlignTitlesToView();
 
@@ -185,8 +185,28 @@ function processWorkItems(workItems, isGMT, allowChangeEvents) {
     VSS.notifyLoadSucceeded();
 }
 
+function isWitInUpdate(id) {
+    if (_witInUpdate.indexOf(id) == -1) {
+        return false;
+    }
+    return true;
+}
+
+function pushWitInUpdate(id) {
+    if (!isWitInUpdate(id)) {
+        _witInUpdate.push(id);
+    }
+}
+
+function removeWitInUpdate(id) {
+    var index = _witInUpdate.indexOf(id);
+    if (index > -1) {
+        _witInUpdate.splice(index, 1);;
+    }
+}
+
 function pushWitToSave(workItemIdhtml) {
-    if (_witToSave.indexOf(parseInt(workItemIdhtml)) === -1) {
+    if (_witToSave.indexOf(parseInt(workItemIdhtml)) == -1) {
         _witToSave.push(parseInt(workItemIdhtml));
     }
 }
@@ -229,16 +249,19 @@ function updateWorkItemInVSS() {
                         "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
                     }];
             }
-
+            pushWitInUpdate(workItem.id);
             promises.push(_witClient.updateWorkItem(wijson, workItem.id));
         });
     }
 
-    processWorkItems(workItems, true, !needSave);
+    processWorkItems(workItems, true, needSave);
 
     if (needSave) {
         _witToSave = [];
         Promise.all(promises).then(function (x) {
+            x.forEach(function(item1,index1) {
+                removeWitInUpdate(item1.id);
+            });
             queryAndRenderWit();
         }, failToCallVss);
     }
@@ -255,7 +278,7 @@ function ResetTasks() {
                 pushWitToSave(index);
             }
         });
-        processWorkItems(workItems, true, true);
+        processWorkItems(workItems, true, false);
     }
 }
 

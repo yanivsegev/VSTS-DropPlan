@@ -345,10 +345,10 @@ canvas {
     background:#ff5722; 
 }
 
-
-
 #tasksTable .sameParent{
-    
-        background: bisque;
-    }
-    
+    background: bisque;
+}
+
+.taskSaving{
+    opacity: 0.5;
+}
