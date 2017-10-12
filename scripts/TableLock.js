@@ -76,7 +76,7 @@ The table is made up like this:
         TableLock_update();
 
         // Detect resize every second
-        window.setInterval(function () {
+        tlt.interval_id = window.setInterval(function () {
             var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
             if (tlt.innerwidth != width &&
@@ -159,7 +159,6 @@ The table is made up like this:
                                 catch (e) {
                                 }
                             }
-                            newNode.classList.add("staticCell");
                             newNode.innerHTML = node.innerHTML;
                             newNode.style.height = node.offsetHeight + "px";
                             newNode.style.width = node.offsetWidth + "px";
@@ -243,6 +242,29 @@ The table is made up like this:
         }
     }
 
+    function TableLock_clear() {
+
+        for (var t = 0; t < TL_tables.length; t++) {
+            var tlt = TL_tables[t];
+
+            window.clearInterval(tlt.interval_id);
+
+            for (var i = 0; i < tlt.row_elements.length; i++) {
+                var obj = tlt.row_elements[i];
+                obj.node.remove();
+            }
+            for (var i = 0; i < tlt.col_elements.length; i++) {
+                var obj = tlt.col_elements[i];
+                obj.node.remove();
+            }
+            for (var i = 0; i < tlt.lock_elements.length; i++) {
+                var obj = tlt.lock_elements[i];
+                obj.node.remove();
+            }
+        }
+        TL_tables = new Array();
+    }
+
     function TL_getPos(oElement) {
         var y = 0;
         var x = 0;
@@ -256,4 +278,5 @@ The table is made up like this:
 
     // Add the TableLock function to the window to make it global
     window.TableLock = TableLock;
+    window.TableLock_clear = TableLock_clear;
 }());
