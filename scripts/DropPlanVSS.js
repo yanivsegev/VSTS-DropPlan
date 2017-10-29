@@ -89,7 +89,7 @@ function queryAndRenderWit() {
 
     // Query object containing the WIQL query
     var query = {
-        query: "SELECT [System.Id] FROM WorkItem WHERE [System.State] NOT IN ('Removed') AND [System.IterationPath] UNDER '" + currentIterationPath + "' "
+        query: "SELECT [System.Id] FROM WorkItem WHERE [System.State] NOT IN ('Removed') AND [System.IterationPath] UNDER '" + currentIterationPath.replace("'","''") + "' "
     };
     if (_teamValues.values.length > 0) {
         query.query = query.query + " AND (";
@@ -97,7 +97,7 @@ function queryAndRenderWit() {
             if (index > 0) {
                 query.query = query.query + " OR ";
             }
-            query.query = query.query + "[" + _teamValues.field.referenceName + "] ";
+            query.query = query.query + "[" + _teamValues.field.referenceName.replace("'","''") + "] ";
             if (item.includeChildren == true) {
                 query.query = query.query + "UNDER";
             }
