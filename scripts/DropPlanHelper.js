@@ -444,7 +444,8 @@ function getTable(workItems, startDate, endDate, isGMT) {
     var areaPaths = {};
     var areaPathsId = 1;
     var globalDates = getDates(startDate, endDate);
-
+    var dateNow = new Date(new Date().toLocaleDateString()).getGMT();
+    
     for (var i = 0; i < workItems.length; i++) {
         var workItem = workItems[i];
         var assignedTo = workItem.fields["System.AssignedTo"] || "";
@@ -480,11 +481,12 @@ function getTable(workItems, startDate, endDate, isGMT) {
             var capacity = personRow.Capacity;
             var witChanged = false;
 
+            
             if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]) {
                 witChanged = true;
                 globalDates.forEach(function (item, index) {
                     var tasksPerDay = names[assignedTo].days[item.yyyymmdd()] || 0;
-                    if (tasksPerDay < capacity && !witStartDate && !isDayOff(assignedTo, item.yyyymmdd(), item.getDay())) {
+                    if ((tasksPerDay < capacity || capacity == 0) && !witStartDate && !isDayOff(assignedTo, item.yyyymmdd(), item.getDay()) && (item.getGMT() >= dateNow)) {
                         witStartDate = item.getGMT();
                     }
                 });
@@ -508,10 +510,10 @@ function getTable(workItems, startDate, endDate, isGMT) {
                 dates.forEach(function (item, index) {
                     var tasksPerDay = names[assignedTo].days[item.yyyymmdd()] || 0;
 
-                    if (tasksPerDay < capacity && !isDayOff(assignedTo, item.yyyymmdd(), item.getDay()) && !witEndDate) {
+                    if ((tasksPerDay < capacity || capacity == 0) && !isDayOff(assignedTo, item.yyyymmdd(), item.getDay()) && !witEndDate) {
 
                         var todayPart = remainingWorkLeft;
-                        if (tasksPerDay + todayPart > capacity) {
+                        if (tasksPerDay + todayPart > capacity && capacity > 0) {
                             todayPart = capacity - tasksPerDay;
                         }
                         remainingWorkLeft = remainingWorkLeft - todayPart;
