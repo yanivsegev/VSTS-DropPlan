@@ -106,10 +106,13 @@ function process(isGMT, isSaving) {
 
             result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><img class='assignedToAvatar' src='" + getMemberImage(personRow.assignedTo) + "'/><div class='assignedToName'>" + personRow.assignedTo + "</div>"
 
-            if (personRow.TotalCapacity > 0 && personRow.TatalTasks > 0) {
+            if (personRow.TotalCapacity > 0) {
                 var cssClass = 'visual-progress-total visual-progress-overallocated';
                 var cssClassOut = 'visual-progress-current visual-progress-overallocated';
-                var precent = personRow.TotalCapacity / personRow.TatalTasks * 100;
+                var precent = 0;
+                if (personRow.TatalTasks > 0){
+                    precent = personRow.TotalCapacity / personRow.TatalTasks * 100;
+                }
                 if (personRow.TotalCapacity >= personRow.TatalTasks) {
                     cssClass = ' visual-progress-underallocated';
                     cssClassOut = 'visual-progress-total visual-progress-current visual-progress-total-unallocated';
@@ -231,7 +234,7 @@ function getFirstAvailableDate(days, remainingWork, globalDates) {
 }
 
 function getCapacity(name) {
-    var result = 6;
+    var result = 0;
     $.each(_teamMemberCapacities, function (index, value) {
         if (value.teamMember.displayName == name) {
             if (value.activities.length > 0 && value.activities[0].capacityPerDay > 0) {
@@ -454,7 +457,7 @@ function getTable(workItems, startDate, endDate, isGMT) {
             }
             if (!names[assignedTo]) {
                 names[assignedTo] = { id: result.length, days: [] };
-                var newName = { Name: assignedTo, Capacity: getCapacity(name), TotalCapacity: 0, TatalTasks: 0 };
+                var newName = { Name: assignedTo, Capacity: getCapacity(assignedTo), TotalCapacity: 0, TatalTasks: 0 };
                 for (var colIndex = 0; colIndex < globalDates.length; colIndex++) {
                     var currentDate = globalDates[colIndex];
                     newName[currentDate.yyyymmdd()] = [];

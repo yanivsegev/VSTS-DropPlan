@@ -292,8 +292,8 @@ function ResetTasks() {
     }
 }
 
-function failToCallVss() {
-    console.log("Call to server failed! please refresh the page.")
+function failToCallVss(reason) {
+    console.log("Call to server failed! reason: " + JSON.stringify(reason));
     alert("Call to server failed! please refresh the page.");
 }
 
