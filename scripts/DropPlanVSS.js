@@ -14,6 +14,7 @@ var _scrollToToday = true;
 
 function BuildDropPlan() {
     console.log("Stating. (" + (performance.now() - t0) + " ms.)");
+
     
     VSS.init({
         explicitNotifyLoaded: true,
@@ -30,8 +31,16 @@ function BuildDropPlan() {
     VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient", "TFS/WorkItemTracking/Services"],
         function (VSS_Service, TFS_Wit_WebApi, TFS_Work, TFS_Wit_Services) {
             try {
-                console.log("VSS loaded. (" + (performance.now() - t0) + " ms.)");
+                extVersion = VSS.getExtensionContext().version;
+                
+                console.log("VSS loaded V " + extVersion + ". (" + (performance.now() - t0) + " ms.)");
+                
+                if ( window._trackJs ){
 
+                    trackJs.configure({version: extVersion});
+
+                }
+                
                 var context = VSS.getWebContext();
                 var workClient = TFS_Work.getClient();
                 var teamContext = { projectId: context.project.id, teamId: context.team.id, project: "", team: "" };
@@ -294,7 +303,13 @@ function ResetTasks() {
 
 function failToCallVss(reason) {
     console.log("Call to server failed! reason: " + JSON.stringify(reason));
-    alert("Call to server failed! please refresh the page.");
+
+    if (reason && reason.message){
+        alert(reason.message);
+    }
+    else{
+        alert("Call to server failed! please refresh the page.");
+    }
 }
 
 BuildDropPlan();
