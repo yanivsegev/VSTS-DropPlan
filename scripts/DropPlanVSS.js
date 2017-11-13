@@ -114,7 +114,7 @@ function queryAndRenderWit() {
                 query.query = query.query + "=";
             }
 
-            query.query = query.query + " '" + item.value + "'";
+            query.query = query.query + " '" + item.value.replace("'","''") + "'";
         });
 
         query.query = query.query + " )";
