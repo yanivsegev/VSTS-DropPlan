@@ -33,11 +33,11 @@ function BuildDropPlan() {
             try {
                 extVersion = VSS.getExtensionContext().version;
                 
-                console.log("VSS loaded V " + extVersion + ". (" + (performance.now() - t0) + " ms.)");
+                console.log("VSS loaded V " + extVersion + " VssSDKRestVersion:" + VSS.VssSDKRestVersion + " VssSDKVersion:" + VSS.VssSDKVersion + ". (" + (performance.now() - t0) + " ms.)");
                 
                 if ( window._trackJs ){
 
-                    trackJs.configure({version: extVersion, VssSDKVersion:VSS.VssSDKRestVersion, VssSDKVersion:VSS.VssSDKVersion});
+                    trackJs.configure({version: extVersion});
 
                 }
                 
