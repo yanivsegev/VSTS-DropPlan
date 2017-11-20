@@ -37,7 +37,7 @@ function BuildDropPlan() {
                 
                 if ( window._trackJs ){
 
-                    trackJs.configure({version: extVersion});
+                    trackJs.configure({version: extVersion, VssSDKVersion:VSS.VssSDKRestVersion, VssSDKVersion:VSS.VssSDKVersion});
 
                 }
                 
