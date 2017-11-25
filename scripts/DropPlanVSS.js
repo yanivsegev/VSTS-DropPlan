@@ -38,6 +38,8 @@ function BuildDropPlan() {
                 if ( window._trackJs ){
 
                     trackJs.configure({version: extVersion});
+                    trackJs.addMetadata("VssSDKVersion",VSS.VssSDKRestVersion);
+                    trackJs.addMetadata("VssSDKVersion",VSS.VssSDKVersion);
 
                 }
                 

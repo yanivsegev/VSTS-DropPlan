@@ -33,7 +33,7 @@ function getColumns(startDate, stopDate) {
 
     for (var colIndex = 0; colIndex < dates.length; colIndex++) {
         var day = dates[colIndex].getDay();
-        columnArray.push({ text: days[day], date: dates[colIndex].toLocaleDateString(), index: colIndex + 1 });
+        columnArray.push({ text: days[day], date: VSS.Core.convertValueToDisplayString(dates[colIndex],"d"), index: colIndex + 1 });
     }
     return columnArray;
 }
