@@ -29,26 +29,22 @@
     </script>
 
     <link href="styles/main.css" rel="stylesheet"></link>
-    <link href="styles/jquery-ui.css" rel="stylesheet" type="text/css" />
-
-    <script src="scripts/Promise.js"></script>
-    <script src="scripts/jquery-1.12.1.min.js"></script>
-    <script src="scripts/jquery-ui.min.js"></script> 
-    <script src="scripts/VSS.SDK.min.js"></script>    
-    <script src="scripts/TableLock.js"></script>
-   
-    <script src="scripts/DateHealpers.js"></script>
-	<script src="scripts/DropPlanHelper.js"></script>
-    <script src="scripts/DropPlanVSS.js"></script>
-    
+    <link href="styles/jquery-ui.css" rel="stylesheet" type="text/css" />   
    
 </head>
 
 <body class='mainBody'>
     <canvas id="canvas1" width="2000" height="1000"></canvas>
     <canvas id="canvas2" width="2000" height="1000"></canvas>
-    <div id="grid-container" >   
-		<h1>Please wait while loading data ...</h1>
+    <div id="grid-container" >
+        <div class="messageBoxContainer">
+            <div class="messageBox">
+                <div id="messageBoxInner" class="messageBoxInner">
+                    <h2>Please wait while loading data ...</h2>
+                    <p id="messages"></p>
+                </div>
+            </div>
+        </div>
     </div>
     
     <br/>
@@ -72,6 +68,15 @@
     </span>
 
 </body>
+
+<script src="scripts/Promise.js"></script>
+<script src="scripts/jquery-1.12.1.min.js"></script>
+<script src="scripts/jquery-ui.min.js"></script> 
+<script src="scripts/VSS.SDK.min.js"></script>    
+<script src="scripts/TableLock.js"></script>
+<script src="scripts/DateHealpers.js"></script>
+<script src="scripts/DropPlanHelper.js"></script>
+<script src="scripts/DropPlanVSS.js"></script>
 <script src="scripts/arrows.js"></script>
 <script src="scripts/themes.js"></script>
 

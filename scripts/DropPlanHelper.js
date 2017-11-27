@@ -2,6 +2,7 @@ var colWidth = 180;
 var workItems, startDate, endDate, container;
 var nameById = [];
 var _witToSave = [];
+var _witIdsToSave = [];
 var _witInUpdate = [];
 
 
@@ -89,7 +90,7 @@ function process(isGMT, isSaving) {
     result = result + "<td class='locked_class_name'><div class='taskColumn assignToColumn rowHeaderSpace'><button class='refreshPlanBtn' onclick='refreshPlan();'>Refresh Plan</button></div></td>"
 
     for (var colIndex = 1; colIndex < cols.length; colIndex++) {
-        result = result + "<td class='column_class_name'><div class='taskColumn' style='width:" + colWidth + "px'>" + cols[colIndex].text + "<br>" + cols[colIndex].date + "</div></td>";
+        result = result + "<td class='column_class_name'><div class='taskColumn taskHeader' style='width:" + colWidth + "px'>" + cols[colIndex].text + "<br>" + cols[colIndex].date + "</div></td>";
     }
     result = result + "</tr><tbody>"
 

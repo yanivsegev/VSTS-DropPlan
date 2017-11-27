@@ -11,10 +11,23 @@ var _backlogConfigurations;
 var _workItemTypes;
 var t0 = performance.now();
 var _scrollToToday = true;
+var _shouldReportProgress = true;
+
+function reportProgress(msg){
+    var messages = document.getElementById("messages");
+    if (messages){
+        messages.innerHTML = messages.innerHTML + msg + "<br/>";
+    }
+}
+
+function reportFailure(msg){
+
+    var messages = document.getElementById("messageBoxInner");
+    messages.innerHTML = "<h1>" + msg + "</h1>";
+}    
 
 function BuildDropPlan() {
     console.log("Stating. (" + (performance.now() - t0) + " ms.)");
-
     
     VSS.init({
         explicitNotifyLoaded: true,
@@ -24,6 +37,7 @@ function BuildDropPlan() {
     
     VSS.ready(function () {
         VSS.register(VSS.getContribution().id, {});
+        VSS.notifyLoadSucceeded();
     });
     
     console.log("VSS init. (" + (performance.now() - t0) + " ms.)");
@@ -34,7 +48,9 @@ function BuildDropPlan() {
                 extVersion = VSS.getExtensionContext().version;
                 
                 console.log("VSS loaded V " + extVersion + " VssSDKRestVersion:" + VSS.VssSDKRestVersion + " VssSDKVersion:" + VSS.VssSDKVersion + ". (" + (performance.now() - t0) + " ms.)");
+                reportProgress("Framework loaded.");
                 
+
                 if ( window._trackJs ){
 
                     trackJs.configure({version: extVersion});
@@ -68,7 +84,7 @@ function BuildDropPlan() {
                 var serverAnswer = Promise.all(promisesList).then(function (values) {
 
                     console.log("Team data loaded. (" + (performance.now() - t0) + " ms.)");
-
+                    reportProgress("Team settings loaded.");
                     _daysOff = values[0];
                     _teamSettings = values[1];
                     _teamMemberCapacities = values[2];
@@ -83,13 +99,13 @@ function BuildDropPlan() {
                     }
                     queryAndRenderWit();
                     loadThemes();
+                    
 
                 }, failToCallVss);
             }
             catch (e) {
                 console.log(e);
-                $("#grid-container")[0].innerHTML = "<h1>Browser is not supported.</h1>";
-                VSS.notifyLoadFailed();
+                reportFailure("Browser is not supported.");
             }
         });
 }
@@ -126,19 +142,18 @@ function queryAndRenderWit() {
         function (result) {
 
             console.log("Iteration data loaded. (" + (performance.now() - t0) + " ms.)");
-
+            reportProgress("Work items list loaded.");
+            _shouldReportProgress = false;
             // Generate an array of all open work item ID's
             var openWorkItems = result.workItems.map(function (wi) { return wi.id });
 
             var container = document.getElementById("grid-container");
 
             if (openWorkItems.length == 0) {
-                container.innerHTML = '<h1>No work items found.</h1>';
-                VSS.notifyLoadSucceeded();
+                reportFailure("No work items found.");
             }
             else if (!_iteration.attributes.startDate || !_iteration.attributes.finishDate) {
-                container.innerHTML = '<h1>Please set iteration dates.</h1>';
-                VSS.notifyLoadSucceeded();
+                reportFailure("Please set iteration dates.");
             }
             else {
                 var start = 0;
@@ -169,13 +184,12 @@ function refreshPlan() {
 
 function processAllWorkItems(values) {
 
-    var merged = [].concat.apply([], values);
+    var merged = jQuery.grep([].concat.apply([], values), function( elm, i ) { return elm.id > 0; });
     var tasks = jQuery.grep(merged, function( elm, i ) { return isTaskWit(elm); });
-
+    
     if (tasks.length == 0) {
         var container = document.getElementById("grid-container");
-        container.innerHTML = '<h1>No work items of type "Task" found.</h1>';
-        VSS.notifyLoadSucceeded();
+        reportFailure("No work items of type 'Task' found.");
     }
     else{
         processWorkItems(merged, false, false);
@@ -203,7 +217,6 @@ function processWorkItems(workItems, isGMT, isSaving) {
         _scrollToToday = false;
         $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width() / 2);
     }
-    VSS.notifyLoadSucceeded();
 }
 
 function isWitInUpdate(id) {
@@ -227,58 +240,64 @@ function removeWitInUpdate(id) {
 }
 
 function pushWitToSave(workItemIdhtml) {
-    if (_witToSave.indexOf(parseInt(workItemIdhtml)) == -1) {
-        _witToSave.push(parseInt(workItemIdhtml));
+    var id = parseInt(workItemIdhtml);
+    if (_witToSave.indexOf(id) == -1) {
+        _witToSave.push(id);
+        _witIdsToSave.push(workItems[id].id);
     }
 }
 
 function updateWorkItemInVSS() {
 
     var needSave = _witToSave.length > 0;
-
+    var promises = [];
+    console.log("Saving Items: " + _witIdsToSave.join(", "));
+    
     if (needSave) {
-        var promises = [];
         _witToSave.forEach(function (item, index) {
             var workItem = workItems[item];
-            var wijson =
-                [{
-                    "op": "add",
-                    "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-                    "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
-                },
-                {
-                    "op": "add",
-                    "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-                    "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
-                },
-                {
-                    "op": "add",
-                    "path": "/fields/System.AssignedTo",
-                    "value": workItem.fields["System.AssignedTo"] || ""
-                }];
-
-            if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]) {
-                wijson =
+            if (workItem){
+                var wijson =
                     [{
-                        "op": "remove",
+                        "op": "add",
                         "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
                         "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
                     },
                     {
-                        "op": "remove",
+                        "op": "add",
                         "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
                         "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                    },
+                    {
+                        "op": "add",
+                        "path": "/fields/System.AssignedTo",
+                        "value": workItem.fields["System.AssignedTo"] || ""
                     }];
+
+                if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]) {
+                    wijson =
+                        [{
+                            "op": "remove",
+                            "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
+                            "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
+                        },
+                        {
+                            "op": "remove",
+                            "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
+                            "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                        }];
+                }
+                pushWitInUpdate(workItem.id);
+                promises.push(_witClient.updateWorkItem(wijson, workItem.id));
             }
-            pushWitInUpdate(workItem.id);
-            promises.push(_witClient.updateWorkItem(wijson, workItem.id));
         });
     }
 
     processWorkItems(workItems, true, needSave);
 
-    if (needSave) {
-        _witToSave = [];
+    _witToSave = [];
+    _witIdsToSave = [];
+    if (promises.length > 0) {
         Promise.all(promises).then(function (x) {
             x.forEach(function(item1,index1) {
                 removeWitInUpdate(item1.id);

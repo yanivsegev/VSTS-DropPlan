@@ -1,6 +1,11 @@
 .taskColumn {
     background: white;
 }
+
+.taskHeader{
+    padding-left: 12px;
+}
+
 .taskStart {
     margin-left: 10px;
     border-right:  1px  solid #c8c8c8;
@@ -30,7 +35,6 @@
 .taskDiv
 {
     height: 70px;
-   margin-bottom: 5px;
     margin-top: 5px;
     margin-right: -10px;
 }
@@ -46,20 +50,20 @@
 }
 
 .taskTrSpace{
-    height: 5px;
+    height: 4px;
 }
 
 .taskTrContent{
-    background: rgb(242, 242, 242)
+    
 }
 
 
 
 .taskTdDiv{
     background: #dadada;
-    margin-right: 10px;
-    padding-bottom: 10px;
-    padding-top: 1px;
+    margin-right: 4px;
+    padding-bottom: 4px;
+    padding-top: 4px;
 }
 
 .taskTitle{
@@ -117,6 +121,7 @@
 .assignedToAvatar{
     height: 30px;
     width: 30px;
+    border-radius: 50%;
 }
 
 .assignToColumn{
@@ -159,6 +164,7 @@ canvas {
     padding: 10px;
     height: 100%;
     z-index: 30;
+    border-right: 4px solid white;
 }
 
 .rowHeaderSpace{
@@ -351,4 +357,31 @@ canvas {
 
 .taskSaving{
     opacity: 0.5;
+}
+
+
+.messageBoxContainer{
+    text-align: center;
+    padding: 0;
+    margin-top: 144px;
+    position: absolute;
+    width: 100%;
+    z-index: 0;
+}
+
+.messageBox{
+    border: 1px solid #eaeaea;
+    background: #ffffff;
+    margin: 0 auto;
+    text-align: center;
+    margin: 0px 50px;
+    padding: 40px;
+    min-width: 400px;
+}
+
+.messageBoxInner{
+    display: inline-block;
+    text-align: center;
+    padding: 0px 20px;
+    vertical-align: middle;
 }
