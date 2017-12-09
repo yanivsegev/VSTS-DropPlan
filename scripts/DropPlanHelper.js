@@ -105,7 +105,13 @@ function process(isGMT, isSaving) {
 
         if (personRow.assignedTo) {
 
-            result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><img class='assignedToAvatar' src='" + getMemberImage(personRow.assignedTo) + "'/><div class='assignedToName'>" + personRow.assignedTo + "</div>"
+
+            result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'>";
+            var avatar = getMemberImage(personRow.assignedTo);
+            if (avatar) {
+                result = result +  "<img class='assignedToAvatar' src='" + avatar + "'/>"
+            }
+            result = result + "<div class='assignedToName'>" + personRow.assignedTo + "</div>"
 
             if (personRow.TotalCapacity > 0) {
                 var cssClass = 'visual-progress-total visual-progress-overallocated';

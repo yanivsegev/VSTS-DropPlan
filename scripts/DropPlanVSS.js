@@ -54,7 +54,7 @@ function BuildDropPlan() {
                 if ( window._trackJs ){
 
                     trackJs.configure({version: extVersion});
-                    trackJs.addMetadata("VssSDKVersion",VSS.VssSDKRestVersion);
+                                                                                                                                                                                                                                                trackJs.addMetadata("VssSDKRestVersion",VSS.VssSDKRestVersion);
                     trackJs.addMetadata("VssSDKVersion",VSS.VssSDKVersion);
 
                 }
@@ -147,8 +147,6 @@ function queryAndRenderWit() {
             // Generate an array of all open work item ID's
             var openWorkItems = result.workItems.map(function (wi) { return wi.id });
 
-            var container = document.getElementById("grid-container");
-
             if (openWorkItems.length == 0) {
                 reportFailure("No work items found.");
             }
@@ -184,6 +182,8 @@ function refreshPlan() {
 
 function processAllWorkItems(values) {
 
+    reportProgress("Work items details loaded.");
+    
     var merged = jQuery.grep([].concat.apply([], values), function( elm, i ) { return elm.id > 0; });
     var tasks = jQuery.grep(merged, function( elm, i ) { return isTaskWit(elm); });
     
