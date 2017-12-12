@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "Drop-plan-extension-test",
-    "version": "1.0.901",
+    "version": "1.0.904",
     "name": "Sprint Drop Plan-test",
     "description": "Plan and track your sprint with a calendar based view.",
     "publisher": "yanivsegev",
@@ -55,6 +55,22 @@
                 "name": "Drop plan test",
                 "order": 99,
                 "uri": "index.html"
+            }
+        },
+        {
+            "id": "CreateTasks",
+            "type": "ms.vss-web.action",
+            "description": "Create tasks for drop plan",
+            "targets": [
+                "ms.vss-work-web.work-item-context-menu"
+            ],
+            "properties": {
+                "text": "Create dev and qa tasks",
+                "title": "Create dev and qa tasks",
+                "toolbarText": "Create dev and qa tasks",                
+                "icon": "images/logo.png",
+                "uri": "toolbar.html",
+                "registeredObjectId": "CreateTasks"
             }
         }
     ],
