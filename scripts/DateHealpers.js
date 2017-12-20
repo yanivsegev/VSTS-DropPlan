@@ -37,6 +37,9 @@ Date.prototype.getGMT = function() {
   return new Date(this.valueOf() + this.getTimezoneOffset() * 60000);
 };
 
+Date.prototype.getNonGMT = function() {
+    return new Date(this.valueOf() - this.getTimezoneOffset() * 60000);
+};
 
 function getDates(startDate, stopDate) {
     var dateArray = new Array();

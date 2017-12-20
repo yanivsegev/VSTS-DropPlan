@@ -2,6 +2,8 @@
 
 Sprint Drop Plan is an organizational tool that helps team members to sync their tasks by visualizing work status and dependencies on a sprint-based calendar. 
 
+[![Donate](images/donate.png)](https://www.paypal.me/yanivsegev/5)  
+
 ## Review your sprint plan ##
 
 ![Drop plan](images/dropplan.png)
