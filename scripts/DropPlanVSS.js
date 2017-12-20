@@ -51,7 +51,7 @@ function BuildDropPlan() {
                 reportProgress("Framework loaded.");
                 
 
-                if ( window._trackJs && trackJs){
+                if ( window._trackJs && typeof trackJs != "undefined"){
 
                     trackJs.configure({version: extVersion});
                                                                                                                                                                                                                                                 trackJs.addMetadata("VssSDKRestVersion",VSS.VssSDKRestVersion);
