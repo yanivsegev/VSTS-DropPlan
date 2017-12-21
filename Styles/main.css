@@ -64,6 +64,7 @@
     margin-right: 4px;
     padding-bottom: 4px;
     padding-top: 4px;
+    min-height: 130px;
 }
 
 .taskTitle{
