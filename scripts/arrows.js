@@ -151,19 +151,19 @@ function drawRelations() {
     
     clearRelations(ctx, can);
     var pathslist = [];
-    workItems.forEach(function(item1,index1) {
-        if (isTaskWit(item1) && item1.relations){
+    sprint.Wits.forEach(function(item1,index1) {
+        if (item1.isTaskWit && item1.relations){
 
             item1.relations.forEach(function(item,index) { 
                 if (item.rel == "System.LinkTypes.Dependency-Forward"){
                     var seccesor = item.url.substring(item.url.lastIndexOf("/") + 1)
                     var seccesorDiv = $("div[witId=" + seccesor + "]");
-                    var item2 = workItems[seccesorDiv.attr("workItemId")];
+                    var item2 = sprint.GetWorkitemById(seccesor)
                     if (item2)
                     {
                         var fillStyle = "gray";
-                        var start1 = new Date(item1.fields["Microsoft.VSTS.Scheduling.StartDate"]).getGMT();
-                        var end2 = new Date(item2.fields["Microsoft.VSTS.Scheduling.FinishDate"]).getGMT();
+                        var start1 = item1.StartDate;
+                        var end2 = item2.FinishDate;
                         if ( start1 > end2 ) 
                         {
                             fillStyle = "red";

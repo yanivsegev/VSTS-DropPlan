@@ -1,5 +1,3 @@
-
-
 var _iteration;
 var _daysOff;
 var _witClient;
@@ -9,6 +7,7 @@ var _iterationId;
 var _teamValues;
 var _backlogConfigurations;
 var _workItemTypes;
+var _workItemPBITypes;
 var t0 = performance.now();
 var _scrollToToday = true;
 var _shouldReportProgress = true;
@@ -95,8 +94,10 @@ function BuildDropPlan() {
                     if (values.length > 6){
                         _backlogConfigurations = values[6];
                         _workItemTypes = _backlogConfigurations.taskBacklog.workItemTypes;
+                        _workItemPBITypes = _backlogConfigurations.requirementBacklog.workItemTypes;
                     }else{
                         _workItemTypes = [{name: "Task"}];
+                        _workItemPBITypes = [{name:'Product Backlog Item'},{name:'Bug'}];
                     }
                     queryAndRenderWit();
                     loadThemes();
@@ -170,12 +171,6 @@ function queryAndRenderWit() {
 
 }
 
-function isTaskWit(wit){
-
-    return jQuery.grep( _workItemTypes , function(element){ return element.name == wit.fields["System.WorkItemType"]; }).length > 0 
-
-}
-
 function refreshPlan() {
     $("#refreshPlanBtn").css('opacity', '0');
     queryAndRenderWit();
@@ -186,25 +181,30 @@ function processAllWorkItems(values) {
     reportProgress("Work items details loaded.");
     
     var merged = jQuery.grep([].concat.apply([], values), function( elm, i ) { return elm.id > 0; });
-    var tasks = jQuery.grep(merged, function( elm, i ) { return isTaskWit(elm); });
+    var tasks = jQuery.grep(merged, function( elm, i ) { return jQuery.grep( _workItemTypes , function(element){ return element.name == elm.fields["System.WorkItemType"]; }).length > 0; });
     
     if (tasks.length == 0) {
         var container = document.getElementById("grid-container");
         reportFailure("No work items of type 'Task' found.");
     }
     else{
-        processWorkItems(merged, false, false);
+        processWorkItems(merged, false);
     }
 
 }
-function processWorkItems(workItems, isGMT, isSaving) {
+function processWorkItems(workItems, isSaving) {
 
     console.log("Work items data loaded. (" + (performance.now() - t0) + " ms.)");
 
-    var t = document.getElementById("grid-container");
-    setData(t, workItems, _iteration.attributes.startDate, _iteration.attributes.finishDate);
+    sprint = new SprintData(workItems, _iteration.attributes.startDate, _iteration.attributes.finishDate);
 
-    process(isGMT, isSaving);
+    container = document.getElementById("grid-container");;
+
+    var data = getTable();
+    var cols = getColumns();
+    
+    render(isSaving, data, cols);
+
     attachEvents();
     drawRelations();
     AlignTitlesToView();
@@ -240,11 +240,10 @@ function removeWitInUpdate(id) {
     }
 }
 
-function pushWitToSave(workItemIdhtml) {
-    var id = parseInt(workItemIdhtml);
-    if (_witToSave.indexOf(id) == -1) {
-        _witToSave.push(id);
-        _witIdsToSave.push(workItems[id].id);
+function pushWitToSave(witId) {
+    var wit = sprint.GetWorkitemById(witId);
+    if (wit && _witToSave.indexOf(witId) == -1) {
+        _witToSave.push(witId);
     }
 }
 
@@ -252,52 +251,52 @@ function updateWorkItemInVSS() {
 
     var needSave = _witToSave.length > 0;
     var promises = [];
-    console.log("Saving Items: " + _witIdsToSave.join(", "));
+    console.log("Saving Items: " + _witToSave.join(", "));
     
     if (needSave) {
         _witToSave.forEach(function (item, index) {
-            var workItem = workItems[item];
+            var workItem = sprint.GetWorkitemById(item);
             if (workItem){
                 var wijson =
                     [{
                         "op": "add",
                         "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-                        "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
+                        "value": workItem.FinishDate.yyyy_mm_dd()
                     },
                     {
                         "op": "add",
                         "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-                        "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                        "value": workItem.StartDate.yyyy_mm_dd()
                     },
                     {
                         "op": "add",
                         "path": "/fields/System.AssignedTo",
-                        "value": workItem.fields["System.AssignedTo"] || ""
+                        "value": workItem.AssignedTo
                     }];
 
-                if (!workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]) {
+                if (!workItem.StartDate) {
                     wijson =
                         [{
                             "op": "remove",
                             "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-                            "value": workItem.fields["Microsoft.VSTS.Scheduling.FinishDate"]
+                            "value": workItem.FinishDate.yyyy_mm_dd()
                         },
                         {
                             "op": "remove",
                             "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-                            "value": workItem.fields["Microsoft.VSTS.Scheduling.StartDate"]
+                            "value": workItem.StartDate.yyyy_mm_dd()
                         }];
                 }
-                pushWitInUpdate(workItem.id);
-                promises.push(_witClient.updateWorkItem(wijson, workItem.id));
+                workItem.UpdateRawData();
+                pushWitInUpdate(workItem.Id);
+                promises.push(_witClient.updateWorkItem(wijson, workItem.Id));
             }
         });
     }
 
-    processWorkItems(workItems, true, needSave);
+    processWorkItems(sprint.RawWits, needSave);
 
     _witToSave = [];
-    _witIdsToSave = [];
     if (promises.length > 0) {
         Promise.all(promises).then(function (x) {
             x.forEach(function(item1,index1) {
@@ -312,14 +311,15 @@ function ResetTasks() {
 
     if (confirm("Are you sure you want to rearrange all tasks?")) {
         console.log("Reset Tasks")
-        workItems.forEach(function (item, index) {
-            if (isTaskWit(item)) {
-                item.fields["Microsoft.VSTS.Scheduling.FinishDate"] = undefined;
-                item.fields["Microsoft.VSTS.Scheduling.StartDate"] = undefined;
-                pushWitToSave(index);
+        sprint.Wits.forEach(function (item, index) {
+            if (item.isTaskWit) {
+                item.FinishDate = undefined;
+                item.StartDate = undefined;
+                item.UpdateRawData();
+                pushWitToSave(item.Id);
             }
         });
-        processWorkItems(workItems, true, false);
+        processWorkItems(sprint.RawWits, false);
     }
 }
 

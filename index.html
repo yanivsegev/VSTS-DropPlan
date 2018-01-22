@@ -65,11 +65,16 @@
             <input id="showAreaPath" type="checkbox" onclick="$('body').toggleClass('showareapath');" style="margin-left: 10px;"/>
             <label for="showAreaPath">Highlight same area path</label>
         </div>
+        <div> 
+            <input id="showPBIs" type="checkbox" onclick="switchViewByTasks(!($('#showPBIs').prop('checked')));" style="margin-left: 10px;"/>
+            <label for="showPBIs">View by PBIs</label>
+        </div>
     </span>
-
 </body>
 
 <script src="scripts/Promise.js"></script>
+<script src="scripts/components/SprintData.js"></script>
+<script src="scripts/components/Workitem.js"></script>
 <script src="scripts/jquery-1.12.1.min.js"></script>
 <script src="scripts/jquery-ui.min.js"></script> 
 <script src="scripts/VSS.SDK.min.js"></script>    

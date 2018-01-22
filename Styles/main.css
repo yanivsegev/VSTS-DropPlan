@@ -27,6 +27,27 @@
 }
 
 
+
+.PBItaskStart {
+    margin-left: 10px;
+    border-right:  1px  solid #c8c8c8;
+    border-top: 1px solid #c8c8c8;
+    border-bottom: 1px solid #c8c8c8;
+    position: absolute !important;
+    padding-left:5px;
+}
+
+.PBItaskStart:before {
+    content:"\00a0";
+    background:rgb(0, 156, 204);
+    height:calc(100% + 2px);
+    position:absolute;
+    width:6px;
+    left:0px;
+    top: -1px;
+
+}
+
 .task {
     height: 65px;
     background: white;
@@ -44,6 +65,8 @@
 .taskTd
 {
     vertical-align: top;
+    background: #dadada;
+    border-left: 4px solid white;
 }
 
 .taskTr{
@@ -60,11 +83,6 @@
 
 
 .taskTdDiv{
-    background: #dadada;
-    margin-right: 4px;
-    padding-bottom: 4px;
-    padding-top: 4px;
-    min-height: 130px;
 }
 
 .taskTitle{
