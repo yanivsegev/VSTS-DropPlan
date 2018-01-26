@@ -4,7 +4,8 @@
 <head>
     <!-- BEGIN TRACKJS -->
     <script type="text/javascript">
-        if (window.location.pathname.toLowerCase().indexOf("drop-plan-extension-test") == -1){
+        if ((window.location.pathname.toLowerCase().indexOf("drop-plan-extension-test") == -1) &&
+        (window.location.hostname.toLowerCase().indexOf("localhost") == -1) ){
 
             window._trackJs = { token: 'fc6fa20e86714ea3b7ee9cb34cee66d2', version: "0" };
             var js = document.createElement('script')
@@ -16,7 +17,8 @@
     <!-- END TRACKJS -->
 
     <script>
-        if (window.location.pathname.indexOf("Drop-plan-extension-test") == -1){
+        if ((window.location.pathname.indexOf("Drop-plan-extension-test") == -1)&&
+        (window.location.hostname.toLowerCase().indexOf("localhost") == -1) ){
 
             (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
             (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -59,7 +61,7 @@
         </select> 
         </div>
         <div>
-            <input type="button" onclick="ResetTasks();" value="Rearrange tasks" style="margin-left: 10px;"/>
+            <input id="resetTasksBtn" type="button" onclick="ResetTasks();" value="Rearrange tasks" style="margin-left: 10px;"/>
         </div>
         <div> 
             <input id="showAreaPath" type="checkbox" onclick="$('body').toggleClass('showareapath');" style="margin-left: 10px;"/>

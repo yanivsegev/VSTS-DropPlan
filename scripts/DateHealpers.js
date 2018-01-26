@@ -1,7 +1,6 @@
  Date.prototype.addDays = function(days) {
-    var dat = new Date(this.valueOf())
-    dat.setDate(dat.getDate() + days);
-    return dat;
+  
+    return new Date(this.valueOf() + days * 24 * 60 * 60000);
 }
 
 Date.prototype.yyyymmdd = function() {
@@ -33,12 +32,23 @@ Date.prototype.mmdd = function() {
          ].join('/');
 };
 
+//"2018-01-25T00:00:00Z"
+Date.prototype.tfsFormat = function() {
+    var mm = this.getMonth() + 1; // getMonth() is zero-based
+    var dd = this.getDate();
+  
+    return [this.getFullYear(),
+            (mm>9 ? '' : '0') + mm,
+            (dd>9 ? '' : '0') + dd
+           ].join('-') + "T00:00:00Z";
+  };
+
 Date.prototype.getGMT = function() {
   return new Date(this.valueOf() + this.getTimezoneOffset() * 60000);
 };
 
 Date.prototype.getNonGMT = function() {
-    return new Date(this.valueOf() - this.getTimezoneOffset() * 60000);
+    return new Date(this.valueOf());// - this.getTimezoneOffset() * 60000);
 };
 
 function getDates(startDate, stopDate) {
@@ -49,10 +59,6 @@ function getDates(startDate, stopDate) {
         currentDate = currentDate.addDays(1);
     }
     return dateArray;
-}
-
-function isToday(date){
-    return new Date().yyyymmdd() == date;
 }
 
 function isDayInRange(range, date){

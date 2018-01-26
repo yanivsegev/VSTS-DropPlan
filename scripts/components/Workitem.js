@@ -49,12 +49,12 @@ function Workitem(workitem){
     
     this.UpdateRawData = function () {
         if (this.StartDate){
-            this._workitem.fields["Microsoft.VSTS.Scheduling.StartDate"] = this.StartDate.yyyy_mm_dd();
+            this._workitem.fields["Microsoft.VSTS.Scheduling.StartDate"] = this.StartDate.tfsFormat();
         }else{
             this._workitem.fields["Microsoft.VSTS.Scheduling.StartDate"] = this.StartDate;
         }
         if (this.FinishDate){
-            this._workitem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = this.FinishDate.yyyy_mm_dd();
+            this._workitem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = this.FinishDate.tfsFormat();
         }else{
             this._workitem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = this.FinishDate;
         }

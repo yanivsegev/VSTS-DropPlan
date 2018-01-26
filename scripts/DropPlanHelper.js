@@ -5,7 +5,7 @@ var _witToSave = [];
 var _witInUpdate = [];
 var _viewByTasks = true;
 
-var _today = new Date(new Date().getGMT().yyyy_mm_dd());
+var _today = new Date(new Date().yyyy_mm_dd());
 
 window.addEventListener("message", receiveMessage, false);
 
@@ -25,17 +25,19 @@ function receiveMessage(event) {
 
 function switchViewByTasks(viewByTasks){
     _viewByTasks = viewByTasks;
+    $("#resetTasksBtn").attr("disabled", !viewByTasks);
     processWorkItems(sprint.RawWits, false);
 }
 
 function getColumns() {
     var columnArray = new Array();
     columnArray.push({ text: "", date: "", index: 0 });
-    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-   
+    
     for (var colIndex = 0; colIndex < sprint.Dates.length; colIndex++) {
-        var day = sprint.Dates[colIndex].getDay();
-        columnArray.push({ text: days[day], date: VSS.Core.convertValueToDisplayString(sprint.Dates[colIndex].getNonGMT(),"d"), index: colIndex + 1 });
+        columnArray.push({ 
+            text: VSS.Core.convertValueToDisplayString(sprint.Dates[colIndex].getNonGMT(),"dddd"), 
+            date: VSS.Core.convertValueToDisplayString(sprint.Dates[colIndex].getNonGMT(),"d"), 
+            index: colIndex + 1 });
     }
     return columnArray;
 }
@@ -54,144 +56,147 @@ function render(isSaving, data, cols) {
     for (var nameIndex = 0; nameIndex < data.length; nameIndex++) {
         var personRow = data[nameIndex];
 
-        result = result + "<tr class='taskTr taskTrSpace'><td class='row_class_name'><div class='rowHeaderSpace'/></td><td colspan='" + (sprint.Dates.length) + "'/></tr>";
-        result = result + "<tr class='taskTr taskTrContent' >";
+        if (personRow.hasItems){
 
-        if (personRow.assignedTo) {
+            result = result + "<tr class='taskTr taskTrSpace'><td class='row_class_name'><div class='rowHeaderSpace'/></td><td colspan='" + (sprint.Dates.length) + "'/></tr>";
+            result = result + "<tr class='taskTr taskTrContent' >";
 
-            result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'>";
-            var avatar = getMemberImage(personRow.assignedTo);
-            if (avatar) {
-                result = result +  "<img class='assignedToAvatar' src='" + avatar + "'/>"
-            }
-            result = result + "<div class='assignedToName'>" + personRow.assignedTo + "</div>"
+            if (personRow.assignedTo) {
 
-            if (personRow.TotalCapacity > 0) {
-                var cssClass = 'visual-progress-total visual-progress-overallocated';
-                var cssClassOut = 'visual-progress-current visual-progress-overallocated';
-                var precent = 0;
-                if (personRow.TatalTasks > 0){
-                    precent = personRow.TotalCapacity / personRow.TatalTasks * 100;
+                result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'>";
+                var avatar = getMemberImage(personRow.assignedTo);
+                if (avatar) {
+                    result = result +  "<img class='assignedToAvatar' src='" + avatar + "'/>"
                 }
-                if (personRow.TotalCapacity >= personRow.TatalTasks) {
-                    cssClass = ' visual-progress-underallocated';
-                    cssClassOut = 'visual-progress-total visual-progress-current visual-progress-total-unallocated';
-                    precent = personRow.TatalTasks / personRow.TotalCapacity * 100;
+                result = result + "<div class='assignedToName'>" + personRow.assignedTo + "</div>"
+
+                if (personRow.TotalCapacity > 0) {
+                    var cssClass = 'visual-progress-total visual-progress-overallocated';
+                    var cssClassOut = 'visual-progress-current visual-progress-overallocated';
+                    var precent = 0;
+                    if (personRow.TatalTasks > 0){
+                        precent = personRow.TotalCapacity / personRow.TatalTasks * 100;
+                    }
+                    if (personRow.TotalCapacity >= personRow.TatalTasks) {
+                        cssClass = ' visual-progress-underallocated';
+                        cssClassOut = 'visual-progress-total visual-progress-current visual-progress-total-unallocated';
+                        precent = personRow.TatalTasks / personRow.TotalCapacity * 100;
+                    }
+
+                    result = result + "<div class='visual-progress-top-container'><div class='visual-progress-container'><div class='" + cssClassOut + "' style='width: 100%;'><div class='" + cssClass + "' style='width: " + precent + "%;'></div></div></div><div class='progress-text'>(" + personRow.TatalTasks + " of " + personRow.TotalCapacity + "h)</div></div></div></td>";
                 }
-
-                result = result + "<div class='visual-progress-top-container'><div class='visual-progress-container'><div class='" + cssClassOut + "' style='width: 100%;'><div class='" + cssClass + "' style='width: " + precent + "%;'></div></div></div><div class='progress-text'>(" + personRow.TatalTasks + " of " + personRow.TotalCapacity + "h)</div></div></div></td>";
+            } else {
+                result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><div class='assignedToName'>Unassigned</div></div></td>";
             }
-        } else {
-            result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><div class='assignedToName'>Unassigned</div></div></td>";
-        }
 
-        for (var dateIndex = 0; dateIndex < sprint.Dates.length; dateIndex++) {
-            var date = sprint.Dates[dateIndex].yyyymmdd();
-            var day = sprint.Dates[dateIndex].getDay();
-            personDateCell = personRow[date];
-            result = result + "<td class='taskTd ";
-            if (isDayOff(personRow.assignedTo, date, day)) result = result + "taskDayOff "
-            if (isToday(date)) result = result + "taskToday "
+            for (var dateIndex = 0; dateIndex < sprint.Dates.length; dateIndex++) {
+                var date = sprint.Dates[dateIndex].yyyymmdd();
+                var day = sprint.Dates[dateIndex].getDay();
+                personDateCell = personRow[date];
+                result = result + "<td class='taskTd ";
+                if (isDayOff(personRow.assignedTo, date, day)) result = result + "taskDayOff "
+                if (date == _today.yyyymmdd()) result = result + "taskToday "
 
-            result = result + "'>";
+                result = result + "'>";
 
-            for (var taskIndex = 0; taskIndex < (personDateCell.MaxDataRow || 0); taskIndex++) {
-                var task = personDateCell[taskIndex];
-                result = result + "<div class='taskDiv'>";
+                for (var taskIndex = 0; taskIndex < (personDateCell.MaxDataRow || 0); taskIndex++) {
+                    var task = personDateCell[taskIndex];
+                    result = result + "<div class='taskDiv'>";
 
-                if (task.Type == 1 && task.part == 0) {
-                    var parentId = null;
-                    var parentWit = null;
-                    var partnerWorktemId = null;
-                    result = result + "<div witId=" + task.workItem.Id;
-                    
-                    if (task.isWitTask){
-                        parentId = task.workItem.GetParentId();
-                        parentWit = sprint.GetWorkitemById(parentId);
-                        partnerWorktemId = sprint.Wits.indexOf(parentWit);
-                        result = result + " witParentId=" + parentId + " class='task tooltip ";
-                    }else{
-                        result = result + " class='task ";
-                    }
-
-                    if (task.endDate < _today) result = result + "taskOverDue "
-
-                    if (isSaving && isWitInUpdate(task.workItem.Id)) result = result + "taskSaving "
-
-                    switch (task.workItem.Blocked) {
-                        case "Yes": result = result + "taskBlocked "; break;
-                    }
-
-                    switch (task.workItem.State) {
-                        case "Done": result = result + "taskDone "; break;
-                        case "Closed": result = result + "taskDone "; break;
-                    }
-
-                    
-                    if (task.isWitTask){
-                        result = result + " taskStart";
-                    }else{
-                        result = result + " PBItaskStart";
-                    }
-
-                    result = result + " taskAreaPath" + task.areaPath.id + " ";
-
-                    result = result + "' style='width:" + (colWidth * task.total - 26) + "px;";
-
-                    var title = task.workItem.Title + " " + task.workItem.StartDate + " " + task.workItem.FinishDate;
-                    var desc = task.workItem.Description;
-                    try {
-                        if (desc && desc.includes("DropPlanJson ")) {
-                            var decodeDesc = $("<div>" + desc + "</div>")[0].innerText;
-                            var json = JSON.parse(decodeDesc.substring(decodeDesc.indexOf("DropPlanJson ") + 13));
-                            if (json.img) {
-                                result = result + "background-image: url(" + json.img + "); background-size:100% 100%;";
-                            }
-                            if (json.showTitle == "0") {
-                                title = "";
-                            }
-                        }
-                    } catch (error) { }
-
-                    result = result + "'>";
-
-                    if (task.isWitTask){
-
-                        var tooltiptextcls = 'tooltiptextPBI';
-                        if (parentWit) {
-                            if (parentWit.WorkItemType == "Bug") {
-                                tooltiptextcls = 'tooltiptextBUG';
-                            }
-                        }
-                        if (parentId != -1) {
-                            result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + ">";
-                            if (parentWit) {
-                                result = result + "<div class='taskTitle pbiText'><div class='openWit'>" + parentWit.Title + "</div><div class='pbiState'>" + parentWit.State + "</div></div>";
-                            } else {
-                                result = result + "<div class='taskTitle pbiText'><div class='openWit'>Open PBI</div></div>";
-                            }
-                            result = result + "</div>";
-                        }
-                    }
-
-                    result = result + "<div class='taskTitle'><div class='openWit'>" + title + "</div></div>";
-
-                    if (task.isWitTask){
+                    if (task.Type == 1 && task.part == 0) {
+                        var parentId = null;
+                        var parentWit = null;
+                        var partnerWorktemId = null;
+                        result = result + "<div witId=" + task.workItem.Id;
                         
-                        var remain = task.workItem.RemainingWork;
-                        if (remain != "") result = result + "<div class='taskRemainingWork'>" + remain + "</div>";
+                        if (task.isWitTask){
+                            parentId = task.workItem.GetParentId();
+                            parentWit = sprint.GetWorkitemById(parentId);
+                            partnerWorktemId = sprint.Wits.indexOf(parentWit);
+                            result = result + " witParentId=" + parentId + " class='task tooltip ";
+                        }else{
+                            result = result + " class='task ";
+                        }
 
+                        if (task.endDate < _today) result = result + "taskOverDue "
+
+                        if (isSaving && isWitInUpdate(task.workItem.Id)) result = result + "taskSaving "
+
+                        switch (task.workItem.Blocked) {
+                            case "Yes": result = result + "taskBlocked "; break;
+                        }
+
+                        switch (task.workItem.State) {
+                            case "Done": result = result + "taskDone "; break;
+                            case "Closed": result = result + "taskDone "; break;
+                        }
+
+                        
+                        if (task.isWitTask){
+                            result = result + " taskStart";
+                        }else{
+                            result = result + " PBItaskStart";
+                        }
+
+                        result = result + " taskAreaPath" + task.areaPath.id + " ";
+
+                        result = result + "' style='width:" + (colWidth * task.total - 26) + "px;";
+
+                        var title = task.workItem.Title;
+                        var desc = task.workItem.Description;
+                        try {
+                            if (desc && desc.includes("DropPlanJson ")) {
+                                var decodeDesc = $("<div>" + desc + "</div>")[0].innerText;
+                                var json = JSON.parse(decodeDesc.substring(decodeDesc.indexOf("DropPlanJson ") + 13));
+                                if (json.img) {
+                                    result = result + "background-image: url(" + json.img + "); background-size:100% 100%;";
+                                }
+                                if (json.showTitle == "0") {
+                                    title = "";
+                                }
+                            }
+                        } catch (error) { }
+
+                        result = result + "'>";
+
+                        if (task.isWitTask){
+
+                            var tooltiptextcls = 'tooltiptextPBI';
+                            if (parentWit) {
+                                if (parentWit.WorkItemType == "Bug") {
+                                    tooltiptextcls = 'tooltiptextBUG';
+                                }
+                            }
+                            if (parentId != -1) {
+                                result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + ">";
+                                if (parentWit) {
+                                    result = result + "<div class='taskTitle pbiText'><div class='openWit'>" + parentWit.Title + "</div><div class='pbiState'>" + parentWit.State + "</div></div>";
+                                } else {
+                                    result = result + "<div class='taskTitle pbiText'><div class='openWit'>Open PBI</div></div>";
+                                }
+                                result = result + "</div>";
+                            }
+                        }
+
+                        result = result + "<div class='taskTitle'><div class='openWit'>" + title + "</div></div>";
+
+                        if (task.isWitTask){
+                            
+                            var remain = task.workItem.RemainingWork;
+                            if (remain != "") result = result + "<div class='taskRemainingWork'>" + remain + "</div>";
+
+                        }
+
+                        result = result + "</div>";
                     }
 
                     result = result + "</div>";
+
                 }
-
-                result = result + "</div>";
-
+                result = result + "</td>";
             }
-            result = result + "</td>";
+            result = result + "</tr>";
         }
-        result = result + "</tr>";
     }
 
     result = result + "</tbody></table>";
@@ -413,39 +418,54 @@ function getTable() {
     for (var i = 0; i < sprint.Wits.length; i++) {
         var workItem = sprint.Wits[i];
         var personRow;
-                
+        
+        if (!names[workItem.AssignedTo]) {
+            names[workItem.AssignedTo] = { id: result.length, days: [] };
+            var newName = { 
+                Name: workItem.AssignedTo, 
+                Capacity: getCapacity(workItem.AssignedTo), 
+                TotalCapacity: 0, 
+                TatalTasks: 0,
+                assignedTo: workItem.AssignedTo, 
+                assignedToId: result.length,
+                hasItems: false,
+            };
+            for (var colIndex = 0; colIndex < globalDates.length; colIndex++) {
+                var currentDate = globalDates[colIndex];
+                newName[currentDate.yyyymmdd()] = [];
+                if (currentDate >= _today && !isDayOff(workItem.AssignedTo, currentDate.yyyymmdd(), currentDate.getDay())) {
+                    newName.TotalCapacity = newName.TotalCapacity + newName.Capacity;
+                }
+            }
+            
+            result.push(newName);
+            nameById[names[workItem.AssignedTo].id] = { Name: workItem.AssignedTo };
+        }
+
+        personRow = result[names[workItem.AssignedTo].id];
+       
+        var remainingWork = 0;
+        
+        if (workItem.isTaskWit) {
+            
+            remainingWork = workItem.RemainingWork;
+            personRow.TatalTasks = personRow.TatalTasks + remainingWork;
+        }
 
         if ((!_viewByTasks && workItem.isPBIWit) || (_viewByTasks && workItem.isTaskWit)){
             if (!areaPaths[workItem.AreaPath]) {
                 areaPaths[workItem.AreaPath] = { id: areaPathsId };
                 areaPathsId = areaPathsId + 1;
             }
-            if (!names[workItem.AssignedTo]) {
-                names[workItem.AssignedTo] = { id: result.length, days: [] };
-                var newName = { Name: workItem.AssignedTo, Capacity: getCapacity(workItem.AssignedTo), TotalCapacity: 0, TatalTasks: 0 };
-                for (var colIndex = 0; colIndex < globalDates.length; colIndex++) {
-                    var currentDate = globalDates[colIndex];
-                    newName[currentDate.yyyymmdd()] = [];
-                    if (currentDate >= _today && !isDayOff(workItem.AssignedTo, currentDate.yyyymmdd(), currentDate.getDay())) {
-                        newName.TotalCapacity = newName.TotalCapacity + newName.Capacity;
-                    }
-                }
-                result.push(newName);
-                nameById[names[workItem.AssignedTo].id] = { Name: workItem.AssignedTo };
-            }
-
-            personRow = result[names[workItem.AssignedTo].id];
-            personRow.assignedTo = workItem.AssignedTo;
-            personRow.assignedToId = names[workItem.AssignedTo].id;
+           
+            personRow.hasItems = true;
             
             var isWitTask;
-            
+           
+
             if (_viewByTasks && workItem.isTaskWit) {
                 
                 isWitTask = true;
-                var remainingWork = workItem.RemainingWork;
-                personRow.TatalTasks = personRow.TatalTasks + remainingWork;
-
                 var capacity = personRow.Capacity;
                 var witChanged = false;
                 
@@ -508,8 +528,12 @@ function getTable() {
                         if (item.rel == "System.LinkTypes.Hierarchy-Forward") {
                             var childId = item.url.substring(item.url.lastIndexOf("/") + 1);
                             var childWit = sprint.GetWorkitemById(childId);
-
                             if (childWit) {
+
+                                if (childWit.Blocked == "Yes"){
+                                    workItem.Blocked = childWit.Blocked;
+                                }
+
                                 var ds = childWit.StartDate;
                                 var de = childWit.FinishDate;
 
