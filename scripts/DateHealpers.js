@@ -43,13 +43,22 @@ Date.prototype.tfsFormat = function() {
            ].join('-') + "T00:00:00Z";
   };
 
+
 Date.prototype.getGMT = function() {
-  return new Date(this.valueOf() + this.getTimezoneOffset() * 60000);
+    return new Date(this.valueOf() + this.getTimezoneOffset() * 60000);
 };
 
-Date.prototype.getNonGMT = function() {
-    return new Date(this.valueOf());// - this.getTimezoneOffset() * 60000);
+Date.prototype.ConvertGMTToServerTimeZone = function() {
+
+    if (!this._serverToGMTDiff){
+        this._serverToGMTDiff = (new Date(VSS.Core.convertValueToDisplayString(new Date("2000-01-01"), 'u')).getTime() - new Date("2000-01-01").getTime()) + (new Date().getTimezoneOffset() * 60000);
+    }
+
+
+    return new Date(this.getTime() - this._serverToGMTDiff);
 };
+
+
 
 function getDates(startDate, stopDate) {
     var dateArray = new Array();

@@ -34,9 +34,9 @@ function getColumns() {
     columnArray.push({ text: "", date: "", index: 0 });
     
     for (var colIndex = 0; colIndex < sprint.Dates.length; colIndex++) {
+
         columnArray.push({ 
-            text: VSS.Core.convertValueToDisplayString(sprint.Dates[colIndex].getNonGMT(),"dddd"), 
-            date: VSS.Core.convertValueToDisplayString(sprint.Dates[colIndex].getNonGMT(),"d"), 
+            date: sprint.Dates[colIndex].ConvertGMTToServerTimeZone(), 
             index: colIndex + 1 });
     }
     return columnArray;
@@ -49,7 +49,19 @@ function render(isSaving, data, cols) {
     result = result + "<td class='locked_class_name'><div class='taskColumn assignToColumn rowHeaderSpace'><button class='refreshPlanBtn' onclick='refreshPlan();'>Refresh Plan</button></div></td>"
 
     for (var colIndex = 1; colIndex < cols.length; colIndex++) {
-        result = result + "<td class='column_class_name'><div class='taskColumn taskHeader' style='width:" + colWidth + "px'>" + cols[colIndex].text + "<br>" + cols[colIndex].date + "</div></td>";
+        result = result + "<td class='column_class_name'><div class='taskColumn taskHeader' style='width:" + colWidth + "px'>" + 
+                            VSS.Core.convertValueToDisplayString(cols[colIndex].date, "dddd") + "<br>";
+
+        if (debug_mode) {
+            result = result + VSS.Core.convertValueToDisplayString(cols[colIndex].date, "u") + "</div></td>";           
+        } 
+        else{
+            result = result + VSS.Core.convertValueToDisplayString(cols[colIndex].date, "d") + "</div></td>";            
+        }
+
+
+        
+                            
     }
     result = result + "</tr><tbody>"
  
@@ -98,6 +110,8 @@ function render(isSaving, data, cols) {
                 if (date == _today.yyyymmdd()) result = result + "taskToday "
 
                 result = result + "'>";
+
+                if (debug_mode) result = result + date;
 
                 for (var taskIndex = 0; taskIndex < (personDateCell.MaxDataRow || 0); taskIndex++) {
                     var task = personDateCell[taskIndex];
@@ -179,7 +193,7 @@ function render(isSaving, data, cols) {
                         }
 
                         result = result + "<div class='taskTitle'><div class='openWit'>" + title + "</div></div>";
-
+                        
                         if (task.isWitTask){
                             
                             var remain = task.workItem.RemainingWork;

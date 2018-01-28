@@ -2,17 +2,13 @@ function SprintData(workitems, startDate, endDate){
 
     this.RawWits = workitems;
     this.Wits = [];
-    
+
     this.StartDate = startDate.getGMT();
     this.EndDate = endDate.getGMT();
 
     this.Dates;
-
-    this.Init = InitFunc;
-
-    this.Init();
-
-    function InitFunc(){
+    
+    this.Init = function (){
         var items = [];
         this.RawWits.forEach( function(item, index) {
             items.push( new Workitem(item) );
@@ -21,7 +17,6 @@ function SprintData(workitems, startDate, endDate){
         this.Wits = SortWits(items);
 
         this.Dates = getDates(this.StartDate, this.EndDate);
-        
     }
 
     function SortWits(items){
@@ -64,5 +59,6 @@ function SprintData(workitems, startDate, endDate){
     this.GetWorkitemById = function( id ){
         return jQuery.grep(this.Wits, function (element) { return element.Id == id; })[0];
     } 
-
+    
+    this.Init();
 }
