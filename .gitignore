@@ -1,2 +1,5 @@
 *.vsix
 .vscode/
+node_modules/
+dist/
+publisherid

@@ -1,8 +1,8 @@
 {
     "manifestVersion": 1,
-    "id": "Drop-plan-extension-test",
+    "id": "Drop-plan-extension#{testing-flag}",
     "version": "1.1.30",
-    "name": "Sprint Drop Plan-test",
+    "name": "Sprint Drop Plan#{testing-flag}",
     "description": "Plan and track your sprint with a calendar based view.",
     "publisher": "yanivsegev",
     "public": false,
@@ -45,32 +45,16 @@
     ],
     "contributions": [
         {
-            "id": "DropPlanTest",
+            "id": "DropPlan#{testing-flag}",
             "type": "ms.vss-web.tab",
             "description": "Adds Drop Plan to the Work hub group",
             "targets": [
                 "ms.vss-work-web.iteration-backlog-tabs"
             ],
             "properties": {
-                "name": "Drop plan test",
+                "name": "Drop Plan#{testing-flag}",
                 "order": 99,
                 "uri": "index.html"
-            }
-        },
-        {
-            "id": "CreateTasks",
-            "type": "ms.vss-web.action",
-            "description": "Create tasks for drop plan",
-            "targets": [
-                "ms.vss-work-web.work-item-context-menu"
-            ],
-            "properties": {
-                "text": "Create dev and qa tasks",
-                "title": "Create dev and qa tasks",
-                "toolbarText": "Create dev and qa tasks",                
-                "icon": "images/logo.png",
-                "uri": "toolbar.html",
-                "registeredObjectId": "CreateTasks"
             }
         }
     ],
