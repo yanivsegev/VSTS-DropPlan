@@ -23,7 +23,6 @@ function Workitem(workitem){
         this.Blocked = workitem.fields["Microsoft.VSTS.CMMI.Blocked"];
         this.State = workitem.fields["System.State"];
         this.Title = workitem.fields["System.Title"];
-        this.Description = workitem.fields["System.Description"];
         this.WorkItemType = workitem.fields["System.WorkItemType"];
 
         this.Relations = workitem.relations;

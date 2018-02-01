@@ -146,30 +146,14 @@ function render(isSaving, data, cols) {
                         }
 
                         
-                        if (task.isWitTask){
-                            result = result + " taskStart";
-                        }else{
+                        result = result + " taskStart";
+                        if (!task.isWitTask){
                             result = result + " PBItaskStart";
                         }
 
                         result = result + " taskAreaPath" + task.areaPath.id + " ";
 
                         result = result + "' style='width:" + (colWidth * task.total - 26) + "px;";
-
-                        var title = task.workItem.Title;
-                        var desc = task.workItem.Description;
-                        try {
-                            if (desc && desc.includes("DropPlanJson ")) {
-                                var decodeDesc = $("<div>" + desc + "</div>")[0].innerText;
-                                var json = JSON.parse(decodeDesc.substring(decodeDesc.indexOf("DropPlanJson ") + 13));
-                                if (json.img) {
-                                    result = result + "background-image: url(" + json.img + "); background-size:100% 100%;";
-                                }
-                                if (json.showTitle == "0") {
-                                    title = "";
-                                }
-                            }
-                        } catch (error) { }
 
                         result = result + "'>";
 
@@ -182,17 +166,17 @@ function render(isSaving, data, cols) {
                                 }
                             }
                             if (parentId != -1) {
-                                result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + ">";
+                                result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + "><div class='taskTitle pbiText'><div class='openWit'>";
                                 if (parentWit) {
-                                    result = result + "<div class='taskTitle pbiText'><div class='openWit'>" + parentWit.Title + "</div><div class='pbiState'>" + parentWit.State + "</div></div>";
+                                    result = result + parentWit.Title + "</div><div class='pbiState'>" + parentWit.State;
                                 } else {
-                                    result = result + "<div class='taskTitle pbiText'><div class='openWit'>Open PBI</div></div>";
+                                    result = result + "Open PBI";
                                 }
-                                result = result + "</div>";
+                                result = result + "</div></div></div>";
                             }
                         }
 
-                        result = result + "<div class='taskTitle'><div class='openWit'>" + title + "</div></div>";
+                        result = result + "<div class='taskTitle'><div class='openWit'>" + task.workItem.Title + "</div></div>";
                         
                         if (task.isWitTask){
                             
@@ -299,7 +283,7 @@ function AlignTitlesToView() {
 
 function attachEvents() {
     console.log("Attach events")
-    $(".taskStart").hover(function (In) {
+    $(".taskStart:not(.PBItaskStart)").hover(function (In) {
         if (!$(".activeTask")[0]) {
             var current = $(In.target).closest(".taskStart");
             DrawRelations(current);
@@ -318,7 +302,7 @@ function attachEvents() {
     });
 
 
-    $(".taskStart").click(function (event) {
+    $(".taskStart:not(.PBItaskStart)").click(function (event) {
         event.stopPropagation();
         ResetRelations();
         $(this).toggleClass("activeTask");
@@ -346,7 +330,7 @@ function attachEvents() {
         }
     });
 
-    $(".taskStart:not(.taskSaving)").draggable(({
+    $(".taskStart:not(.taskSaving):not(.PBItaskStart)").draggable(({
         opacity: 0.7,
         containment: ".mainTable",
         cancel: ".taskChanged",
@@ -370,7 +354,7 @@ function attachEvents() {
     });
 
 
-    $(".taskStart:not(.taskSaving)").resizable({
+    $(".taskStart:not(.taskSaving):not(.PBItaskStart)").resizable({
         grid: colWidth,
         containment: ".mainTable",
         minWidth: 60,

@@ -26,26 +26,8 @@
 
 }
 
-
-
-.PBItaskStart {
-    margin-left: 10px;
-    border-right:  1px  solid #c8c8c8;
-    border-top: 1px solid #c8c8c8;
-    border-bottom: 1px solid #c8c8c8;
-    position: absolute !important;
-    padding-left:5px;
-}
-
 .PBItaskStart:before {
-    content:"\00a0";
     background:rgb(0, 156, 204);
-    height:calc(100% + 2px);
-    position:absolute;
-    width:6px;
-    left:0px;
-    top: -1px;
-
 }
 
 .task {
@@ -371,7 +353,8 @@ canvas {
 }
 
 #tasksTable .sameParent{
-    background: bisque;
+    /*background: bisque;*/
+    box-shadow: 0 0 20px 4px rgba(81, 203, 238, 1);
 }
 
 .taskSaving{
