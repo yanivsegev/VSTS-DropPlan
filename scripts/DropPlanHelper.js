@@ -1,62 +1,24 @@
 var colWidth = 180;
-var sprint, container;
-var nameById = [];
 var _witToSave = [];
 var _witInUpdate = [];
-var _viewByTasks = true;
 
 var _today = new Date(new Date().yyyy_mm_dd());
 
-window.addEventListener("message", receiveMessage, false);
-
-function receiveMessage(event) {
-    try {
-        var result = JSON.parse(event.data);
-        if (result.result.fields) {
-            console.log("Refresh.");
-            queryAndRenderWit();
-        }
-
-    } catch (error) {
-
-    }
-}
-
-
-function switchViewByTasks(viewByTasks){
-    _viewByTasks = viewByTasks;
-    $("#resetTasksBtn").attr("disabled", !viewByTasks);
-    processWorkItems(sprint.RawWits, false);
-}
-
-function getColumns() {
-    var columnArray = new Array();
-    columnArray.push({ text: "", date: "", index: 0 });
-    
-    for (var colIndex = 0; colIndex < sprint.Dates.length; colIndex++) {
-
-        columnArray.push({ 
-            date: sprint.Dates[colIndex].ConvertGMTToServerTimeZone(), 
-            index: colIndex + 1 });
-    }
-    return columnArray;
-}
-
-function render(isSaving, data, cols) {
-    console.log("Rendering. (" + (performance.now() - t0) + " ms.) ");
+function render(isSaving, data) {
     
     var result = "<table id='tasksTable' class='mainTable' cellpadding='0' cellspacing='0'><thead><tr>";
-    result = result + "<td class='locked_class_name'><div class='taskColumn assignToColumn rowHeaderSpace'><button class='refreshPlanBtn' onclick='refreshPlan();'>Refresh Plan</button></div></td>"
+    result = result + "<td class='locked_class_name'><div class='taskColumn assignToColumn rowHeaderSpace'><button class='refreshPlanBtn' onclick='refreshPlan();'>Refresh Tasks</button></div></td>"
 
-    for (var colIndex = 1; colIndex < cols.length; colIndex++) {
+    for (var colIndex = 0; colIndex < sprint.Dates.length; colIndex++) {
+        var date = sprint.Dates[colIndex].ConvertGMTToServerTimeZone();
         result = result + "<td class='column_class_name'><div class='taskColumn taskHeader' style='width:" + colWidth + "px'>" + 
-                            VSS.Core.convertValueToDisplayString(cols[colIndex].date, "dddd") + "<br>";
+                            VSS.Core.convertValueToDisplayString(date, "dddd") + "<br>";
 
         if (debug_mode) {
-            result = result + VSS.Core.convertValueToDisplayString(cols[colIndex].date, "u") + "</div></td>";           
+            result = result + VSS.Core.convertValueToDisplayString(date, "u") + "</div></td>";           
         } 
         else{
-            result = result + VSS.Core.convertValueToDisplayString(cols[colIndex].date, "d") + "</div></td>";            
+            result = result + VSS.Core.convertValueToDisplayString(date, "d") + "</div></td>";            
         }
 
 
@@ -76,9 +38,8 @@ function render(isSaving, data, cols) {
             if (personRow.assignedTo) {
 
                 result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'>";
-                var avatar = getMemberImage(personRow.assignedTo);
-                if (avatar) {
-                    result = result +  "<img class='assignedToAvatar' src='" + avatar + "'/>"
+                if (personRow.avatar) {
+                    result = result +  "<img class='assignedToAvatar' src='" + personRow.avatar + "'/>"
                 }
                 result = result + "<div class='assignedToName'>" + personRow.assignedTo + "</div>"
 
@@ -103,10 +64,9 @@ function render(isSaving, data, cols) {
 
             for (var dateIndex = 0; dateIndex < sprint.Dates.length; dateIndex++) {
                 var date = sprint.Dates[dateIndex].yyyymmdd();
-                var day = sprint.Dates[dateIndex].getDay();
                 personDateCell = personRow[date];
                 result = result + "<td class='taskTd ";
-                if (isDayOff(personRow.assignedTo, date, day)) result = result + "taskDayOff "
+                if (personDateCell.isDayOff) result = result + "taskDayOff "
                 if (date == _today.yyyymmdd()) result = result + "taskToday "
 
                 result = result + "'>";
@@ -201,44 +161,6 @@ function render(isSaving, data, cols) {
     container.innerHTML = result;
 }
 
-function getCapacity(name) {
-    var result = 0;
-    $.each(_teamMemberCapacities, function (index, value) {
-        if (value.teamMember.displayName == name) {
-            if (value.activities.length > 0 && value.activities[0].capacityPerDay > 0) {
-                result = value.activities[0].capacityPerDay || 6;
-            }
-        }
-    });
-    return result;
-}
-function getDefaultDaysPerTask(remainingWork, capacity) {
-    return Math.ceil(remainingWork / capacity) - 1;
-}
-
-function isDayOff(name, date, day) {
-    var dayOff = false;
-    $.each(_teamMemberCapacities, function (index, value) {
-        if (value.teamMember.displayName == name) {
-            if (isDayInRange(value.daysOff, date)) dayOff = true;
-        }
-    });
-
-    if (isDayInRange(_daysOff.daysOff, date)) dayOff = true;
-
-    if ($.inArray(day, _teamSettings.workingDays) == -1) dayOff = true;
-
-    return dayOff;
-}
-
-function getMemberImage(name) {
-    var img = "";
-    $.each(_teamMemberCapacities, function (index, value) {
-        if (value.teamMember.displayName == name) img = value.teamMember.imageUrl;
-    });
-    return img;
-}
-
 function ResetRelations() {
     $(".sameParent").removeClass("sameParent");
 
@@ -279,6 +201,14 @@ function AlignTitlesToView() {
         }
         return true;
     })
+}
+
+function dettachEvents(){
+    $(".taskStart").off();
+    $("body").off();
+    $(window).off();
+    $(".openWit").off();
+    $(".taskTrContent").off();
 }
 
 function attachEvents() {
@@ -324,8 +254,10 @@ function attachEvents() {
             $(this).parent().removeClass('noclick');
         }
         else {
-            _witServices.WorkItemFormNavigationService.getService().then(function (workItemNavSvc) {
+            VSS.require(["TFS/WorkItemTracking/Services"], function (TFS_Wit_Services) {
+                TFS_Wit_Services.WorkItemFormNavigationService.getService().then(function (workItemNavSvc) {
                 workItemNavSvc.openWorkItem(witId);
+                });
             });
         }
     });
@@ -347,7 +279,7 @@ function attachEvents() {
 
     $(".taskTrContent").droppable({
         drop: function (event, ui) {
-            var assignedTo = nameById[$(this).closest('tr')[0].cells[0].attributes["assignedtoid"].value].Name;
+            var assignedTo = sprint.GetAssignToNameById($(this).closest('tr')[0].cells[0].attributes["assignedtoid"].value); ;
             var witId = ui.draggable.attr("witId");
             updateWorkItemAssignTo(witId, assignedTo);
         }
@@ -379,7 +311,6 @@ function SetNoClick(obj) {
     $(obj).addClass("taskChanged");
 }
 
-
 function updateWorkItemDates(witId, changeStartDays, changeEndDays) {
     
     if (changeStartDays != 0 || changeEndDays != 0) {
@@ -405,205 +336,3 @@ function updateWorkItemAssignTo(witId, assignedTo) {
     }
 }
 
-function getTable() {
-
-    var result = new Array();
-    var names = {};
-    var areaPaths = {};
-    var areaPathsId = 1;
-    var globalDates = sprint.Dates;
-    
-    for (var i = 0; i < sprint.Wits.length; i++) {
-        var workItem = sprint.Wits[i];
-        var personRow;
-        
-        if (!names[workItem.AssignedTo]) {
-            names[workItem.AssignedTo] = { id: result.length, days: [] };
-            var newName = { 
-                Name: workItem.AssignedTo, 
-                Capacity: getCapacity(workItem.AssignedTo), 
-                TotalCapacity: 0, 
-                TatalTasks: 0,
-                assignedTo: workItem.AssignedTo, 
-                assignedToId: result.length,
-                hasItems: false,
-            };
-            for (var colIndex = 0; colIndex < globalDates.length; colIndex++) {
-                var currentDate = globalDates[colIndex];
-                newName[currentDate.yyyymmdd()] = [];
-                if (currentDate >= _today && !isDayOff(workItem.AssignedTo, currentDate.yyyymmdd(), currentDate.getDay())) {
-                    newName.TotalCapacity = newName.TotalCapacity + newName.Capacity;
-                }
-            }
-            
-            result.push(newName);
-            nameById[names[workItem.AssignedTo].id] = { Name: workItem.AssignedTo };
-        }
-
-        personRow = result[names[workItem.AssignedTo].id];
-       
-        var remainingWork = 0;
-        
-        if (workItem.isTaskWit) {
-            
-            remainingWork = workItem.RemainingWork;
-            personRow.TatalTasks = personRow.TatalTasks + remainingWork;
-        }
-
-        if ((!_viewByTasks && workItem.isPBIWit) || (_viewByTasks && workItem.isTaskWit)){
-            if (!areaPaths[workItem.AreaPath]) {
-                areaPaths[workItem.AreaPath] = { id: areaPathsId };
-                areaPathsId = areaPathsId + 1;
-            }
-           
-            personRow.hasItems = true;
-            
-            var isWitTask;
-           
-
-            if (_viewByTasks && workItem.isTaskWit) {
-                
-                isWitTask = true;
-                var capacity = personRow.Capacity;
-                var witChanged = false;
-                
-                if (!workItem.StartDate) {
-                    witChanged = true;
-                    globalDates.forEach(function (item, index) {
-                        var tasksPerDay = names[workItem.AssignedTo].days[item.yyyymmdd()] || 0;
-                        if ((tasksPerDay < capacity || capacity == 0) && !workItem.StartDate && !isDayOff(workItem.AssignedTo, item.yyyymmdd(), item.getDay()) && (item >= _today)) {
-                            workItem.StartDate = item;
-                        }
-                    });
-
-                    if (!workItem.StartDate) {
-                        workItem.StartDate = sprint.EndDate;
-                    }
-                }
-
-                if (!workItem.FinishDate) {
-                    witChanged = true;
-                    var remainingWorkLeft = remainingWork;
-                    var dates = getDates(workItem.StartDate, sprint.EndDate);
-                    dates.forEach(function (item, index) {
-                        var tasksPerDay = names[workItem.AssignedTo].days[item.yyyymmdd()] || 0;
-
-                        if ((tasksPerDay < capacity || capacity == 0) && !isDayOff(workItem.AssignedTo, item.yyyymmdd(), item.getDay()) && !workItem.FinishDate) {
-
-                            var todayPart = remainingWorkLeft;
-                            if (tasksPerDay + todayPart > capacity && capacity > 0) {
-                                todayPart = capacity - tasksPerDay;
-                            }
-                            remainingWorkLeft = remainingWorkLeft - todayPart;
-
-                            if (remainingWorkLeft == 0) {
-                                workItem.FinishDate = item;
-                            }
-                        }
-                    });
-
-
-                    if (!workItem.FinishDate) {
-                        workItem.FinishDate = sprint.EndDate;
-                    }
-
-                }
-
-                if (witChanged) {
-                    pushWitToSave(workItem.Id);
-                }
-
-            }
-            
-            if (!_viewByTasks && workItem.isPBIWit) 
-            {
-                isWitTask = false;
-                workItem.StartDate = sprint.EndDate;
-                workItem.FinishDate = sprint.StartDate;
-
-                if (workItem.Relations) {
-                    workItem.Relations.forEach(function (item, index) {
-                        if (item.rel == "System.LinkTypes.Hierarchy-Forward") {
-                            var childId = item.url.substring(item.url.lastIndexOf("/") + 1);
-                            var childWit = sprint.GetWorkitemById(childId);
-                            if (childWit) {
-
-                                if (childWit.Blocked == "Yes"){
-                                    workItem.Blocked = childWit.Blocked;
-                                }
-
-                                var ds = childWit.StartDate;
-                                var de = childWit.FinishDate;
-
-                                if (workItem.StartDate > ds) {
-                                    workItem.StartDate = ds;
-                                }
-
-                                if (workItem.FinishDate < de) {
-                                    workItem.FinishDate = de;
-                                }
-                            }
-                        }
-                    });
-                }
-               
-            }
-
-            if (workItem.StartDate < sprint.StartDate) workItem.StartDate = sprint.StartDate;
-            if (workItem.StartDate > sprint.EndDate) workItem.StartDate = sprint.EndDate;
-            if (workItem.FinishDate > sprint.EndDate) workItem.FinishDate = sprint.EndDate;
-            if (workItem.FinishDate < workItem.StartDate) workItem.FinishDate = workItem.StartDate;
-
-            var dates = getDates(workItem.StartDate, workItem.FinishDate);
-
-            var selectedRow = -1;
-            var found = false;
-            while (!found) {
-                found = true;
-                selectedRow = selectedRow + 1;
-                for (var colIndex = 0; colIndex < dates.length; colIndex++) {
-                    var date = dates[colIndex].yyyymmdd();
-                    if (personRow[date].length > selectedRow) {
-                        if (personRow[date][selectedRow].Type != 0) {
-                            found = false;
-                        }
-                    }
-                }
-            }
-
-            for (var colIndex = 0; colIndex < dates.length; colIndex++) {
-                var date = dates[colIndex].yyyymmdd();
-                personDateCell = personRow[date];
-                
-                while (selectedRow >= personDateCell.length) personDateCell.push({ Type: 0 });
-                
-                if (!isDayOff(workItem.AssignedTo, dates[colIndex].yyyymmdd(), dates[colIndex].getDay())) {
-                    var todayTasks = (names[workItem.AssignedTo].days[date] || 0);
-                    var todayPart = remainingWork;
-                    if (todayTasks + remainingWork > capacity) {
-                        todayPart = capacity - todayTasks;
-                    }
-                    remainingWork = remainingWork - todayPart;
-                    names[workItem.AssignedTo].days[date] = todayTasks + todayPart;
-                }
-
-                if (colIndex == 0) {
-                    personDateCell.MaxDataRow = personDateCell.length;
-                }
-
-                personDateCell[selectedRow] = { 
-                    Type: 1, 
-                    part: colIndex, 
-                    total: dates.length, 
-                    workItem: workItem, 
-                    id: i, 
-                    endDate: dates[dates.length - 1], 
-                    areaPath: areaPaths[workItem.AreaPath],
-                    isWitTask: isWitTask
-                };
-            }
-        }
-    }
-
-    return result.sort(function (a, b) { return a.assignedTo.localeCompare(b.assignedTo) });
-}

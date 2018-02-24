@@ -1,4 +1,4 @@
-function Workitem(workitem){
+function Workitem(workitem, _workItemTypes, _workItemPBITypes){
     
     this._workitem = workitem;
     
