@@ -41,6 +41,7 @@ let js = {
     sourceFiles: ["scripts/Promise.js"
     ,"scripts/components/SprintData.js"
     ,"scripts/components/Workitem.js"
+    ,"scripts/components/VSSRepository.js"    
     ,"scripts/jquery-1.12.1.min.js"
     ,"scripts/jquery-ui.min.js"
     ,"scripts/VSS.SDK.min.js"

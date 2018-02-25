@@ -14,15 +14,7 @@ function render(isSaving, data) {
         result = result + "<td class='column_class_name'><div class='taskColumn taskHeader' style='width:" + colWidth + "px'>" + 
                             VSS.Core.convertValueToDisplayString(date, "dddd") + "<br>";
 
-        if (debug_mode) {
-            result = result + VSS.Core.convertValueToDisplayString(date, "u") + "</div></td>";           
-        } 
-        else{
-            result = result + VSS.Core.convertValueToDisplayString(date, "d") + "</div></td>";            
-        }
-
-
-        
+        result = result + VSS.Core.convertValueToDisplayString(date, "d") + "</div></td>";            
                             
     }
     result = result + "</tr><tbody>"
@@ -70,8 +62,6 @@ function render(isSaving, data) {
                 if (date == _today.yyyymmdd()) result = result + "taskToday "
 
                 result = result + "'>";
-
-                if (debug_mode) result = result + date;
 
                 for (var taskIndex = 0; taskIndex < (personDateCell.MaxDataRow || 0); taskIndex++) {
                     var task = personDateCell[taskIndex];

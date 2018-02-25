@@ -220,4 +220,19 @@ function VSSRepository() {
     this.UpdateWorkItem = function(wijson, Id){
         return this._data.WitClient.updateWorkItem(wijson, Id);
     }
+
+    this.SetValueInExtensionDataPerUser = function(key, value){
+        this._data.dataService.setValue(key, value, {scopeType: "User"});
+    }
+    
+    this.GetValueInExtensionDataPerUser = function(key){
+        var res;
+        this._data.dataService.getValue(key, {scopeType: "User"}).then(function(c) {
+            if (c != "") {
+                $("#themes").val(c);
+                changeTheme(c);
+            }
+        });
+        return res;
+    }
 }

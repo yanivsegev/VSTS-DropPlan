@@ -140,7 +140,7 @@ function SprintData(workitems, repository, viewByTasks) {
                         witChanged = true;
                         this.Dates.forEach(function (item, index) {
                             var tasksPerDay = names[workItem.AssignedTo].days[item.yyyymmdd()] || 0;
-                            if ((tasksPerDay < capacity || capacity == 0) && !workItem.StartDate && !isDayOff(workItem.AssignedTo, item.yyyymmdd(), item.getDay()) && (item >= _today)) {
+                            if ((tasksPerDay < capacity || capacity == 0) && !workItem.StartDate && !repository.IsDayOff(workItem.AssignedTo, item.yyyymmdd(), item.getDay()) && (item >= _today)) {
                                 workItem.StartDate = item;
                             }
                         });
@@ -157,7 +157,7 @@ function SprintData(workitems, repository, viewByTasks) {
                         dates.forEach(function (item, index) {
                             var tasksPerDay = names[workItem.AssignedTo].days[item.yyyymmdd()] || 0;
 
-                            if ((tasksPerDay < capacity || capacity == 0) && !isDayOff(workItem.AssignedTo, item.yyyymmdd(), item.getDay()) && !workItem.FinishDate) {
+                            if ((tasksPerDay < capacity || capacity == 0) && !repository.IsDayOff(workItem.AssignedTo, item.yyyymmdd(), item.getDay()) && !workItem.FinishDate) {
 
                                 var todayPart = remainingWorkLeft;
                                 if (tasksPerDay + todayPart > capacity && capacity > 0) {
