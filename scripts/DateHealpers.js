@@ -1,6 +1,12 @@
  Date.prototype.addDays = function(days) {
   
-    return new Date(this.valueOf() + days * 24 * 60 * 60000);
+    var z = this.getTimezoneOffset()
+    var x = new Date(this.valueOf() + days * 24 * 60 * 60000);
+    var diff = z - x.getTimezoneOffset();
+    if (diff != 0){
+        return new Date(x.valueOf() - (diff * 60000));
+    }
+    return x;
 }
 
 Date.prototype.yyyymmdd = function() {
@@ -45,7 +51,14 @@ Date.prototype.tfsFormat = function() {
 
 
 Date.prototype.getGMT = function() {
-    return new Date(this.valueOf() + this.getTimezoneOffset() * 60000);
+    return new Date(
+        this.getUTCFullYear(),
+        this.getUTCMonth(),
+        this.getUTCDate(),
+        this.getUTCHours(),
+        this.getUTCMinutes(),
+        this.getUTCSeconds(),
+    );;
 };
 
 Date.prototype.ConvertGMTToServerTimeZone = function() {

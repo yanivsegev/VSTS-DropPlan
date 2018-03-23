@@ -51,13 +51,17 @@ function VSSRepository() {
 
                     var iterationId = VSS.getConfiguration().iterationId;
 
+                    VSS.getService(VSS.ServiceIds.ExtensionData).then(function (res){
+                        _this._data.dataService = res;
+                        loadThemes();
+                    });
+
                     var promisesList = [
                         workClient.getTeamDaysOff(teamContext, iterationId),
                         workClient.getTeamSettings(teamContext),
                         workClient.getCapacities(teamContext, iterationId),
                         workClient.getTeamIteration(teamContext, iterationId),
-                        workClient.getTeamFieldValues(teamContext),
-                        VSS.getService(VSS.ServiceIds.ExtensionData)
+                        workClient.getTeamFieldValues(teamContext)
                     ];
 
                     if (workClient.getBacklogConfigurations) {
@@ -76,9 +80,8 @@ function VSSRepository() {
                         _this.IterationFinishDate = _this._data.iteration.attributes.finishDate;
 
                         _this._data.teamValues = values[4];
-                        _this._data.dataService = values[5];
-                        if (values.length > 6) {
-                            _this._data.backlogConfigurations = values[6];
+                        if (values.length > 5) {
+                            _this._data.backlogConfigurations = values[5];
                             _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
                             _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
                         } else {
@@ -93,7 +96,6 @@ function VSSRepository() {
 
                                 OnLoadWorkItems(_this);
                             });
-                        loadThemes();
 
 
                     }, _this._data.failToCallVss);
@@ -230,7 +232,7 @@ function VSSRepository() {
         this._data.dataService.getValue(key, {scopeType: "User"}).then(function(c) {
             if (c != "") {
                 $("#themes").val(c);
-                changeTheme(c);
+                changeTheme(c, false);
             }
         });
         return res;

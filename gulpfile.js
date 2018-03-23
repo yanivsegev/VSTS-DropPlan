@@ -89,7 +89,7 @@ let Production = {
           , js.environment.dev.path + js.fileName + js.environment.dev.extension])
           .pipe(concat(js.fileName + js.environment.prod.extension))
           .pipe(sourcemaps.init({loadMaps: true}))
-          .pipe(uglify())
+          //.pipe(uglify())
           .pipe(sourcemaps.write('.', {addComment: false}))
           .pipe(gulp.dest(js.environment.prod.path));
     },
@@ -150,7 +150,7 @@ exports.default = gulp.series(
                 {Key: '#{testing-flag}', Value: '-test'},
                 //{Key: '"public": false', Value: '"public": false'},
                 {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
-                {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
+               // {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
                 {Key: '#{isMinified}', Value: ''}
             ]),
             copyDynamicFiles(Production.Env, [

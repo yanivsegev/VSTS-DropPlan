@@ -5,10 +5,10 @@ function loadThemes()
     repository.GetValueInExtensionDataPerUser("DropPlanTheme");
 }
 
-function changeTheme(css){
+function changeTheme(css, save){
     $("#themeCss").remove();
 
-    if (css != '') $("head").append("<link id='themeCss' href='" + css +"' rel='stylesheet'></link>");        
-    repository.SetValueInExtensionDataPerUser("DropPlanTheme", css, 1000);
+    if (css != '') $("head").append("<link id='themeCss' href='" + css +"' rel='stylesheet'></link>");     
+    if (save) repository.SetValueInExtensionDataPerUser("DropPlanTheme", css);
 }
 

@@ -4,8 +4,8 @@ function SprintData(workitems, repository, viewByTasks) {
     this.Wits = [];
 
     this.Repository = repository;
-    this.StartDate = repository.IterationStartDate.getGMT();
-    this.EndDate = repository.IterationFinishDate.getGMT();
+    this.StartDate = new Date(repository.IterationStartDate.toISOString()).getGMT();
+    this.EndDate = new Date(repository.IterationFinishDate.toISOString()).getGMT();
 
     this.Dates;
 
