@@ -29,7 +29,7 @@ function render(isSaving, data) {
 
             if (personRow.assignedTo) {
 
-                result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'>";
+                result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='assignToColumn rowHeader'>";
                 if (personRow.avatar) {
                     result = result +  "<img class='assignedToAvatar' src='" + personRow.avatar + "'/>"
                 }
@@ -185,9 +185,9 @@ function AlignTitlesToView() {
         var offset = 0 - ($(elm).offset().left - 100 - $(window).scrollLeft());
         var title = $(elm).find(".openWit");
         if (offset > 0) {
-            title.css("margin-left", (offset) + "px");
+            title.css("padding-left", (offset) + "px");
         } else {
-            title.css("margin-left", "0px");
+            title.css("padding-left", "0px");
         }
         return true;
     })
