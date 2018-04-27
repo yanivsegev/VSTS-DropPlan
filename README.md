@@ -6,7 +6,7 @@ Sprint Drop Plan is an organizational tool that helps team members to sync their
 
 ## Review your sprint plan ##
 
-![Drop plan](images/dropplan.png)
+![Image](images/DropPlan.PNG)
 
 ## Arrange and track sprint progress ##
 
@@ -14,7 +14,7 @@ Sprint Drop Plan is an organizational tool that helps team members to sync their
 - Visualize your progress by colors on the calendar.
 - Highlight tasks on the same requirement by hovering on one of them.
 
-![Drop plan](images/DropPlanWithHelp.png)
+![Image](images/DropPlanWithHelp.PNG)
 
 ## Quick steps to get started ##
 
