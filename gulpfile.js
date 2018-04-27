@@ -148,9 +148,9 @@ exports.default = gulp.series(
             copyDynamicFiles(Development.Env, [
                 {Key: '#{now}', Value: new Date().toJSON()},
                 {Key: '#{testing-flag}', Value: '-test'},
-                //{Key: '"public": false', Value: '"public": false'},
+                {Key: '"public": false', Value: '"public": false'},
                 {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
-               // {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
+                {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
                 {Key: '#{isMinified}', Value: ''}
             ]),
             copyDynamicFiles(Production.Env, [

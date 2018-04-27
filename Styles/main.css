@@ -47,7 +47,7 @@
 .taskTd
 {
     vertical-align: top;
-    background: #dadada;
+    background: #f4f4f4;
     border-left: 4px solid white;
 }
 
@@ -161,7 +161,7 @@ canvas {
 }
     
 .rowHeader{
-    background: rgb(242, 242, 242);
+    background: white;
     padding: 10px;
     height: 100%;
     z-index: 30;
@@ -331,25 +331,37 @@ canvas {
 
 
 .showareapath .taskAreaPath1 {
-    background:#4caf50; 
+    background:#E0FFFF; 
 }
 .showareapath .taskAreaPath2 {
-    background:#2196f3; 
+    background:#FAFAD2; 
 }
 .showareapath .taskAreaPath3 {
-    background:#9e9e9e; 
+    background:#90EE90; 
 }
 .showareapath .taskAreaPath4 {
-    background:#a80000; 
+    background:#87CEFA; 
 }
 .showareapath .taskAreaPath5 {
-    background:#00bcd4; 
+    background:#98FB98; 
 }
 .showareapath .taskAreaPath6 {
-    background:#795548; 
+    background:#D8BFD8; 
 }
 .showareapath .taskAreaPath7 {
-    background:#ff5722; 
+    background:#FFC0CB; 
+}
+
+.showareapath .taskAreaPath8 {
+    background:#7FFFD4; 
+}
+
+.showareapath .taskAreaPath9 {
+    background:#ADD8E6; 
+}
+
+.showareapath .taskAreaPath10 {
+    background:#F08080; 
 }
 
 #tasksTable .sameParent{

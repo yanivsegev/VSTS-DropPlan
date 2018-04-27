@@ -24,7 +24,7 @@ function render(isSaving, data) {
 
         if (personRow.hasItems){
 
-            result = result + "<tr class='taskTr taskTrSpace'><td class='row_class_name'><div class='rowHeaderSpace'/></td><td colspan='" + (sprint.Dates.length) + "'/></tr>";
+            result = result + "<tr class='taskTr taskTrSpace'><td class='row_class_name'><div class='assignToColumn rowHeaderSpace'/></td><td colspan='" + (sprint.Dates.length) + "'/></tr>";
             result = result + "<tr class='taskTr taskTrContent' >";
 
             if (personRow.assignedTo) {
@@ -51,7 +51,7 @@ function render(isSaving, data) {
                     result = result + "<div class='visual-progress-top-container'><div class='visual-progress-container'><div class='" + cssClassOut + "' style='width: 100%;'><div class='" + cssClass + "' style='width: " + precent + "%;'></div></div></div><div class='progress-text'>(" + personRow.TatalTasks + " of " + personRow.TotalCapacity + "h)</div></div></div></td>";
                 }
             } else {
-                result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='rowHeader'><div class='assignedToName'>Unassigned</div></div></td>";
+                result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='assignToColumn rowHeader'><div class='assignedToName'>Unassigned</div></div></td>";
             }
 
             for (var dateIndex = 0; dateIndex < sprint.Dates.length; dateIndex++) {
@@ -258,6 +258,7 @@ function attachEvents() {
         cancel: ".taskChanged",
         start: function (event, ui) {
             SetNoClick(this);
+            PauseAutoRefresh();
         },
         stop: function (event, ui) {
             var changeDays = (Math.round((ui.position.left - ui.originalPosition.left) / colWidth));
@@ -290,6 +291,7 @@ function attachEvents() {
         },
         start: function (event, ui) {
             SetNoClick(this);
+            PauseAutoRefresh();
         },
     });
 }

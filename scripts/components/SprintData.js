@@ -13,6 +13,27 @@ function SprintData(workitems, repository, viewByTasks) {
     this.ViewByTasks = viewByTasks;
     this.nameById = [];
 
+    this.IsSameWorkItems = function (newWorkItems){
+        if (!newWorkItems){
+            return false;
+        }
+        if (newWorkItems.length != this.RawWits.length){
+            return false;
+        }
+        var res = true;
+        this.RawWits.forEach(function (item, index) {
+            var item2 = newWorkItems[index];
+            if (!item2 || 
+                item.id != item2.id ||
+                item.rev != item2.rev)
+                {
+                    res = false;
+                }
+        });
+
+        return res;
+    }
+
     this.Init = function () {
         var items = [];
         this.RawWits.forEach(function (item, index) {

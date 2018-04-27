@@ -22,30 +22,33 @@ function VSSRepository() {
         VSS.ready(function () {
             VSS.register(VSS.getContribution().id, {});
             VSS.notifyLoadSucceeded();
+            console.log("VSS init. (" + (performance.now() - _this._data.t0) + " ms.)");
         });
 
-        console.log("VSS init. (" + (performance.now() - _this._data.t0) + " ms.)");
+        _startVSS(_this);
+        
+        
+    }
+
+    function _startVSS(_this) {
 
         VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient"],
 
             function (VSS_Service, TFS_Wit_WebApi, TFS_Work) {
                 try {
                     var extVersion = VSS.getExtensionContext().version;
-
-                    console.log("VSS loaded V " + extVersion + " VssSDKRestVersion:" + VSS.VssSDKRestVersion + " VssSDKVersion:" + VSS.VssSDKVersion + ". (" + (performance.now() - _this._data.t0) + " ms.)");
+                    _this._data.VssContext = VSS.getWebContext();
+                    
+                    console.log("VSS loaded V " + extVersion + " VssSDKRestVersion:" + VSS.VssSDKRestVersion + " VssSDKVersion:" + VSS.VssSDKVersion + " user: " + _this._data.VssContext.user.uniqueName + ". (" + (performance.now() - _this._data.t0) + " ms.)");
                     _this.reportProgress("Framework loaded.");
-
 
                     if (window._trackJs && typeof trackJs != "undefined") {
 
-                        trackJs.configure({ version: extVersion });
-                        trackJs.addMetadata("VssSDKRestVersion", VSS.VssSDKRestVersion);
+                        trackJs.configure({ version: extVersion, userId: _this._data.VssContext.user.uniqueName });
                         trackJs.addMetadata("VssSDKRestVersion", VSS.VssSDKRestVersion);
                         trackJs.addMetadata("VssSDKVersion", VSS.VssSDKVersion);
-
                     }
 
-                    _this._data.VssContext = VSS.getWebContext();
                     var workClient = TFS_Work.getClient();
                     var teamContext = { projectId: _this._data.VssContext.project.id, teamId: _this._data.VssContext.team.id, project: "", team: "" };
 
@@ -173,7 +176,8 @@ function VSSRepository() {
 
         var merged = jQuery.grep([].concat.apply([], values), function (elm, i) { return elm.id > 0; });
         var tasks = jQuery.grep(merged, function (elm, i) { return jQuery.grep(_this.WorkItemTypes, function (element) { return element.name == elm.fields["System.WorkItemType"]; }).length > 0; });
-
+        merged = merged.sort(function (a, b) { return a.id - b.id});
+        
         if (tasks.length == 0) {
             _this.reportFailure("No work items of type 'Task' found.");
         }

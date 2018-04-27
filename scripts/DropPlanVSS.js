@@ -2,6 +2,7 @@ var repository = new VSSRepository();
     
 var sprint, container;
 var _scrollToToday = true;
+var autoRefresh;
 
 window.addEventListener("message", receiveMessage, false);
 
@@ -49,12 +50,21 @@ function BuildDropPlan() {
 }
 
 function WorkItemsLoaded(workItems){
-    processWorkItems(workItems, false);
+
+    if (sprint && sprint.IsSameWorkItems(workItems)) {
+        console.info("No changes detected.")
+    }
+    else{
+        processWorkItems(workItems, false);
+    }
+    
 }
 
 function refreshPlan() {
     $("#refreshPlanBtn").css('opacity', '0');
     repository.LoadWorkItems();
+    
+    SetAutoRefresh();
 }
 
 
@@ -85,6 +95,24 @@ function processWorkItems(workItems, isSaving) {
         _scrollToToday = false;
         $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width() / 2);
     }
+
+    SetAutoRefresh();
+}
+
+function SetAutoRefresh(){
+
+    PauseAutoRefresh();
+    ResumeAutoRefresh();
+}
+
+function PauseAutoRefresh(){
+
+    clearTimeout(autoRefresh);
+}
+
+function ResumeAutoRefresh(){
+
+    autoRefresh = setTimeout(refreshPlan, 5000);
 }
 
 function isWitInUpdate(id) {
@@ -109,8 +137,8 @@ function removeWitInUpdate(id) {
 
 function pushWitToSave(witId) {
     var wit = sprint.GetWorkitemById(witId);
-    if (wit && _witToSave.indexOf(witId) == -1) {
-        _witToSave.push(witId);
+    if (wit && _witToSave.indexOf(wit.Id) == -1) {
+        _witToSave.push(wit.Id);
     }
 }
 
