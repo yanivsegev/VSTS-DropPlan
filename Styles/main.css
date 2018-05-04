@@ -88,6 +88,25 @@
     background:repeating-linear-gradient(  15deg,  #dadada,  rgb(242, 242, 242) 10px,  rgb(242, 242, 242) 10px,  #dadada 20px)
 }
 
+.relatedTask {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 1px;
+    margin-right: 1px;
+    background: #dadada;
+}
+
+.relatedTaskBox {
+    display: inline-block;
+    background: white;
+    margin-top: -7px;
+    margin-left: 3px;
+    border-radius: 4px;
+    height: 14px;
+    padding: 2px;
+}
 
 .taskOverDue{
     background: rgb(255, 121, 121);
@@ -99,6 +118,10 @@
 
 .taskDone{
     background: lightgreen;
+}
+
+.taskCurrent{
+    background: darkgrey;
 }
 
 .taskRemainingWork{
@@ -399,3 +422,6 @@ canvas {
     padding: 0px 20px;
     vertical-align: middle;
 }
+
+
+

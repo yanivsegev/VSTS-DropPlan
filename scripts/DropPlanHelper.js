@@ -127,7 +127,48 @@ function render(isSaving, data) {
                         }
 
                         result = result + "<div class='taskTitle'><div class='openWit'>" + task.workItem.Title + "</div></div>";
-                        
+                        if (parentWit){
+                            
+                            var relatedItems = [];
+                            parentWit.Relations.forEach(function(item,index) { 
+                                if (item.rel == "System.LinkTypes.Hierarchy-Forward"){
+                                    var seccesor = item.url.substring(item.url.lastIndexOf("/") + 1)
+                                    var item2 = sprint.GetWorkitemById(seccesor)
+                                    if (item2) {
+                                        relatedItems.push(item2);
+                                    }
+                                }
+                            });
+
+                            relatedItems = relatedItems.sort(function (a, b) { return a.StartDate.valueOf() - b.StartDate.valueOf();  });
+
+                            if (relatedItems.length > 1){
+                                result = result + "<div class='relatedTaskBox'>";
+                                
+                                relatedItems.forEach(function(item,index) {
+
+                                    result = result + "<div class='relatedTask ";
+
+                                    if (item.FinishDate < _today) result = result + "taskOverDue ";
+
+                                    switch (item.Blocked) {
+                                        case "Yes": result = result + "taskBlocked "; break;
+                                    }
+
+                                    switch (item.State) {
+                                        case "Done": result = result + "taskDone "; break;
+                                        case "Closed": result = result + "taskDone "; break;
+                                    }
+
+                                    if (item.Id == task.workItem.Id) result = result + "taskCurrent ";
+
+                                    result = result + "'>&nbsp</div>";
+                                });
+
+                                result = result + "</div>";
+                            }    
+                        }
+
                         if (task.isWitTask){
                             
                             var remain = task.workItem.RemainingWork;

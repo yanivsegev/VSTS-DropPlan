@@ -3,6 +3,7 @@ var repository = new VSSRepository();
 var sprint, container;
 var _scrollToToday = true;
 var autoRefresh;
+var showFailAlearts = true;
 
 window.addEventListener("message", receiveMessage, false);
 
@@ -60,6 +61,12 @@ function WorkItemsLoaded(workItems){
     
 }
 
+
+function autoRefreshPlan() {
+    showFailAlearts = false;
+    refreshPlan();
+}
+
 function refreshPlan() {
     $("#refreshPlanBtn").css('opacity', '0');
     repository.LoadWorkItems();
@@ -103,6 +110,7 @@ function SetAutoRefresh(){
 
     PauseAutoRefresh();
     ResumeAutoRefresh();
+    showFailAlearts = true;
 }
 
 function PauseAutoRefresh(){
@@ -112,7 +120,7 @@ function PauseAutoRefresh(){
 
 function ResumeAutoRefresh(){
 
-    autoRefresh = setTimeout(refreshPlan, 5000);
+    autoRefresh = setTimeout(autoRefreshPlan, 5000);
 }
 
 function isWitInUpdate(id) {
@@ -220,12 +228,15 @@ function ResetTasks() {
 
 function failToCallVss(reason) {
     console.log("Call to server failed! reason: " + JSON.stringify(reason));
-
-    if (reason && reason.message){
-        alert(reason.message);
-    }
-    else{
-        alert("Call to server failed! please refresh the page.");
+    PauseAutoRefresh();
+    
+    if (showFailAlearts){
+        if (reason && reason.message){
+            alert(reason.message);
+        }
+        else{
+            alert("Call to server failed! please refresh the page.");
+        }
     }
 }
 
