@@ -190,7 +190,8 @@ function VSSRepository() {
     this.GetCapacity = function (name) {
         var result = 0;
         $.each(this._data.teamMemberCapacities, function (index, value) {
-            if (value.teamMember.displayName == name) {
+            var teamMemberName = value.teamMember.displayName.split("<")[0].trim();
+            if (teamMemberName == name) {
                 if (value.activities.length > 0 && value.activities[0].capacityPerDay > 0) {
                     result = value.activities[0].capacityPerDay || 6;
                 }

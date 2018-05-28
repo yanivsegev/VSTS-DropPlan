@@ -103,21 +103,21 @@ function SprintData(workitems, repository, viewByTasks) {
             var workItem = this.Wits[i];
             var personRow;
 
-            if (!names[workItem.AssignedTo]) {
-                names[workItem.AssignedTo] = { id: result.length, days: [] };
+            if (!names[workItem.AssignedTo.displayName]) {
+                names[workItem.AssignedTo.displayName] = { id: result.length, days: [] };
                 var newName = {
-                    Name: workItem.AssignedTo,
-                    Capacity: this.Repository.GetCapacity(workItem.AssignedTo),
+                    Name: workItem.AssignedTo.displayName,
+                    Capacity: this.Repository.GetCapacity(workItem.AssignedTo.displayName),
                     TotalCapacity: 0,
                     TatalTasks: 0,
-                    assignedTo: workItem.AssignedTo,
-                    avatar: this.Repository.GetMemberImage(workItem.AssignedTo),
+                    assignedTo: workItem.AssignedTo.displayName,
+                    avatar: this.Repository.GetMemberImage(workItem.AssignedTo.displayName),
                     assignedToId: result.length,
                     hasItems: false,
                 };
                 for (var colIndex = 0; colIndex < this.Dates.length; colIndex++) {
                     var currentDate = this.Dates[colIndex];
-                    var isDayOff = this.Repository.IsDayOff(workItem.AssignedTo, currentDate.yyyymmdd(), currentDate.getDay());
+                    var isDayOff = this.Repository.IsDayOff(workItem.AssignedTo.displayName, currentDate.yyyymmdd(), currentDate.getDay());
                     newName[currentDate.yyyymmdd()] = [];
                     newName[currentDate.yyyymmdd()].isDayOff = isDayOff;
 
@@ -127,10 +127,10 @@ function SprintData(workitems, repository, viewByTasks) {
                 }
 
                 result.push(newName);
-                this.nameById[names[workItem.AssignedTo].id] = { Name: workItem.AssignedTo };
+                this.nameById[names[workItem.AssignedTo.displayName].id] = { Name: workItem.AssignedTo.displayName };
             }
 
-            personRow = result[names[workItem.AssignedTo].id];
+            personRow = result[names[workItem.AssignedTo.displayName].id];
 
             var remainingWork = 0;
 
@@ -160,8 +160,8 @@ function SprintData(workitems, repository, viewByTasks) {
                     if (!workItem.StartDate) {
                         witChanged = true;
                         this.Dates.forEach(function (item, index) {
-                            var tasksPerDay = names[workItem.AssignedTo].days[item.yyyymmdd()] || 0;
-                            if ((tasksPerDay < capacity || capacity == 0) && !workItem.StartDate && !repository.IsDayOff(workItem.AssignedTo, item.yyyymmdd(), item.getDay()) && (item >= _today)) {
+                            var tasksPerDay = names[workItem.AssignedTo.displayName].days[item.yyyymmdd()] || 0;
+                            if ((tasksPerDay < capacity || capacity == 0) && !workItem.StartDate && !repository.IsDayOff(workItem.AssignedTo.displayName, item.yyyymmdd(), item.getDay()) && (item >= _today)) {
                                 workItem.StartDate = item;
                             }
                         });
@@ -176,9 +176,9 @@ function SprintData(workitems, repository, viewByTasks) {
                         var remainingWorkLeft = remainingWork;
                         var dates = getDates(workItem.StartDate, sprint.EndDate);
                         dates.forEach(function (item, index) {
-                            var tasksPerDay = names[workItem.AssignedTo].days[item.yyyymmdd()] || 0;
+                            var tasksPerDay = names[workItem.AssignedTo.displayName].days[item.yyyymmdd()] || 0;
 
-                            if ((tasksPerDay < capacity || capacity == 0) && !repository.IsDayOff(workItem.AssignedTo, item.yyyymmdd(), item.getDay()) && !workItem.FinishDate) {
+                            if ((tasksPerDay < capacity || capacity == 0) && !repository.IsDayOff(workItem.AssignedTo.displayName, item.yyyymmdd(), item.getDay()) && !workItem.FinishDate) {
 
                                 var todayPart = remainingWorkLeft;
                                 if (tasksPerDay + todayPart > capacity && capacity > 0) {
@@ -266,14 +266,14 @@ function SprintData(workitems, repository, viewByTasks) {
                 
                     while (selectedRow >= personDateCell.length) personDateCell.push({ Type: 0 });
 
-                    if (!this.Repository.IsDayOff(workItem.AssignedTo, dates[colIndex].yyyymmdd(), dates[colIndex].getDay())) {
-                        var todayTasks = (names[workItem.AssignedTo].days[date] || 0);
+                    if (!this.Repository.IsDayOff(workItem.AssignedTo.displayName, dates[colIndex].yyyymmdd(), dates[colIndex].getDay())) {
+                        var todayTasks = (names[workItem.AssignedTo.displayName].days[date] || 0);
                         var todayPart = remainingWork;
                         if (todayTasks + remainingWork > capacity) {
                             todayPart = capacity - todayTasks;
                         }
                         remainingWork = remainingWork - todayPart;
-                        names[workItem.AssignedTo].days[date] = todayTasks + todayPart;
+                        names[workItem.AssignedTo.displayName].days[date] = todayTasks + todayPart;
                     }
 
                     if (colIndex == 0) {

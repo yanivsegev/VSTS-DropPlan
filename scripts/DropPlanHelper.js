@@ -363,8 +363,8 @@ function updateWorkItemDates(witId, changeStartDays, changeEndDays) {
 function updateWorkItemAssignTo(witId, assignedTo) {
     var workItem = sprint.GetWorkitemById(witId);
     
-    if (workItem.AssignedTo != assignedTo) {
-        workItem.AssignedTo = assignedTo;
+    if (workItem.AssignedTo.displayName != assignedTo) {
+        workItem.AssignedTo.displayName = assignedTo;
         pushWitToSave(witId);
     }
 }
