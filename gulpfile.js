@@ -70,6 +70,8 @@ let Development = {
     Scripts: function(){
         return gulp.src(js.sourceFiles)
           .pipe(concat(js.fileName + js.environment.dev.extension))
+          .pipe(sourcemaps.init({loadMaps: true}))
+          .pipe(sourcemaps.write('.', {addComment: false}))
           .pipe(gulp.dest(js.environment.dev.path))
           .pipe(livereload());
     },
