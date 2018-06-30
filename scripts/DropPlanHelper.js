@@ -33,7 +33,7 @@ function render(isSaving, data) {
                 if (personRow.avatar) {
                     result = result +  "<img class='assignedToAvatar' src='" + personRow.avatar + "'/>"
                 }
-                result = result + "<div class='assignedToName'>" + personRow.assignedTo + "</div>"
+                result = result + "<div class='assignedToName'>" + personRow.assignedTo.displayName + "</div>"
 
                 if (personRow.TotalCapacity > 0) {
                     var cssClass = 'visual-progress-total visual-progress-overallocated';

@@ -294,6 +294,6 @@ function SprintData(workitems, repository, viewByTasks) {
             }
         }
 
-        return result.sort(function (a, b) { return a.assignedTo.localeCompare(b.assignedTo) });
+        return result.sort(function (a, b) { return a.assignedTo.displayName.localeCompare(b.assignedTo.displayName) });
     }
 }
