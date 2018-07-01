@@ -33,7 +33,7 @@ function render(isSaving, data) {
                 if (personRow.avatar) {
                     result = result +  "<img class='assignedToAvatar' src='" + personRow.avatar + "'/>"
                 }
-                result = result + "<div class='assignedToName'>" + personRow.assignedTo.displayName + "</div>"
+                result = result + "<div class='assignedToName'>" + personRow.assignedTo + "</div>"
 
                 if (personRow.TotalCapacity > 0) {
                     var cssClass = 'visual-progress-total visual-progress-overallocated';
@@ -363,8 +363,8 @@ function updateWorkItemDates(witId, changeStartDays, changeEndDays) {
 function updateWorkItemAssignTo(witId, assignedTo) {
     var workItem = sprint.GetWorkitemById(witId);
     
-    if (workItem.AssignedTo.displayName != assignedTo) {
-        workItem.AssignedTo.displayName = assignedTo;
+    if (workItem.AssignedTo != assignedTo) {
+        workItem.AssignedTo = assignedTo;
         pushWitToSave(witId);
     }
 }

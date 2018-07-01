@@ -190,8 +190,7 @@ function VSSRepository() {
     this.GetCapacity = function (name) {
         var result = 0;
         $.each(this._data.teamMemberCapacities, function (index, value) {
-            var teamMemberName = value.teamMember.displayName.split("<")[0].trim();
-            if (teamMemberName == name) {
+            if (value.teamMember.displayName.split("<")[0].trim() == name) {
                 if (value.activities.length > 0 && value.activities[0].capacityPerDay > 0) {
                     result = value.activities[0].capacityPerDay || 6;
                 }
@@ -203,7 +202,7 @@ function VSSRepository() {
     this.IsDayOff = function (name, date, day) {
         var dayOff = false;
         $.each(this._data.teamMemberCapacities, function (index, value) {
-            if (value.teamMember.displayName == name) {
+            if (value.teamMember.displayName.split("<")[0].trim() == name) {
                 if (isDayInRange(value.daysOff, date)) dayOff = true;
             }
         });
@@ -218,7 +217,7 @@ function VSSRepository() {
     this.GetMemberImage = function (name) {
         var img = "";
         $.each(this._data.teamMemberCapacities, function (index, value) {
-            if (value.teamMember.displayName == name) img = value.teamMember.imageUrl;
+            if (value.teamMember.displayName.split("<")[0].trim() == name) img = value.teamMember.imageUrl;
         });
         return img;
     }
