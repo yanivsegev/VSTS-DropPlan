@@ -232,7 +232,9 @@ function failToCallVss(reason) {
     
     if (showFailAlearts){
         if (reason && reason.message){
-            alert(reason.message);
+            if (!reason.message.indexOf('Status code 0: error.') > 0){
+                alert(reason.message);
+            }
         }
         else{
             alert("Call to server failed! please refresh the page.");

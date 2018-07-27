@@ -18,6 +18,7 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
         this.BacklogPriority = workitem.fields["Microsoft.VSTS.Common.BacklogPriority"];
         this.AssignedTo = workitem.fields["System.AssignedTo"] || "";
         this.AssignedTo = this.AssignedTo.displayName || this.AssignedTo;
+        this.AssignedTo = this.AssignedTo.split("<")[0].trim();
         
         this.AreaPath = workitem.fields["System.AreaPath"] || "";
         this.RemainingWork = workitem.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || 0;
