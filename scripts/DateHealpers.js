@@ -58,7 +58,7 @@ Date.prototype.getGMT = function() {
         this.getUTCHours(),
         this.getUTCMinutes(),
         this.getUTCSeconds(),
-    );;
+    );
 };
 
 Date.prototype.ConvertGMTToServerTimeZone = function() {
