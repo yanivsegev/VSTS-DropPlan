@@ -81,7 +81,7 @@ function processWorkItems(workItems, isSaving) {
     
     sprint = new SprintData(workItems, repository, viewByTasks);
     
-    container = document.getElementById("grid-container");;
+    container = document.getElementById("grid-container");
 
     var data = sprint.GetData();
     
@@ -139,7 +139,7 @@ function pushWitInUpdate(id) {
 function removeWitInUpdate(id) {
     var index = _witInUpdate.indexOf(id);
     if (index > -1) {
-        _witInUpdate.splice(index, 1);;
+        _witInUpdate.splice(index, 1);
     }
 }
 

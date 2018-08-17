@@ -51,13 +51,14 @@ Date.prototype.tfsFormat = function() {
 
 
 Date.prototype.getGMT = function() {
+
     return new Date(
         this.getUTCFullYear(),
         this.getUTCMonth(),
         this.getUTCDate(),
         this.getUTCHours(),
         this.getUTCMinutes(),
-        this.getUTCSeconds(),
+        this.getUTCSeconds()
     );
 };
 
@@ -65,6 +66,10 @@ Date.prototype.ConvertGMTToServerTimeZone = function() {
 
     if (!this._serverToGMTDiff){
         this._serverToGMTDiff = (new Date(VSS.Core.convertValueToDisplayString(new Date("2000-01-01"), 'u')).getTime() - new Date("2000-01-01").getTime()) + (new Date().getTimezoneOffset() * 60000);
+
+        if (isNaN(this._serverToGMTDiff)){
+            this._serverToGMTDiff = 0;
+        }
     }
 
 
