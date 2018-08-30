@@ -128,8 +128,8 @@ function copyDynamicFiles(env, templateData){
 }
 exports.watch = function(done){
     livereload.listen();
-    gulp.watch('scripts/*.js', Development.Scripts);
-    gulp.watch('styles/*.css', function(){Development.Styles(); copyStaticFiles(Development.Env)();});
+    gulp.watch('scripts/**/*.js', Development.Scripts);
+    gulp.watch('styles/**/*.css', function(){Development.Styles(); copyStaticFiles(Development.Env)();});
     
     gulp.src('./dist/dev')
     .pipe(webserver({

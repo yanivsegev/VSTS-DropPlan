@@ -14,6 +14,10 @@ function receiveMessage(event) {
             console.log("Refresh.");
             repository.LoadWorkItems();
         }
+        if (result.error)
+        {
+            console.log("Error in receiveMessage: " + result.error);
+        }
 
     } catch (error) {
 
@@ -76,34 +80,41 @@ function refreshPlan() {
 
 
 function processWorkItems(workItems, isSaving) {
-    var viewByTasks = true;
-    if (sprint) viewByTasks = sprint.ViewByTasks;
+    try {
+        
+        var viewByTasks = true;
+        if (sprint) viewByTasks = sprint.ViewByTasks;
+        
+        sprint = new SprintData(workItems, repository, viewByTasks);
+        
+        container = document.getElementById("grid-container");
+
+        var data = sprint.GetData();
+        
+        dettachEvents();
+
+        render(isSaving, data);
+
+        attachEvents();
+        drawRelations();
+        AlignTitlesToView();
+
+        TableLock_clear();
+        TableLock("tasksTable", "row_class_name", "column_class_name", "locked_class_name");
+        
+        $("#options").css("display", "flex");
+
+        if ($('.taskToday')[0] && _scrollToToday) {
+            _scrollToToday = false;
+            $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width() / 2);
+        }
+
+        SetAutoRefresh();
     
-    sprint = new SprintData(workItems, repository, viewByTasks);
-    
-    container = document.getElementById("grid-container");
-
-    var data = sprint.GetData();
-    
-    dettachEvents();
-
-    render(isSaving, data);
-
-    attachEvents();
-    drawRelations();
-    AlignTitlesToView();
-
-    TableLock_clear();
-    TableLock("tasksTable", "row_class_name", "column_class_name", "locked_class_name");
-    
-    $("#options").css("display", "flex");
-
-    if ($('.taskToday')[0] && _scrollToToday) {
-        _scrollToToday = false;
-        $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width() / 2);
+    } catch (error) {
+        console.log(error);
+        alert(error);                
     }
-
-    SetAutoRefresh();
 }
 
 function SetAutoRefresh(){

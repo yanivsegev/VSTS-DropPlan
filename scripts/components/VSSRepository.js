@@ -11,7 +11,7 @@ function VSSRepository() {
 
     function _init(_this) {
 
-        console.log("Stating. (" + (performance.now() - _this.t0) + " ms.)");
+        console.log("Stating. (" + (performance.now() - _this._data.t0) + " ms.)");
 
         VSS.init({
             explicitNotifyLoaded: true,
@@ -116,7 +116,7 @@ function VSSRepository() {
 
         // Query object containing the WIQL query
         var query = {
-            query: "SELECT [System.Id] FROM WorkItem WHERE [System.State] NOT IN ('Removed') AND [System.IterationPath] UNDER '" + currentIterationPath.replace("'", "''") + "' "
+            query: "SELECT [System.Id] FROM WorkItem WHERE ([System.WorkItemType] IN GROUP 'Microsoft.TaskCategory' OR [System.WorkItemType] IN GROUP 'Microsoft.BugCategory' OR [System.WorkItemType] IN GROUP 'Microsoft.RequirementCategory') AND [System.State] NOT IN ('Removed') AND [System.IterationPath] UNDER '" + currentIterationPath.replace("'", "''") + "' "
         };
         if (_this._data.teamValues.values.length > 0) {
             query.query = query.query + " AND (";
@@ -234,7 +234,7 @@ function VSSRepository() {
     this.GetValueInExtensionDataPerUser = function(key){
         var res;
         this._data.dataService.getValue(key, {scopeType: "User"}).then(function(c) {
-            if (c != "") {
+            if (c && c != "") {
                 $("#themes").val(c);
                 changeTheme(c, false);
             }
