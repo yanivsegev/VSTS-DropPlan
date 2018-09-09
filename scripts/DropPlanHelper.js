@@ -7,7 +7,7 @@ var _today = new Date(new Date().yyyy_mm_dd());
 function render(isSaving, data) {
     
     var result = "<table id='tasksTable' class='mainTable' cellpadding='0' cellspacing='0'><thead><tr>";
-    result = result + "<td class='locked_class_name'><div class='taskColumn assignToColumn rowHeaderSpace'><button class='refreshPlanBtn' onclick='refreshPlan();'>Refresh Tasks</button></div></td>"
+    result = result + "<td class='locked_class_name'><div class='taskColumn assignToColumn rowHeaderSpace'>&nbsp;</div></td>"
 
     for (var colIndex = 0; colIndex < sprint.Dates.length; colIndex++) {
         var date = sprint.Dates[colIndex].ConvertGMTToServerTimeZone();
@@ -75,8 +75,8 @@ function render(isSaving, data) {
                         
                         if (task.isWitTask){
                             parentId = task.workItem.GetParentId();
-                            parentWit = sprint.GetWorkitemById(parentId);
-                            partnerWorktemId = sprint.Wits.indexOf(parentWit);
+                            parentWit = sprint.GetWorkitemByIdFromAll(parentId);
+                            partnerWorktemId = sprint.AllWits.indexOf(parentWit);
                             result = result + " witParentId=" + parentId + " class='task tooltip ";
                         }else{
                             result = result + " class='task ";
@@ -133,7 +133,7 @@ function render(isSaving, data) {
                             parentWit.Relations.forEach(function(item,index) { 
                                 if (item.rel == "System.LinkTypes.Hierarchy-Forward"){
                                     var seccesor = item.url.substring(item.url.lastIndexOf("/") + 1)
-                                    var item2 = sprint.GetWorkitemById(seccesor)
+                                    var item2 = sprint.GetWorkitemByIdFromAll(seccesor)
                                     if (item2) {
                                         relatedItems.push(item2);
                                     }
@@ -348,7 +348,7 @@ function updateWorkItemDates(witId, changeStartDays, changeEndDays) {
     
     if (changeStartDays != 0 || changeEndDays != 0) {
         
-        var workItem = sprint.GetWorkitemById(witId);
+        var workItem = sprint.GetWorkitemByIdFromAll(witId);
         if (workItem.StartDate) {
         
             workItem.StartDate = workItem.StartDate.addDays(changeStartDays);
@@ -361,7 +361,7 @@ function updateWorkItemDates(witId, changeStartDays, changeEndDays) {
 }
 
 function updateWorkItemAssignTo(witId, assignedTo) {
-    var workItem = sprint.GetWorkitemById(witId);
+    var workItem = sprint.GetWorkitemByIdFromAll(witId);
     
     if (workItem.AssignedTo != assignedTo) {
         workItem.AssignedTo = assignedTo;

@@ -38,6 +38,20 @@ Date.prototype.mmdd = function() {
          ].join('/');
 };
 
+
+
+Date.prototype.HHmmss = function() {
+    var HH = this.getHours();
+    var mm = this.getMinutes();
+    var ss = this.getSeconds();
+  
+    return [(HH>9 ? '' : '0') + HH,
+            (mm>9 ? '' : '0') + mm,
+            (ss>9 ? '' : '0') + ss
+           ].join(':');
+  };
+
+
 //"2018-01-25T00:00:00Z"
 Date.prototype.tfsFormat = function() {
     var mm = this.getMonth() + 1; // getMonth() is zero-based

@@ -104,8 +104,9 @@ function VSSRepository() {
                     }, _this._data.failToCallVss);
                 }
                 catch (e) {
-                    console.log(e);
-                    _this.reportFailure("Browser is not supported.");
+                    var msg = 'Unknown error occurred.';
+                    alertUser(msg, e)
+                    _this.reportFailure(msg);
                 }
             });
     }

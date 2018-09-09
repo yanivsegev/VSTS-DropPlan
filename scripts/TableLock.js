@@ -204,6 +204,8 @@ The table is made up like this:
         var scroll_left = document.all ? iebody.scrollLeft : pageXOffset;
         var scroll_top = document.all ? iebody.scrollTop : pageYOffset;
 
+        scroll_top = scroll_top + 38;
+
         for (var t = 0; t < TL_tables.length; t++) {
             var tlt = TL_tables[t];
             for (var i = 0; i < tlt.row_elements.length; i++) {

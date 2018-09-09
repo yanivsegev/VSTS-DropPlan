@@ -39,6 +39,7 @@ let css = {
 
 let js = {
     sourceFiles: ["scripts/Promise.js"
+    ,"scripts/Polyfill.js"
     ,"scripts/components/SprintData.js"
     ,"scripts/components/Workitem.js"
     ,"scripts/components/VSSRepository.js"    

@@ -4,6 +4,7 @@
 
 .taskHeader{
     padding-left: 12px;
+    padding-top: 2px;
 }
 
 .taskStart {
@@ -261,11 +262,14 @@ canvas {
 
 .refreshPlanBtn{
 
+    margin-top: -5px;
+
     -webkit-animation: fadein 5s; /* Safari, Chrome and Opera > 12.1 */
        -moz-animation: fadein 5s; /* Firefox < 16 */
         -ms-animation: fadein 5s; /* Internet Explorer */
          -o-animation: fadein 5s; /* Opera < 12.1 */
             animation: fadein 5s;
+
 }
 
 @keyframes fadein {
@@ -423,5 +427,40 @@ canvas {
     vertical-align: middle;
 }
 
+.options{
+    height: 38px;
+    width: 100%;
+    position: fixed;
+    background: white;
+    z-index: 1001;
+    
+}
+
+.optionsInner{
+    border-top: 1px solid rgba(200,200,200,1);
+    border-bottom: 1px solid rgba(200,200,200,1);
+    margin-left: 10px;
+    margin-Right: 10px;
+    display: flex;
+    width: 100%;
+    min-width: 900px;
+}
+.optionsspace{
+    height: 38px;
+}
+
+.optionsInner > div {
+    padding-top: 8px;
+    margin-left: 10px;
+}
+
+.optionsInner .alignToLeft{ 
+    margin-left: auto;
+    margin-right: 10px;
+}
 
 
+.updateTime{
+    padding-left: 4px;
+    padding-right: 14px;
+}

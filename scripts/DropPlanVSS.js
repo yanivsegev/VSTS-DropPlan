@@ -30,6 +30,18 @@ function switchViewByTasks(viewByTasks){
     processWorkItems(sprint.RawWits, false);
 }
 
+var timerid;
+$("#filterBy").on("input", function(e) {
+  sprint.FilterTerm = $('#filterBy').val();
+  sprint.FilterArea = $('#filterArea').val();
+  processWorkItems(sprint.RawWits, false);
+});
+
+$("#filterArea").on("change", function(e) {
+    sprint.FilterTerm = $('#filterBy').val();
+    sprint.FilterArea = $('#filterArea').val();
+    processWorkItems(sprint.RawWits, false);
+});
 
 function reportProgress(msg){
     var messages = document.getElementById("messages");
@@ -46,16 +58,19 @@ function reportFailure(msg){
 
 function BuildDropPlan() {
 
-    repository.reportProgress = reportProgress;
-    repository.reportFailure = reportFailure;
-    repository.failToCallVss = failToCallVss;
-    repository.WorkItemsLoaded = WorkItemsLoaded;
-    repository.Init();
-
+    try{
+        repository.reportProgress = reportProgress;
+        repository.reportFailure = reportFailure;
+        repository.failToCallVss = failToCallVss;
+        repository.WorkItemsLoaded = WorkItemsLoaded;
+        repository.Init();
+    } catch (error) {
+        alertUser(error);                
+    }
 }
 
 function WorkItemsLoaded(workItems){
-
+    $("#updateTime").html(new Date().HHmmss());
     if (sprint && sprint.IsSameWorkItems(workItems)) {
         console.info("No changes detected.")
     }
@@ -82,10 +97,7 @@ function refreshPlan() {
 function processWorkItems(workItems, isSaving) {
     try {
         
-        var viewByTasks = true;
-        if (sprint) viewByTasks = sprint.ViewByTasks;
-        
-        sprint = new SprintData(workItems, repository, viewByTasks);
+        sprint = new SprintData(workItems, repository, sprint);
         
         container = document.getElementById("grid-container");
 
@@ -112,8 +124,7 @@ function processWorkItems(workItems, isSaving) {
         SetAutoRefresh();
     
     } catch (error) {
-        console.log(error);
-        alert(error);                
+        alertUser(error);                
     }
 }
 
@@ -155,7 +166,7 @@ function removeWitInUpdate(id) {
 }
 
 function pushWitToSave(witId) {
-    var wit = sprint.GetWorkitemById(witId);
+    var wit = sprint.GetWorkitemByIdFromAll(witId);
     if (wit && _witToSave.indexOf(wit.Id) == -1) {
         _witToSave.push(wit.Id);
     }
@@ -169,10 +180,30 @@ function updateWorkItemInVSS() {
     
     if (needSave) {
         _witToSave.forEach(function (item, index) {
-            var workItem = sprint.GetWorkitemById(item);
+            var workItem = sprint.GetWorkitemByIdFromAll(item);
             if (workItem){
-                var wijson =
+                var wijson;
+
+                if (!workItem.StartDate) {
+                    wijson =
+                        [{
+                            "op": "remove",
+                            "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
+                            "value": ""
+                        },
+                        {
+                            "op": "remove",
+                            "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
+                            "value": ""
+                        }];
+                }else{
+                    wijson = 
                     [{
+                        "op": "add",
+                        "path": "/fields/System.AssignedTo",
+                        "value": workItem.AssignedTo
+                    },
+                    {
                         "op": "add",
                         "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
                         "value": workItem.FinishDate.yyyy_mm_dd()
@@ -181,25 +212,7 @@ function updateWorkItemInVSS() {
                         "op": "add",
                         "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
                         "value": workItem.StartDate.yyyy_mm_dd()
-                    },
-                    {
-                        "op": "add",
-                        "path": "/fields/System.AssignedTo",
-                        "value": workItem.AssignedTo
                     }];
-
-                if (!workItem.StartDate) {
-                    wijson =
-                        [{
-                            "op": "remove",
-                            "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-                            "value": workItem.FinishDate.yyyy_mm_dd()
-                        },
-                        {
-                            "op": "remove",
-                            "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-                            "value": workItem.StartDate.yyyy_mm_dd()
-                        }];
                 }
                 workItem.UpdateRawData();
                 pushWitInUpdate(workItem.Id);
@@ -244,14 +257,23 @@ function failToCallVss(reason) {
     if (showFailAlearts){
         if (reason && reason.message){
             if (!reason.message.indexOf('Status code 0: error.') > 0){
-                alert(reason.message);
+                alertUser(reason.message);
             }
         }
         else{
-            alert("Call to server failed! please refresh the page.");
+            alertUser("Call to server failed! please refresh the page.");
         }
     }
 }
 
+function alertUser(msg, e){
+    var logMsg = "Alert User: [" + msg + "]";
+    console.log(logMsg);
+    if (e) console.log(e);
+    if (window._trackJs && typeof trackJs != "undefined") { trackJs.track(logMsg); }
+    alert(msg);
+}
+
 BuildDropPlan();
+
 

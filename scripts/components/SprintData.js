@@ -1,17 +1,26 @@
-function SprintData(workitems, repository, viewByTasks) {
+function SprintData(workitems, repository, existingSprint) {
 
     this.RawWits = workitems;
     this.Wits = [];
+    this.AllWits = [];
 
     this.Repository = repository;
     this.StartDate = new Date(repository.IterationStartDate.toISOString()).getGMT();
     this.EndDate = new Date(repository.IterationFinishDate.toISOString()).getGMT();
 
     this.Dates;
-
-
-    this.ViewByTasks = viewByTasks;
+    this.FilterTerm = '';
+    this.FilterArea = '';
+    
+    this.ViewByTasks = true;
     this.nameById = [];
+
+    if (existingSprint){
+        this.ViewByTasks = existingSprint.ViewByTasks;
+        this.FilterTerm = existingSprint.FilterTerm;
+        this.FilterArea = existingSprint.FilterArea;
+    } 
+    
 
     this.IsSameWorkItems = function (newWorkItems){
         if (!newWorkItems){
@@ -36,13 +45,39 @@ function SprintData(workitems, repository, viewByTasks) {
 
     this.Init = function () {
         var items = [];
+        var _this = this;
         this.RawWits.forEach(function (item, index) {
             items.push(new Workitem(item, repository.WorkItemTypes, repository.WorkItemPBITypes));
         });
+        this.AllWits = items;
+        
+        this.AllWits.forEach(function (item, index) {
+            var parentId = item.GetParentId();
+            if (parentId != -1){
+                var parent = _this.GetWorkitemByIdFromAll(parentId);
+                if (parent){
+                    item.ParentTitle = parent.Title;
+                }
+            }
+            
+        });
 
-        this.Wits = SortWits(items);
+        this.Wits = SortWits(this.FilerWits(items));
 
         this.Dates = getDates(this.StartDate, this.EndDate);
+
+    }
+    
+    this.FilerWits = function (items) {
+        filterTerm = this.FilterTerm;
+        filterArea = this.FilterArea;
+
+        return items.filter(function (a) {
+            
+            return filterTerm == '' || 
+                   filterTerm == undefined || 
+                   (a[filterArea] != undefined && a[filterArea].toLowerCase().includes(filterTerm.toLowerCase()));
+        })
     }
 
     function SortWits(items) {
@@ -84,6 +119,10 @@ function SprintData(workitems, repository, viewByTasks) {
 
     this.GetWorkitemById = function (id) {
         return jQuery.grep(this.Wits, function (element) { return element.Id == id; })[0];
+    }
+
+    this.GetWorkitemByIdFromAll = function (id) {
+        return jQuery.grep(this.AllWits, function (element) { return element.Id == id; })[0];
     }
 
     this.GetAssignToNameById = function(id){
@@ -214,7 +253,7 @@ function SprintData(workitems, repository, viewByTasks) {
                         workItem.Relations.forEach(function (item, index) {
                             if (item.rel == "System.LinkTypes.Hierarchy-Forward") {
                                 var childId = item.url.substring(item.url.lastIndexOf("/") + 1);
-                                var childWit = sprint.GetWorkitemById(childId);
+                                var childWit = sprint.GetWorkitemByIdFromAll(childId);
                                 if (childWit) {
 
                                     if (childWit.Blocked == "Yes") {
