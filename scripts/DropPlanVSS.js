@@ -176,9 +176,9 @@ function updateWorkItemInVSS() {
 
     var needSave = _witToSave.length > 0;
     var promises = [];
-    console.log("Saving Items: " + _witToSave.join(", "));
     
     if (needSave) {
+        console.log("Saving Items: " + _witToSave.join(", "));
         _witToSave.forEach(function (item, index) {
             var workItem = sprint.GetWorkitemByIdFromAll(item);
             if (workItem){

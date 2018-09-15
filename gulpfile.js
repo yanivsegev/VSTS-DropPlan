@@ -128,20 +128,32 @@ function copyDynamicFiles(env, templateData){
     }
 }
 exports.watch = function(done){
-    livereload.listen();
-    gulp.watch('scripts/**/*.js', Development.Scripts);
-    gulp.watch('styles/**/*.css', function(){Development.Styles(); copyStaticFiles(Development.Env)();});
-    
-    gulp.src('./dist/dev')
-    .pipe(webserver({
-      livereload: false,
-      directoryListing: false,
-      open: false,
-      https: true,
-      port: 8080
-    }));
+    build( () => {
+        livereload.listen();
+        gulp.watch('scripts/**/*.js', Development.Scripts);
+        gulp.watch('styles/**/*.css', Development.Styles);
+        gulp.watch('images/**/*.*', copyStaticFiles(Development.Env));
+        gulp.watch('*.html', copyDynamicFiles(Development.Env, [
+            {Key: '#{now}', Value: new Date().toJSON()},
+            {Key: '#{testing-flag}', Value: '-test'},
+            {Key: '"public": false', Value: '"public": false'},
+            {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
+            {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
+            {Key: '#{isMinified}', Value: ''}
+        ]));
+        
+        gulp.src('./dist/dev')
+        .pipe(webserver({
+        livereload: false,
+        directoryListing: false,
+        open: false,
+        https: true,
+        port: 8080
+        }));
+
+    });
 }
-exports.default = gulp.series(
+let build = gulp.series(
         clean, 
         gulp.parallel(
             Development.Styles, 
@@ -169,6 +181,7 @@ exports.default = gulp.series(
                 Production.Styles
             ));
 
+exports.default = build;
 exports.clean = clean
 exports.styles = Development.Styles
 exports.scripts = Development.Scripts
