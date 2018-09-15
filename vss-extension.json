@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "Drop-plan-extension#{testing-flag}",
-    "version": "1.5.1",
+    "version": "1.6.2",
     "name": "Sprint Drop Plan#{testing-flag}",
     "description": "Plan and track your sprint with a calendar based view.",
     "publisher": "yanivsegev",
@@ -41,7 +41,7 @@
         }
     ],
     "demands": [
-        "api-version/3.0"
+        "api-version/4.0"
     ],
     "contributions": [
         {

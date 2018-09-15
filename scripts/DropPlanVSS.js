@@ -268,7 +268,7 @@ function failToCallVss(reason) {
 
 function alertUser(msg, e){
     var logMsg = "Alert User: [" + msg + "]";
-    console.log(logMsg);
+    console.log(msg);
     if (e) console.log(e);
     if (window._trackJs && typeof trackJs != "undefined") { trackJs.track(logMsg); }
     alert(msg);

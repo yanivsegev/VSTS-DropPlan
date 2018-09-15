@@ -152,10 +152,11 @@ function drawRelations() {
     clearRelations(ctx, can);
     var pathslist = [];
     sprint.Wits.forEach(function(item1,index1) {
-        if (item1.isTaskWit && item1.relations){
+        if (item1.isTaskWit && item1.Relations){
 
-            item1.relations.forEach(function(item,index) { 
+            item1.Relations.forEach(function(item,index) { 
                 if (item.rel == "System.LinkTypes.Dependency-Forward"){
+                    
                     var seccesor = item.url.substring(item.url.lastIndexOf("/") + 1)
                     var seccesorDiv = $("div[witId=" + seccesor + "]");
                     var item2 = sprint.GetWorkitemById(seccesor)
@@ -168,7 +169,7 @@ function drawRelations() {
                         {
                             fillStyle = "red";
                         }
-                        drawArrow(ctx, can, $("div[witId=" + item1.id + "]"), seccesorDiv,fillStyle, true);
+                        drawArrow(ctx, can, $("div[witId=" + item1.Id + "]"), seccesorDiv,fillStyle, true);
                     }
                 }
             });
