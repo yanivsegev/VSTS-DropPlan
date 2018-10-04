@@ -31,7 +31,8 @@
     "gulp-util": "^3.0.8",
     "gulp-webserver": "^0.9.1",
     "http": "0.0.0",
-    "st": "^1.2.2"
+    "st": "^1.2.2",
+    "vss-web-extension-sdk": "2.109.1"
   },
   "optionalDependencies": {}
 }

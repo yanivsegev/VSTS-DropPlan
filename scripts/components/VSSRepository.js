@@ -51,57 +51,65 @@ function VSSRepository() {
 
                     var workClient = TFS_Work.getClient();
                     var teamContext = { projectId: _this._data.VssContext.project.id, teamId: _this._data.VssContext.team.id, project: "", team: "" };
+                    var configuration = VSS.getConfiguration();
+                    console.log("getConfiguration: " + JSON.stringify(configuration));
+                    
+                    if (configuration && configuration.iterationId){
+                        var iterationId = configuration.iterationId;
 
-                    var iterationId = VSS.getConfiguration().iterationId;
+                        VSS.getService(VSS.ServiceIds.ExtensionData).then(function (res){
+                            _this._data.dataService = res;
+                            loadThemes();
+                        });
 
-                    VSS.getService(VSS.ServiceIds.ExtensionData).then(function (res){
-                        _this._data.dataService = res;
-                        loadThemes();
-                    });
+                        var promisesList = [
+                            workClient.getTeamDaysOff(teamContext, iterationId),
+                            workClient.getTeamSettings(teamContext),
+                            workClient.getCapacities(teamContext, iterationId),
+                            workClient.getTeamIteration(teamContext, iterationId),
+                            workClient.getTeamFieldValues(teamContext)
+                        ];
 
-                    var promisesList = [
-                        workClient.getTeamDaysOff(teamContext, iterationId),
-                        workClient.getTeamSettings(teamContext),
-                        workClient.getCapacities(teamContext, iterationId),
-                        workClient.getTeamIteration(teamContext, iterationId),
-                        workClient.getTeamFieldValues(teamContext)
-                    ];
-
-                    if (workClient.getBacklogConfigurations) {
-                        promisesList.push(workClient.getBacklogConfigurations(teamContext));
-                    }
-
-                    var serverAnswer = Promise.all(promisesList).then(function (values) {
-
-                        console.log("Team data loaded. (" + (performance.now() - _this._data.t0) + " ms.)");
-                        _this.reportProgress("Team settings loaded.");
-                        _this._data.daysOff = values[0];
-                        _this._data.teamSettings = values[1];
-                        _this._data.teamMemberCapacities = values[2];
-                        _this._data.iteration = values[3];
-                        _this.IterationStartDate = _this._data.iteration.attributes.startDate;
-                        _this.IterationFinishDate = _this._data.iteration.attributes.finishDate;
-
-                        _this._data.teamValues = values[4];
-                        if (values.length > 5) {
-                            _this._data.backlogConfigurations = values[5];
-                            _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
-                            _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
-                        } else {
-                            _this.WorkItemTypes = [{ name: "Task" }];
-                            _this.WorkItemPBITypes = [{ name: 'Product Backlog Item' }, { name: 'Bug' }];
+                        if (workClient.getBacklogConfigurations) {
+                            promisesList.push(workClient.getBacklogConfigurations(teamContext));
                         }
-                        VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
 
-                            function (VSS_Service, TFS_Wit_WebApi) {
+                        var serverAnswer = Promise.all(promisesList).then(function (values) {
 
-                                _this._data.WitClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
+                            console.log("Team data loaded. (" + (performance.now() - _this._data.t0) + " ms.)");
+                            _this.reportProgress("Team settings loaded.");
+                            _this._data.daysOff = values[0];
+                            _this._data.teamSettings = values[1];
+                            _this._data.teamMemberCapacities = values[2];
+                            _this._data.iteration = values[3];
+                            _this.IterationStartDate = _this._data.iteration.attributes.startDate;
+                            _this.IterationFinishDate = _this._data.iteration.attributes.finishDate;
 
-                                OnLoadWorkItems(_this);
-                            });
+                            _this._data.teamValues = values[4];
+                            if (values.length > 5) {
+                                _this._data.backlogConfigurations = values[5];
+                                _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
+                                _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+                            } else {
+                                _this.WorkItemTypes = [{ name: "Task" }];
+                                _this.WorkItemPBITypes = [{ name: 'Product Backlog Item' }, { name: 'Bug' }];
+                            }
+                            VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
+
+                                function (VSS_Service, TFS_Wit_WebApi) {
+
+                                    _this._data.WitClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
+
+                                    OnLoadWorkItems(_this);
+                                });
 
 
-                    }, _this._data.failToCallVss);
+                        }, _this._data.failToCallVss);
+                    }
+                    else
+                    {
+                        _this.reportFailure("Failed to load iteration data");
+                    }
                 }
                 catch (e) {
                     var msg = 'Unknown error occurred.';

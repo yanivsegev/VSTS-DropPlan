@@ -85,12 +85,12 @@ function SprintData(workitems, repository, existingSprint) {
         return items.sort(function (a, b) {
 
             if (a.isTaskWit && b.isTaskWit) {
-
+    
                 if (!a.StartDate && !b.StartDate) {
                     var parentIda = a.GetParentId();
                     var parentIdb = b.GetParentId();
                     var pa = null, pb = null;
-
+    
                     if (parentIda == parentIdb) {
                         pa = a.BacklogPriority || 0;
                         pb = b.BacklogPriority || 0;
@@ -99,8 +99,13 @@ function SprintData(workitems, repository, existingSprint) {
                             if (item.Id == parentIda) pa = item.BacklogPriority || 0;
                             if (item.Id == parentIdb) pb = item.BacklogPriority || 0;
                         });
+    
+                        if (pa == pb){
+                            pa = a.BacklogPriority || 0;
+                            pb = b.BacklogPriority || 0;
+                        }
                     }
-
+    
                     if ((pa || 0) != 0 && (pb || 0) != 0) {
                         return pa - pb;
                     }
@@ -109,10 +114,10 @@ function SprintData(workitems, repository, existingSprint) {
                 } else if (a.StartDate && !b.StartDate) {
                     return -1;
                 }
-
-
+    
+    
             }
-
+    
             return a.Id - b.Id;
         });
     }

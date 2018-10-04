@@ -140,7 +140,13 @@ function render(isSaving, data) {
                                 }
                             });
 
-                            relatedItems = relatedItems.sort(function (a, b) { return a.StartDate.valueOf() - b.StartDate.valueOf();  });
+                            relatedItems = relatedItems.sort(function (a, b) { 
+                                if (a.StartDate && b.StartDate) {
+                                    return a.StartDate.valueOf() - b.StartDate.valueOf();
+                                } else {
+                                    return a.Id - b.Id;
+                                }
+                              });
 
                             if (relatedItems.length > 1){
                                 result = result + "<div class='relatedTaskBox'>";

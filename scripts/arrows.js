@@ -169,7 +169,11 @@ function drawRelations() {
                         {
                             fillStyle = "red";
                         }
-                        drawArrow(ctx, can, $("div[witId=" + item1.Id + "]"), seccesorDiv,fillStyle, true);
+                        var currentDiv = $("div[witId=" + item1.Id + "]");
+
+                        if (seccesorDiv.length > 0 && currentDiv.length > 0){
+                            drawArrow(ctx, can, currentDiv, seccesorDiv,fillStyle, true);
+                        }
                     }
                 }
             });
