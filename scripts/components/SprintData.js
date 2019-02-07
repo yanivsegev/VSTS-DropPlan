@@ -142,6 +142,7 @@ function SprintData(workitems, repository, existingSprint) {
         var names = {};
         var areaPaths = {};
         var areaPathsId = 1;
+        var today = new Date(new Date().yyyy_mm_dd());
 
         for (var i = 0; i < this.Wits.length; i++) {
             var workItem = this.Wits[i];
@@ -158,6 +159,7 @@ function SprintData(workitems, repository, existingSprint) {
                     avatar: this.Repository.GetMemberImage(workItem.AssignedTo),
                     assignedToId: result.length,
                     hasItems: false,
+                    isCurrenctUser: this.Repository.IsCurrenctUser(workItem.AssignedTo),
                 };
                 for (var colIndex = 0; colIndex < this.Dates.length; colIndex++) {
                     var currentDate = this.Dates[colIndex];
@@ -332,7 +334,9 @@ function SprintData(workitems, repository, existingSprint) {
                         id: i,
                         endDate: dates[dates.length - 1],
                         areaPath: areaPaths[workItem.AreaPath],
-                        isWitTask: isWitTask
+                        isWitTask: isWitTask,
+                        isOverDue: dates[dates.length - 1] < today,
+                        isBlocked: workItem.Blocked == "Yes",
                     };
                 }
             }

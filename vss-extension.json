@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "Drop-plan-extension#{testing-flag}",
-    "version": "1.6.8",
+    "version": "1.7.2",
     "name": "Sprint Drop Plan#{testing-flag}",
     "description": "Plan and track your sprint with a calendar based view.",
     "publisher": "yanivsegev",
@@ -56,11 +56,37 @@
                 "order": 99,
                 "uri": "index.html"
             }
+        },
+        {
+            "id": "DropPlan#{testing-flag}-hub-group",
+            "type": "ms.vss-web.hub-group",
+            "targets": [
+                "ms.vss-web.mobile-collection-hub-groups-collection",
+                "ms.vss-web.mobile-project-hub-groups-collection"
+            ],
+            "properties": {
+                "name": "My Drop Plan#{testing-flag}"
+            }
+        },
+        {
+            "id": "DropPlan#{testing-flag}-hub",
+            "type": "ms.vss-web.hub",
+            "targets": [
+                ".DropPlan#{testing-flag}-hub-group"
+            ],
+            "properties": {
+                "name": "My Drop Plan#{testing-flag}",
+                "uri": "index_mobile.html"
+            }
         }
     ],
     "files": [
         {
             "path": "index.html",
+            "addressable": true
+        },
+        {
+            "path": "index_mobile.html",
             "addressable": true
         },
         {

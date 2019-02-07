@@ -464,3 +464,75 @@ canvas {
     padding-left: 4px;
     padding-right: 14px;
 }
+
+
+.summary{
+    width: 100vw;
+    min-width: initial;
+    padding: 0 10px;
+}
+
+.summaryDay{
+
+    border-bottom: 1px solid;
+    border-color: rgba(234,234,234,1);
+    border-color: rgba(var(--palette-neutral-8,234, 234, 234),1);    
+}
+
+.summaryDayTitle{
+
+    padding: 5px 0;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.summaryTask{
+    padding: 10px 0 10px 0;
+
+    border-top: 1px solid;
+    border-color: rgba(234,234,234,1);
+    border-color: rgba(var(--palette-neutral-8,234, 234, 234),1);
+
+    font-size: 14px;
+    color: #767676;
+
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    height: 40px;
+}
+
+.summaryTaskTitle{
+    display: inline-block;
+
+}
+
+.summaryTaskRemainingWork{
+    display: inline-block;
+
+}
+
+.summaryTaskIcon{
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    background: #107c10;
+}
+
+.summaryTaskIcon .taskDone{
+    background: red;
+}
+
+.mobile .messageBoxContainer{
+    margin: 0;
+}
+
+.mobile .messageBox{
+    min-width: 0;
+    margin: 0 auto;
+}
+
+.mobile .messageBoxInner{
+    padding: 0;
+}

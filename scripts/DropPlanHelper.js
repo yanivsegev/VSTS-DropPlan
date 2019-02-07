@@ -1,8 +1,31 @@
 var colWidth = 180;
 var _witToSave = [];
 var _witInUpdate = [];
+var _scrollToToday = true;
 
 var _today = new Date(new Date().yyyy_mm_dd());
+
+function renderCalender(isSaving, data){
+    dettachEvents();
+
+    render(isSaving, data);
+
+    attachEvents();
+    drawRelations();
+    AlignTitlesToView();
+
+    TableLock_clear();
+    TableLock("tasksTable", "row_class_name", "column_class_name", "locked_class_name");
+    
+    $("#options").css("display", "flex");
+
+    if ($('.taskToday')[0] && _scrollToToday) {
+        _scrollToToday = false;
+        $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width() / 2);
+    }
+
+}
+
 
 function render(isSaving, data) {
     
@@ -195,6 +218,7 @@ function render(isSaving, data) {
     }
 
     result = result + "</tbody></table>";
+    var container = document.getElementById("grid-container");
     container.innerHTML = result;
 }
 

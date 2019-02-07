@@ -6,9 +6,7 @@
     </link>
 </head>
 
-<body class='mainBody'>
-    <canvas id="canvas1" width="2000" height="1000"></canvas>
-    <canvas id="canvas2" width="2000" height="1000"></canvas>
+<body class='mainBody mobile'>
     <div id="options" style="display:none; " class="options">
         <div class="optionsInner">
             <div>
@@ -67,7 +65,8 @@
 
 <script src="scripts/dropPlan#{isMinified}.js?l=#{now}"></script>
 <script type="text/javascript">
-    BuildDropPlan(false);
+    //BuildDropPlan(true);
+    buildSummery();
 </script>
-    
+
 </html>

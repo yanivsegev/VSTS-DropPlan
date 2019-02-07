@@ -1,7 +1,6 @@
 var repository = new VSSRepository();
     
 var sprint, container;
-var _scrollToToday = true;
 var autoRefresh;
 var showFailAlearts = true;
 
@@ -56,13 +55,14 @@ function reportFailure(msg){
     messages.innerHTML = "<h1>" + msg + "</h1>";
 }    
 
-function BuildDropPlan() {
+function BuildDropPlan(isMobile) {
 
     try{
         repository.reportProgress = reportProgress;
         repository.reportFailure = reportFailure;
         repository.failToCallVss = failToCallVss;
         repository.WorkItemsLoaded = WorkItemsLoaded;
+        repository.isMobile = isMobile;
         repository.Init();
     } catch (error) {
         alertUser(error);                
@@ -98,30 +98,16 @@ function processWorkItems(workItems, isSaving) {
     try {
         
         sprint = new SprintData(workItems, repository, sprint);
-        
-        container = document.getElementById("grid-container");
-
         var data = sprint.GetData();
         
-        dettachEvents();
-
-        render(isSaving, data);
-
-        attachEvents();
-        drawRelations();
-        AlignTitlesToView();
-
-        TableLock_clear();
-        TableLock("tasksTable", "row_class_name", "column_class_name", "locked_class_name");
-        
-        $("#options").css("display", "flex");
-
-        if ($('.taskToday')[0] && _scrollToToday) {
-            _scrollToToday = false;
-            $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width() / 2);
+        if (repository.isMobile){
+            renderSummary(data);
         }
-
-        SetAutoRefresh();
+        else
+        {
+            renderCalender(isSaving, data);
+            SetAutoRefresh();
+        }
     
     } catch (error) {
         alertUser(error);                
@@ -274,6 +260,6 @@ function alertUser(msg, e){
     alert(msg);
 }
 
-BuildDropPlan();
+
 
 

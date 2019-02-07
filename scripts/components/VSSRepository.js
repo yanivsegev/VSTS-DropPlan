@@ -4,6 +4,7 @@ function VSSRepository() {
     this.reportFailure;
     this.failToCallVss;
     this.WorkItemsLoaded;
+    this.isMobile;
     this._data = { t0: performance.now() };
     this.LoadWorkItems = function () { OnLoadWorkItems(this) };
 
@@ -26,21 +27,58 @@ function VSSRepository() {
         });
 
         _startVSS(_this);
-        
-        
     }
 
     function _startVSS(_this) {
 
-        VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient"],
+        _this.reportProgress("Framework loaded.");
 
-            function (VSS_Service, TFS_Wit_WebApi, TFS_Work) {
+        if (_this.isMobile){
+            VSS.require(["TFS/Core/RestClient"],
+            function (TFS_Core) {
                 try {
-                    var extVersion = VSS.getExtensionContext().version;
-                    _this._data.VssContext = VSS.getWebContext();
                     
-                    console.log("VSS loaded V " + extVersion + " VssSDKRestVersion:" + VSS.VssSDKRestVersion + " VssSDKVersion:" + VSS.VssSDKVersion + " user: " + _this._data.VssContext.user.uniqueName + ". (" + (performance.now() - _this._data.t0) + " ms.)");
-                    _this.reportProgress("Framework loaded.");
+                    var coreClient = TFS_Core.getClient()
+                    
+                    coreClient.getProjects().then( (x)=>{
+                    coreClient.getTeams(x[0].id).then((y)=>{
+                        _this._data.VssContext = VSS.getWebContext();
+                        _this._data.VssContext.project = {id: y[0].projectId}
+                        _this._data.VssContext.team = {id: y[0].id};
+
+                        loadTeamData(_this);       
+                    
+                    });});
+
+                }
+                catch (e) {
+                    var msg = 'Unknown error occurred.';
+                    alertUser(msg, e)
+                    _this.reportFailure(msg);
+                }
+            });
+        }
+        else
+        {
+            loadTeamData(_this);
+        }
+    }
+
+
+    function loadTeamData(_this){
+        
+        VSS.require(["TFS/Work/RestClient"],
+                function (TFS_Work) {
+                    try {
+                        
+                        _this._data.VssContext = _this._data.VssContext || VSS.getWebContext();
+ 
+
+                        var extVersion = VSS.getExtensionContext().version;
+                        console.log("VSS loaded V " + extVersion + " VssSDKRestVersion:" + VSS.VssSDKRestVersion + " VssSDKVersion:" + VSS.VssSDKVersion + " user: " + _this._data.VssContext.user.uniqueName + ". (" + (performance.now() - _this._data.t0) + " ms.)");
+        
+                        workClient = TFS_Work.getClient();
+
 
                     if (window._trackJs && typeof trackJs != "undefined") {
 
@@ -49,67 +87,36 @@ function VSSRepository() {
                         trackJs.addMetadata("VssSDKVersion", VSS.VssSDKVersion);
                     }
 
-                    var workClient = TFS_Work.getClient();
                     var teamContext = { projectId: _this._data.VssContext.project.id, teamId: _this._data.VssContext.team.id, project: "", team: "" };
-                    var configuration = VSS.getConfiguration();
-                    console.log("getConfiguration: " + JSON.stringify(configuration));
-                    
-                    if (configuration && configuration.iterationId){
-                        var iterationId = configuration.iterationId;
 
-                        VSS.getService(VSS.ServiceIds.ExtensionData).then(function (res){
-                            _this._data.dataService = res;
-                            loadThemes();
-                        });
+                    if (_this.isMobile){
 
-                        var promisesList = [
-                            workClient.getTeamDaysOff(teamContext, iterationId),
-                            workClient.getTeamSettings(teamContext),
-                            workClient.getCapacities(teamContext, iterationId),
-                            workClient.getTeamIteration(teamContext, iterationId),
-                            workClient.getTeamFieldValues(teamContext)
-                        ];
-
-                        if (workClient.getBacklogConfigurations) {
-                            promisesList.push(workClient.getBacklogConfigurations(teamContext));
-                        }
-
-                        var serverAnswer = Promise.all(promisesList).then(function (values) {
-
-                            console.log("Team data loaded. (" + (performance.now() - _this._data.t0) + " ms.)");
-                            _this.reportProgress("Team settings loaded.");
-                            _this._data.daysOff = values[0];
-                            _this._data.teamSettings = values[1];
-                            _this._data.teamMemberCapacities = values[2];
-                            _this._data.iteration = values[3];
-                            _this.IterationStartDate = _this._data.iteration.attributes.startDate;
-                            _this.IterationFinishDate = _this._data.iteration.attributes.finishDate;
-
-                            _this._data.teamValues = values[4];
-                            if (values.length > 5) {
-                                _this._data.backlogConfigurations = values[5];
-                                _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
-                                _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
-                            } else {
-                                _this.WorkItemTypes = [{ name: "Task" }];
-                                _this.WorkItemPBITypes = [{ name: 'Product Backlog Item' }, { name: 'Bug' }];
+                        workClient.getTeamIterations(teamContext).then(function (x){
+                            var i = 0;
+                            while (i < x.length - 1 && x[i].attributes.timeFrame != 1){
+                                i = i + 1;
                             }
-                            VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
-
-                                function (VSS_Service, TFS_Wit_WebApi) {
-
-                                    _this._data.WitClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
-
-                                    OnLoadWorkItems(_this);
-                                });
-
-
-                        }, _this._data.failToCallVss);
+                            loadIterationData(_this, teamContext, x[i].id);
+                        });
                     }
                     else
                     {
-                        _this.reportFailure("Failed to load iteration data");
+                        var configuration = VSS.getConfiguration();
+                        console.log("getConfiguration: " + JSON.stringify(configuration));
+    
+                        if (configuration && configuration.iterationId){
+                            var iterationId = configuration.iterationId;
+                            loadIterationData(_this, teamContext, iterationId);
+                        }
+                        else
+                        {
+                            _this.reportFailure("Failed to load iteration data");
+                        }
+                        
                     }
+
+                    
+                    
                 }
                 catch (e) {
                     var msg = 'Unknown error occurred.';
@@ -119,34 +126,100 @@ function VSSRepository() {
             });
     }
 
+    function loadIterationData(_this, teamContext, iterationId){
+        VSS.getService(VSS.ServiceIds.ExtensionData).then(function (res){
+            _this._data.dataService = res;
+            loadThemes();
+        });
+
+        var promisesList = [
+            workClient.getTeamDaysOff(teamContext, iterationId),
+            workClient.getTeamSettings(teamContext),
+            workClient.getCapacities(teamContext, iterationId),
+            workClient.getTeamIteration(teamContext, iterationId),
+            workClient.getTeamFieldValues(teamContext)
+        ];
+
+        if (workClient.getBacklogConfigurations) {
+            promisesList.push(workClient.getBacklogConfigurations(teamContext));
+        }
+
+        var serverAnswer = Promise.all(promisesList).then(function (values) {
+
+            console.log("Team data loaded. (" + (performance.now() - _this._data.t0) + " ms.)");
+            _this.reportProgress("Team settings loaded.");
+            _this._data.daysOff = values[0];
+            _this._data.teamSettings = values[1];
+            _this._data.teamMemberCapacities = values[2];
+            _this._data.iteration = values[3];
+            _this.IterationStartDate = _this._data.iteration.attributes.startDate;
+            _this.IterationFinishDate = _this._data.iteration.attributes.finishDate;
+
+            _this._data.teamValues = values[4];
+            if (values.length > 5) {
+                _this._data.backlogConfigurations = values[5];
+                _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
+                _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+            } else {
+                _this.WorkItemTypes = [{ name: "Task" }];
+                _this.WorkItemPBITypes = [{ name: 'Product Backlog Item' }, { name: 'Bug' }];
+            }
+            VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
+
+                function (VSS_Service, TFS_Wit_WebApi) {
+
+                    _this._data.WitClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
+
+                    OnLoadWorkItems(_this);
+                });
+
+
+        }, _this._data.failToCallVss);
+
+    }
+
     function OnLoadWorkItems(_this) {
 
         var currentIterationPath = _this._data.iteration.path;
+        var queryIterarionFilter = "AND [Source].[System.IterationPath] UNDER '" + currentIterationPath.replace("'", "''") + "' ";
+        var queryFilter = "";
 
-        // Query object containing the WIQL query
-        var query = {
-            query: "SELECT [System.Id] FROM WorkItem WHERE ([System.WorkItemType] IN GROUP 'Microsoft.TaskCategory' OR [System.WorkItemType] IN GROUP 'Microsoft.BugCategory' OR [System.WorkItemType] IN GROUP 'Microsoft.RequirementCategory') AND [System.State] NOT IN ('Removed') AND [System.IterationPath] UNDER '" + currentIterationPath.replace("'", "''") + "' "
-        };
         if (_this._data.teamValues.values.length > 0) {
-            query.query = query.query + " AND (";
+            queryFilter = queryFilter + " AND (";
             $.each(_this._data.teamValues.values, function (index, item) {
                 if (index > 0) {
-                    query.query = query.query + " OR ";
+                    queryFilter = queryFilter + " OR ";
                 }
-                query.query = query.query + "[" + _this._data.teamValues.field.referenceName.replace("'", "''") + "] ";
+                queryFilter = queryFilter + "[Source].[" + _this._data.teamValues.field.referenceName.replace("'", "''") + "] ";
                 if (item.includeChildren == true) {
-                    query.query = query.query + "UNDER";
+                    queryFilter = queryFilter + "UNDER";
                 }
                 else {
-                    query.query = query.query + "=";
+                    queryFilter = queryFilter + "=";
                 }
 
-                query.query = query.query + " '" + item.value.replace("'", "''") + "'";
+                queryFilter = queryFilter + " '" + item.value.replace("'", "''") + "'";
             });
-
-            query.query = query.query + " )";
+            queryFilter = queryFilter + ")";
         }
 
+
+        var queryWIQL = "";
+        queryWIQL = queryWIQL + "SELECT [System.Id] FROM workitemLinks ";
+        queryWIQL = queryWIQL + "WHERE (";
+        queryWIQL = queryWIQL + "([Source].[System.WorkItemType] IN GROUP 'Microsoft.TaskCategory' OR [Source].[System.WorkItemType] IN GROUP 'Microsoft.BugCategory')";
+        queryWIQL = queryWIQL + "AND [Source].[System.State] <> 'Removed' ";
+        queryWIQL = queryWIQL + queryIterarionFilter + queryFilter + ") ";
+        queryWIQL = queryWIQL + "AND ([System.Links.LinkType] = 'System.LinkTypes.Hierarchy-Reverse')";
+        queryWIQL = queryWIQL + "AND ([Target].[System.WorkItemType] IN GROUP 'Microsoft.RequirementCategory' "
+        queryWIQL = queryWIQL + "AND [Target].[System.State] <> 'Removed'"
+        queryWIQL = queryWIQL + queryFilter.replace(/\[Source\]/g, "[Target]") +" )";
+        queryWIQL = queryWIQL + "MODE (MayContain)";
+
+        console.log(queryWIQL);
+        
+        // Query object containing the WIQL query
+        var query = { query: queryWIQL };
 
         // Executes the WIQL query against the active project
         _this._data.WitClient.queryByWiql(query, _this._data.VssContext.project.id).then(
@@ -155,7 +228,13 @@ function VSSRepository() {
                 console.log("Iteration data loaded. (" + (performance.now() - _this._data.t0) + " ms.)");
                 _this.reportProgress("Work items list loaded.");
                 // Generate an array of all open work item ID's
-                var openWorkItems = result.workItems.map(function (wi) { return wi.id });
+                //var openWorkItems = result.workItems.map(function (wi) { return wi.id });
+
+                var openWorkItems = [];
+                $.each(result.workItemRelations, function(i, el){
+                    if(el.source && $.inArray(el.source.id, openWorkItems) === -1) openWorkItems.push(el.source.id);
+                    if(el.target && $.inArray(el.target.id, openWorkItems) === -1) openWorkItems.push(el.target.id);
+                });
 
                 if (openWorkItems.length == 0) {
                     _this.reportFailure("No work items found.");
@@ -249,5 +328,9 @@ function VSSRepository() {
             }
         });
         return res;
+    }
+
+    this.IsCurrenctUser  = function(user){
+        return this._data.VssContext.user.name == user;
     }
 }

@@ -49,6 +49,7 @@ let js = {
     ,"scripts/TableLock.js"
     ,"scripts/DateHealpers.js"
     ,"scripts/DropPlanHelper.js"
+    ,"scripts/mobileHelper.js"
     ,"scripts/arrows.js"
     ,"scripts/themes.js"
     ,"scripts/DropPlanVSS.js"],
@@ -118,7 +119,7 @@ function copyStaticFiles(env){
 }
 function copyDynamicFiles(env, templateData){
     return function BuildAndCopyDynamicFiles(){
-        let task = gulp.src(['index.html', 'vss-extension.json'])  
+        let task = gulp.src(['index.html','index_mobile.html', 'vss-extension.json'])  
             
         templateData.forEach(function(data, index){
             task.pipe(replace(data.Key, data.Value));
@@ -138,7 +139,8 @@ exports.watch = function(done){
             {Key: '#{testing-flag}', Value: '-test'},
             {Key: '"public": false', Value: '"public": false'},
             {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
-            {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
+            {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080/index.html"'},
+            {Key: '"uri": "index_mobile.html"', Value: '"uri": "https://localhost:8080/index_mobile.html"'},
             {Key: '#{isMinified}', Value: ''}
         ]));
         
@@ -165,7 +167,8 @@ let build = gulp.series(
                 {Key: '#{testing-flag}', Value: '-test'},
                 {Key: '"public": false', Value: '"public": false'},
                 {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
-                {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
+                {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080/index.html"'},
+                {Key: '"uri": "index_mobile.html"', Value: '"uri": "https://localhost:8080/index_mobile.html"'},
                 {Key: '#{isMinified}', Value: ''}
             ]),
             copyDynamicFiles(Production.Env, [
