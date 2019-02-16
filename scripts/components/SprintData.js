@@ -74,6 +74,8 @@ function SprintData(workitems, repository, existingSprint) {
 
         return items.filter(function (a) {
             
+            a.AllSearchable = a.AreaPath + ' ' + a.AssignedTo + ' ' + a.Title + ' ' + a.ParentTitle + ' ' + a.State;
+
             return filterTerm == '' || 
                    filterTerm == undefined || 
                    (a[filterArea] != undefined && a[filterArea].toLowerCase().includes(filterTerm.toLowerCase()));
