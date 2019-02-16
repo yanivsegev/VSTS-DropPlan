@@ -67,5 +67,18 @@
 </body>
 
 <script src="scripts/dropPlan#{isMinified}.js?l=#{now}"></script>
+<script>
+
+(function(){
+    
+    var js = document.createElement('script')
+    js.src = "https://cdn.logrocket.io/LogRocket.min.js";
+    js.crossorigin = "anonymous";
+    var fjs = document.getElementsByTagName('script')[0];
+    fjs.parentNode.insertBefore(js,fjs);
+    
+})();
+
+</script>
 
 </html>

@@ -1,73 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Fresca|Indie+Flower');
 
-.taskTd{
-    background: rgba(255, 255, 255,0.6);
-}
-
-.taskTrContent:nth-child(2){
-    background: orange;
-}
-
-.taskTrContent:nth-child(4){
-    background: lightblue;
-}
-
-.taskTrContent:nth-child(6){
-    background: lightskyblue;
-}
-
-.taskTrContent:nth-child(8){
-    background: lightseagreen;
-}
-
-.taskTrContent:nth-child(10){
-    background: lightsalmon;
-}
-
-.taskTrContent:nth-child(12){
-    background: lightslategrey;
-}
-
-.taskTrContent:nth-child(14){
-    background: lightblue;
-}
-
-.taskTrContent:nth-child(16){
-    background: lightskyblue;
-}
-
-.taskTrContent:nth-child(18){
-    background: lightseagreen;
-}
-
-.taskTrContent:nth-child(20){
-    background: lightsalmon;
-}
-
-.taskTrContent:nth-child(22){
-    background: lightslategrey;
-}
-
-.taskTrContent:nth-child(24){
-    background: lightblue;
-}
-
-.taskTrContent:nth-child(26){
-    background: lightskyblue;
-}
-
-.taskTrContent:nth-child(28){
-    background: lightseagreen;
-}
-
-.taskTrContent:nth-child(30){
-    background: lightsalmon;
-}
-
-.taskTrContent:nth-child(32){
-    background: lightslategrey;
-}
-
 .taskStart{
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     border: 1px solid lightgray;
@@ -120,8 +52,27 @@
 }
 
 .taskOverDue {
-    background: rgb(255, 121, 121);
+    background:white;
+
 }
+
+.taskOverDue:after{
+    font-size: 150%;
+    text-align:center;
+    content: "Overdue";
+    position:absolute;
+    bottom:5px;
+    right:-5px;
+    width:100px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background:rgb(255, 121, 121);
+    transform: rotate(-5deg);
+
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    
+}
+
 
 .taskDone{
     background:white;
@@ -135,7 +86,7 @@
     position:absolute;
     bottom:5px;
     right:-5px;
-    width:70%;
+    width:100px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     background:lightgreen;
     transform: rotate(-5deg);
@@ -144,17 +95,6 @@
 
 .sameParent{
     background: bisque;
-}
-
-.taskToday{
-   background: rgba(250,0,0,0.3)
-}
-
-.taskToday.taskDayOff{
-    background:repeating-linear-gradient(  15deg,  #dadada,  #fff4ce 10px,  #fff4ce 10px,  #dadada 20px)
-}
-.taskDayOff{
-    background:repeating-linear-gradient(  15deg,  rgba(50,0,0,0.3),  rgba(0,0,0,0.0) 10px,  rgba(50,0,0,0.3) 10px,  rgba(0,0,0,0.0) 20px)
 }
 
 .activeTask{

@@ -49,6 +49,29 @@ function VSSRepository() {
                         trackJs.addMetadata("VssSDKVersion", VSS.VssSDKVersion);
                     }
 
+                    if (window.LogRocket) {
+                        window.LogRocket.init('ig33h1/drop-plan');
+                        LogRocket.identify(_this._data.VssContext.user.uniqueName, {
+                            name: _this._data.VssContext.user.uniqueName,
+                          
+                            VssSDKRestVersion: VSS.VssSDKRestVersion,
+                            VssSDKVersion: VSS.VssSDKVersion,
+                          });
+
+                          if (window._trackJs && typeof trackJs != "undefined") {
+
+                            // other stuff
+                            window._trackJs.onError = function (payload, error){
+                                payload.metadata.push({
+                                key: "LogRocket URL",
+                                value: (LogRocket || {}).sessionURL
+                                });
+
+                                return true; // Ensure error gets sent
+                                }
+                            }
+                    }
+
                     var workClient = TFS_Work.getClient();
                     var teamContext = { projectId: _this._data.VssContext.project.id, teamId: _this._data.VssContext.team.id, project: "", team: "" };
                     var configuration = VSS.getConfiguration();
