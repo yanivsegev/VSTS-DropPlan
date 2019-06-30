@@ -17,5 +17,5 @@ steps:
 
 - script: |
     npm install
-    npm run build
+    npm run gulp
   displayName: 'npm install and run gulp'
