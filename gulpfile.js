@@ -23,15 +23,15 @@ try{
 }
 
 let css = {
-    sourceFiles: ['styles/main.css', 'styles/jquery-ui.css'],
+    sourceFiles: ['Styles/main.css', 'Styles/jquery-ui.css'],
     fileName: 'dropPlan',
     environment: {
         dev:{
-            path: './dist/dev/styles/',
+            path: './dist/dev/Styles/',
             extension: '.css'
         },
         prod:{
-            path: './dist/prod/styles/',
+            path: './dist/prod/Styles/',
             extension: '.min.css'
         }
     }
@@ -109,7 +109,7 @@ function clean(){
 }
 function copyStaticFiles(env){
     return function CopyEnvStaticFiles(){
-        return gulp.src(['styles/*.css', '!styles/jquery-ui.css',
+        return gulp.src(['Styles/*.css', '!Styles/jquery-ui.css',
                         'images/*',
                         'README.md',
                         'LICENSE'])
@@ -131,7 +131,7 @@ exports.watch = function(done){
     build( () => {
         livereload.listen();
         gulp.watch('scripts/**/*.js', Development.Scripts);
-        gulp.watch('styles/**/*.css', Development.Styles);
+        gulp.watch('Styles/**/*.css', Development.Styles);
         gulp.watch('images/**/*.*', copyStaticFiles(Development.Env));
         gulp.watch('*.html', copyDynamicFiles(Development.Env, [
             {Key: '#{now}', Value: new Date().toJSON()},
