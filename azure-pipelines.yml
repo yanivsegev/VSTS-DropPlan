@@ -19,3 +19,11 @@ steps:
     npm install
     gulp default --gulpfile gulpfile.js
   displayName: 'npm install and run gulp'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
