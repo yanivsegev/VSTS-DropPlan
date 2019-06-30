@@ -4,7 +4,8 @@
   "description": "Sprint Drop Plan is an organizational tool that helps team members to sync their tasks by visualizing work status and dependencies on a sprint-based calendar.",
   "main": "index.html",
   "scripts": {
-    "build": "(gulp && cd dist/dev && tfx extension create --manifest-globs vss-extension.json && cd ../prod && tfx extension create --manifest-globs vss-extension.json)"
+    "build": "(gulp && cd dist/dev && tfx extension create --manifest-globs vss-extension.json && cd ../prod && tfx extension create --manifest-globs vss-extension.json)",
+    "gulp": "gulp"
   },
   "repository": {
     "type": "git",
