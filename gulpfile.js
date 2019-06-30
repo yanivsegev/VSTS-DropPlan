@@ -182,6 +182,7 @@ let build = gulp.series(
             ));
 
 exports.default = build;
+exports.build = build;
 exports.clean = clean
 exports.styles = Development.Styles
 exports.scripts = Development.Scripts
