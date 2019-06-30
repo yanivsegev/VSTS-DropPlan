@@ -57,18 +57,18 @@ function VSSRepository() {
                             VssSDKRestVersion: VSS.VssSDKRestVersion,
                             VssSDKVersion: VSS.VssSDKVersion,
                           });
+                    }
 
-                          if (window._trackJs && typeof trackJs != "undefined") {
+                    if (window._trackJs && typeof trackJs != "undefined") {
 
-                            // other stuff
-                            window._trackJs.onError = function (payload, error){
-                                payload.metadata.push({
-                                key: "LogRocket URL",
-                                value: (LogRocket || {}).sessionURL
-                                });
+                        // other stuff
+                        window._trackJs.onError = function (payload, error){
+                            payload.metadata.push({
+                            key: "LogRocket URL",
+                            value: (LogRocket || {}).sessionURL
+                            });
 
-                                return true; // Ensure error gets sent
-                                }
+                            return true; // Ensure error gets sent
                             }
                     }
 
