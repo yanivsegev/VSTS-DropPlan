@@ -115,7 +115,7 @@ function render(isSaving, data) {
                                     tooltiptextcls = 'tooltiptextBUG';
                                 }
                             }
-                            if (parentId != -1) {
+                            if (parentId != -1) {tooltiptext tooltiptextPBI
                                 result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + "><div class='taskTitle pbiText'><div class='openWit'>";
                                 if (parentWit) {
                                     result = result + parentWit.Title + "</div><div class='pbiState'>" + parentWit.State;
@@ -283,21 +283,96 @@ function attachEvents() {
         AlignTitlesToView();
     });
 
-    $(".openWit").click(function (event) {
-        event.stopPropagation();
-        var witId = $(this).parent().parent().attr("witId");
+    $.fn.scrollView = function (fromTop) {
+        var scroll = this;
+        scroll.fromTop = fromTop;
+        return this.each(function () {
+          $('html, body').animate({
+            scrollTop: $(this).offset().top - scroll.fromTop
+          }, 1);
+        });
+      }
 
-        if ($(this).parent().hasClass('noclick')) {
-            $(this).parent().removeClass('noclick');
+    window.fixMouseEvents = function(){
+        function throttled(fn, delay) {
+            let lastCall = 0;
+            return function (...args) {
+              const now = (new Date).getTime();
+              if (now - lastCall < delay) {
+                return;
+              }
+              lastCall = now;
+              return fn(...args);
+            }
+          };
+
+        var drag_active = false;
+
+        var original_mouseMove = jQuery.ui.mouse.prototype._mouseMove;
+        jQuery.ui.mouse.prototype._mouseMove = function () {
+            if (drag_active) {
+                original_mouseMove.apply(this, arguments);
+            }
         }
-        else {
-            VSS.require(["TFS/WorkItemTracking/Services"], function (TFS_Wit_Services) {
-                TFS_Wit_Services.WorkItemFormNavigationService.getService().then(function (workItemNavSvc) {
-                workItemNavSvc.openWorkItem(witId);
-                });
+
+        var original_mouseDown = jQuery.ui.mouse.prototype._mouseDown;
+        jQuery.ui.mouse.prototype._mouseDown = function () {
+            drag_active = true;
+            original_mouseDown.apply(this, arguments);
+        }
+        var original_mouseUp = jQuery.ui.mouse.prototype._mouseUp;
+        jQuery.ui.mouse.prototype._mouseUp = function () {
+            original_mouseUp.apply(this, arguments);
+            drag_active = false;
+        }
+
+        jQuery.ui.mouse.prototype._mouseMove = throttled(jQuery.ui.mouse.prototype._mouseMove, 10);
+    }
+
+    window.setupOpenWit = function(){
+        $(".openWit").unbind("click");
+        $(".openWit").click(function (event) {
+                       event.stopPropagation();
+        
+                var witId = $(this).parent().parent().attr("witId");
+        
+                if ($(this).parent().hasClass('noclick')) {
+                    $(this).parent().removeClass('noclick');
+                }
+                else if(event.ctrlKey){
+                    var text = $(event.target).text();
+                    window.goBackElemClass = '.'+ $(event.target).attr('class').split(' ').join('.') + ':contains("'+text+'")';
+					window.goBackElemClassTop = $(event.target)[0].getBoundingClientRect().top;
+                    $(document).bind('keydown.escFilter', function(e) {
+                        if (e.key == "Escape") {
+                        $('#filterBy').val('');
+                        $('#filterBy').trigger('input');
+                        setTimeout(function(){ 
+                             var oldLocationElement = $(window.goBackElemClass);
+                              oldLocationElement.scrollView(window.goBackElemClassTop);
+                             },50);
+                           $(document).unbind('keydown.escFilter');
+                        }
+                        window.setupOpenWit();
+                    });
+                    
+                    var cleanText  = text.replace(/\[.*?\]/,'');
+                    $('#filterArea > option:nth-child(3)').prop('selected', true);
+                    $('#filterBy').val(cleanText);
+                    $('#filterBy').trigger('input');
+                }
+                else {
+                    VSS.require(["TFS/WorkItemTracking/Services"], function (TFS_Wit_Services) {
+                        TFS_Wit_Services.WorkItemFormNavigationService.getService().then(function (workItemNavSvc) {
+                        workItemNavSvc.openWorkItem(witId);
+                        });
+                    });
+                }
             });
-        }
-    });
+    };
+    window.setupOpenWit();
+    window.fixMouseEvents();
+ 
 
     $(".taskStart:not(.taskSaving):not(.PBItaskStart)").draggable(({
         opacity: 0.7,
