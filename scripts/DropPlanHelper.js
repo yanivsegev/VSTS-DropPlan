@@ -115,7 +115,7 @@ function render(isSaving, data) {
                                     tooltiptextcls = 'tooltiptextBUG';
                                 }
                             }
-                            if (parentId != -1) {tooltiptext tooltiptextPBI
+                            if (parentId != -1) {
                                 result = result + "<div class='tooltiptext " + tooltiptextcls + "' witId=" + parentId + "><div class='taskTitle pbiText'><div class='openWit'>";
                                 if (parentWit) {
                                     result = result + parentWit.Title + "</div><div class='pbiState'>" + parentWit.State;
