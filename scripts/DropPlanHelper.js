@@ -306,26 +306,6 @@ function attachEvents() {
             }
           };
 
-        var drag_active = false;
-
-        var original_mouseMove = jQuery.ui.mouse.prototype._mouseMove;
-        jQuery.ui.mouse.prototype._mouseMove = function () {
-            if (drag_active) {
-                original_mouseMove.apply(this, arguments);
-            }
-        }
-
-        var original_mouseDown = jQuery.ui.mouse.prototype._mouseDown;
-        jQuery.ui.mouse.prototype._mouseDown = function () {
-            drag_active = true;
-            original_mouseDown.apply(this, arguments);
-        }
-        var original_mouseUp = jQuery.ui.mouse.prototype._mouseUp;
-        jQuery.ui.mouse.prototype._mouseUp = function () {
-            original_mouseUp.apply(this, arguments);
-            drag_active = false;
-        }
-
         jQuery.ui.mouse.prototype._mouseMove = throttled(jQuery.ui.mouse.prototype._mouseMove, 10);
     }
 
