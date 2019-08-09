@@ -126,7 +126,7 @@ function render(isSaving, data) {
                             }
                         }
 
-                        result = result + "<div class='taskTitle'><div class='openWit'>" + task.workItem.Title + "</div></div>";
+                        result = result + "<div class='taskTitle'><span class='openWit'>" + task.workItem.Title + "</span></div>";
                         if (parentWit){
                             
                             var relatedItems = [];
@@ -357,7 +357,7 @@ function attachEvents() {
                     });
                     
                     var cleanText  = text.replace(/\[.*?\]/,'');
-                    $('#filterArea > option:nth-child(3)').prop('selected', true);
+                    $('#filterArea > option:nth-child(1)').prop('selected', true);
                     $('#filterBy').val(cleanText);
                     $('#filterBy').trigger('input');
                 }
@@ -371,7 +371,7 @@ function attachEvents() {
             });
     };
     window.setupOpenWit();
-    window.fixMouseEvents();
+    //window.fixMouseEvents();
  
 
     $(".taskStart:not(.taskSaving):not(.PBItaskStart)").draggable(({
