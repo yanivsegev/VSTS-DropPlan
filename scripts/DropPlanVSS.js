@@ -1,11 +1,23 @@
 var repository = new VSSRepository();
-    
+
 var sprint, container;
 var _scrollToToday = true;
 var autoRefresh;
 var showFailAlearts = true;
 
 window.addEventListener("message", receiveMessage, false);
+
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        console.log("background refresh only")
+        PauseAutoRefresh();
+        ResumeAutoRefresh(300000);
+        showFailAlearts = false;
+    } else {
+        console.log("foreground refresh")
+        SetAutoRefresh()
+    }
+});
 
 function receiveMessage(event) {
     try {
@@ -28,6 +40,10 @@ function switchViewByTasks(viewByTasks){
     sprint.ViewByTasks = viewByTasks;
     $("#resetTasksBtn").attr("disabled", !viewByTasks);
     processWorkItems(sprint.RawWits, false);
+}
+
+function switchPlanningIssues(planningIssues) {
+    sprint.PlanningIssues = planningIssues;
 }
 
 var timerid;
@@ -57,7 +73,6 @@ function reportFailure(msg){
 }    
 
 function BuildDropPlan() {
-
     try{
         repository.reportProgress = reportProgress;
         repository.reportFailure = reportFailure;
@@ -65,7 +80,7 @@ function BuildDropPlan() {
         repository.WorkItemsLoaded = WorkItemsLoaded;
         repository.Init();
     } catch (error) {
-        alertUser(error);                
+        alertUser(error);
     }
 }
 
@@ -77,7 +92,6 @@ function WorkItemsLoaded(workItems){
     else{
         processWorkItems(workItems, false);
     }
-    
 }
 
 
@@ -124,25 +138,22 @@ function processWorkItems(workItems, isSaving) {
         SetAutoRefresh();
     
     } catch (error) {
-        alertUser(error);                
+        alertUser(error);
     }
 }
 
 function SetAutoRefresh(){
-
     PauseAutoRefresh();
     ResumeAutoRefresh();
     showFailAlearts = true;
 }
 
 function PauseAutoRefresh(){
-
     clearTimeout(autoRefresh);
 }
 
-function ResumeAutoRefresh(){
-
-    autoRefresh = setTimeout(autoRefreshPlan, 5000);
+function ResumeAutoRefresh(refreshTime = 30000){
+    autoRefresh = setTimeout(autoRefreshPlan, refreshTime);
 }
 
 function isWitInUpdate(id) {

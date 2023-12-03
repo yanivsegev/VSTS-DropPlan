@@ -18,6 +18,7 @@ let gulp       = require('gulp'),
 let publisherId = 'yanivsegev'
 try{
     publisherId = fs.readFileSync('publisherid', 'utf8');
+    util.log('Publisher id set to "' + publisherId + '"');
 }catch(e){
     util.log('If your publisher id from microsoft visual studio is not "' + publisherId + '", create a file at the root of the project with your publisher id inside');
 }
@@ -38,20 +39,22 @@ let css = {
 };
 
 let js = {
-    sourceFiles: ["scripts/Promise.js"
-    ,"scripts/Polyfill.js"
-    ,"scripts/components/SprintData.js"
-    ,"scripts/components/Workitem.js"
-    ,"scripts/components/VSSRepository.js"    
-    ,"scripts/jquery-1.12.1.min.js"
-    ,"scripts/jquery-ui.min.js"
-    ,"scripts/VSS.SDK.min.js"
-    ,"scripts/TableLock.js"
-    ,"scripts/DateHealpers.js"
-    ,"scripts/DropPlanHelper.js"
-    ,"scripts/arrows.js"
-    ,"scripts/themes.js"
-    ,"scripts/DropPlanVSS.js"],
+    sourceFiles: [
+        "scripts/Promise.js"
+        ,"scripts/Polyfill.js"
+        ,"scripts/components/SprintData.js"
+        ,"scripts/components/Workitem.js"
+        ,"scripts/components/VSSRepository.js"
+        ,"scripts/jquery-1.12.1.min.js"
+        ,"scripts/jquery-ui.min.js"
+        ,"node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"
+        ,"scripts/TableLock.js"
+        ,"scripts/DateHealpers.js"
+        ,"scripts/DropPlanHelper.js"
+        ,"scripts/arrows.js"
+        ,"scripts/themes.js"
+        ,"scripts/DropPlanVSS.js"
+    ],
     fileName: 'dropPlan',
     environment: {
         dev: {
@@ -61,8 +64,10 @@ let js = {
         prod: {
             path: './dist/prod/scripts/',
             extension: '.min.js',
-            sourceFiles: ["scripts/ga.js"
-            ,"scripts/trackjs.js"]
+            sourceFiles: [
+                "scripts/ga.js",
+                "scripts/trackjs.js"
+            ]
         }
     }
 };
@@ -118,8 +123,8 @@ function copyStaticFiles(env){
 }
 function copyDynamicFiles(env, templateData){
     return function BuildAndCopyDynamicFiles(){
-        let task = gulp.src(['index.html', 'vss-extension.json'])  
-            
+        let task = gulp.src(['index.html', 'vss-extension.json'])
+
         templateData.forEach(function(data, index){
             task.pipe(replace(data.Key, data.Value));
         });
@@ -132,6 +137,7 @@ exports.watch = function(done){
         livereload.listen();
         gulp.watch('scripts/**/*.js', Development.Scripts);
         gulp.watch('Styles/**/*.css', Development.Styles);
+        gulp.watch('Styles/**/*.css', copyStaticFiles(Development.Env));
         gulp.watch('images/**/*.*', copyStaticFiles(Development.Env));
         gulp.watch('*.html', copyDynamicFiles(Development.Env, [
             {Key: '#{now}', Value: new Date().toJSON()},
@@ -141,22 +147,22 @@ exports.watch = function(done){
             {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
             {Key: '#{isMinified}', Value: ''}
         ]));
-        
+
         gulp.src('./dist/dev')
-        .pipe(webserver({
-        livereload: false,
-        directoryListing: false,
-        open: false,
-        https: true,
-        port: 8080
-        }));
+            .pipe(webserver({
+                livereload: false,
+                directoryListing: false,
+                open: false,
+                https: true,
+                port: 8080
+            }));
 
     });
 }
 let build = gulp.series(
-        clean, 
+        clean,
         gulp.parallel(
-            Development.Styles, 
+            Development.Styles,
             Development.Scripts,
             copyStaticFiles(Development.Env),
             copyStaticFiles(Production.Env),

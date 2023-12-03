@@ -20,12 +20,12 @@ function drawArrowhead(ctx, can, locx, locy, angle, sizex, sizey, fillStyle) {
     ctx.rotate(-angle);
     ctx.translate(-locx,-locy);
 }
-    
+
 
 // returns radians
 function findAngle(sx, sy, ex, ey) {
     // make sx and sy at the zero point
-    return Math.atan((ey - sy) / (ex - sx));
+    return Math.atan((ey - sy) / (ex - sx))-(sx > ex ? Math.PI : 0);
 }
 
 function drawArrowByXY(ctx, can, sx,sy,c1x,c1y,c2x,c2y, ex,ey, fillStyle, includeArrow)

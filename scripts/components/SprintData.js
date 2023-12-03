@@ -1,5 +1,4 @@
 function SprintData(workitems, repository, existingSprint) {
-
     this.RawWits = workitems;
     this.Wits = [];
     this.AllWits = [];
@@ -11,16 +10,18 @@ function SprintData(workitems, repository, existingSprint) {
     this.Dates;
     this.FilterTerm = '';
     this.FilterArea = '';
-    
+
     this.ViewByTasks = true;
+    this.PlanningIssues = true;
     this.nameById = [];
 
     if (existingSprint){
         this.ViewByTasks = existingSprint.ViewByTasks;
         this.FilterTerm = existingSprint.FilterTerm;
         this.FilterArea = existingSprint.FilterArea;
-    } 
-    
+        this.PlanningIssues = existingSprint.PlanningIssues;
+    }
+
 
     this.IsSameWorkItems = function (newWorkItems){
         if (!newWorkItems){
@@ -32,7 +33,7 @@ function SprintData(workitems, repository, existingSprint) {
         var res = true;
         this.RawWits.forEach(function (item, index) {
             var item2 = newWorkItems[index];
-            if (!item2 || 
+            if (!item2 ||
                 item.id != item2.id ||
                 item.rev != item2.rev)
                 {
@@ -50,34 +51,40 @@ function SprintData(workitems, repository, existingSprint) {
             items.push(new Workitem(item, repository.WorkItemTypes, repository.WorkItemPBITypes));
         });
         this.AllWits = items;
-        
+
         this.AllWits.forEach(function (item, index) {
             var parentId = item.GetParentId();
-            if (parentId != -1){
+            if (parentId != -1) {
                 var parent = _this.GetWorkitemByIdFromAll(parentId);
-                if (parent){
+                if (parent) {
                     item.ParentTitle = parent.Title;
+                    const activity = item.Activity || "";
+
+                    let childActivity=parent.childActivities[activity]
+                    if (childActivity){
+                        childActivity.MinStart=minDate(childActivity.MinStart, item.StartDate);
+                        childActivity.MaxFinish=maxDate(childActivity.MaxFinish, item.FinishDate);
+                    } else {
+                        parent.childActivities[activity]={MinStart: item.StartDate, MaxFinish: item.FinishDate};
+                    }
                 }
             }
-            
         });
 
         this.Wits = SortWits(this.FilerWits(items));
 
         this.Dates = getDates(this.StartDate, this.EndDate);
-
     }
-    
+
     this.FilerWits = function (items) {
         filterTerm = this.FilterTerm;
         filterArea = this.FilterArea;
 
         return items.filter(function (a) {
-            
             a.AllSearchable = a.AreaPath + ' ' + a.AssignedTo + ' ' + a.Title + ' ' + a.ParentTitle + ' ' + a.State;
 
-            return filterTerm == '' || 
-                   filterTerm == undefined || 
+            return filterTerm == '' ||
+                   filterTerm == undefined ||
                    (a[filterArea] != undefined && a[filterArea].toLowerCase().includes(filterTerm.toLowerCase()));
         })
     }
@@ -130,6 +137,12 @@ function SprintData(workitems, repository, existingSprint) {
 
     this.GetWorkitemByIdFromAll = function (id) {
         return jQuery.grep(this.AllWits, function (element) { return element.Id == id; })[0];
+    }
+
+    this.GetWorkitemsByIdsFromAll = function (ids) {
+        return ids.map(
+            (id)=> this.GetWorkitemByIdFromAll(id)
+        );
     }
 
     this.GetAssignToNameById = function(id){
@@ -289,15 +302,15 @@ function SprintData(workitems, repository, existingSprint) {
                 if (workItem.FinishDate > sprint.EndDate) workItem.FinishDate = sprint.EndDate;
                 if (workItem.FinishDate < workItem.StartDate) workItem.FinishDate = workItem.StartDate;
 
-                var dates = getDates(workItem.StartDate, workItem.FinishDate);
+                dates = getDates(workItem.StartDate, workItem.FinishDate);
 
-                var selectedRow = -1;
-                var found = false;
+                let selectedRow = -1;
+                let found = false;
                 while (!found) {
                     found = true;
                     selectedRow = selectedRow + 1;
-                    for (var colIndex = 0; colIndex < dates.length; colIndex++) {
-                        var date = dates[colIndex].yyyymmdd();
+                    for (const element of dates) {
+                        const date = element.yyyymmdd();
                         if (personRow[date].length > selectedRow) {
                             if (personRow[date][selectedRow].Type != 0) {
                                 found = false;

@@ -1,10 +1,34 @@
+.mainBody {
+	background-color: white;
+	color: black;
+}
+
+#actualContent {
+    opacity: 1;
+}
+
+label {
+	color: rgba(0,0,0,.55);
+}
+
+input, select {
+	background-color: rgba(255,255,255,1);
+}
+
+.rowHeader{
+	background: white;
+}
+
 @import url('https://fonts.googleapis.com/css?family=Fresca|Indie+Flower');
+
+.taskColumn {
+    background: white;
+}
 
 .taskStart{
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     border: 1px solid lightgray;
     border-radius: 10px;
-    
 }
 
 .PBItaskStart{
@@ -37,6 +61,13 @@
     background:white;
 }
 
+.relatedTaskBox > .taskCurrent {
+    opacity: 0.5;
+}
+
+.relatedTask {
+	opacity: 1;
+}
 
 .taskBlocked:after{
     font-size: 110%;

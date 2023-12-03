@@ -7,8 +7,8 @@ function loadThemes()
 
 function changeTheme(css, save){
     $("#themeCss").remove();
-
-    if (css != '') $("head").append("<link id='themeCss' href='" + css +"' rel='stylesheet'></link>");     
+    if (css =="") css = "modern";
+    $("head").append("<link id='themeCss' href='styles/" + css +".css' rel='stylesheet'></link>");
     if (save) repository.SetValueInExtensionDataPerUser("DropPlanTheme", css);
 }
 
