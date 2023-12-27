@@ -11,7 +11,8 @@ document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
         console.log("background refresh only")
         PauseAutoRefresh();
-        ResumeAutoRefresh(300000);
+        // Reduce the number of refreshes if the tab is in the background to once every 7 minutes (prime number)
+        ResumeAutoRefresh(420000);
         showFailAlearts = false;
     } else {
         console.log("foreground refresh")
@@ -152,7 +153,8 @@ function PauseAutoRefresh(){
     clearTimeout(autoRefresh);
 }
 
-function ResumeAutoRefresh(refreshTime = 30000){
+function ResumeAutoRefresh(refreshTime = 17000){
+    // using a prime number for scheduling reduces the chance of multiple things running at once.
     autoRefresh = setTimeout(autoRefreshPlan, refreshTime);
 }
 

@@ -296,8 +296,12 @@ function VSSRepository() {
     this.GetValueInExtensionDataPerUser = function(key){
         this._data.dataService.getValue(key, {scopeType: "User"}).then(function(c) {
             c=c || "modern";
+            // Attempt to set the value, but if it's not in the list revert to "modern"
+            if(c !== $("#themes").val(c).val()){
+                c="modern";
+                $("#themes").val(c);
+            };
             changeTheme(c, false);
-            $("#themes").val(c);
         });
     }
 

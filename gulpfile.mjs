@@ -1,30 +1,27 @@
 'use strict';
+import {deleteAsync as del} from 'del';
+import gulp from 'gulp';
+import replace from 'gulp-replace';
+import rename from 'gulp-rename';
+import concat from 'gulp-concat';
+import sourcemaps from 'gulp-sourcemaps';
+import fs from 'fs'
+import log from 'fancy-log'
 
-let gulp       = require('gulp'),
-    rename     = require("gulp-rename"),
-    concat     = require('gulp-concat'),
-    uglify     = require('gulp-uglify'),
-    sourcemaps = require('gulp-sourcemaps'),
-    http       = require('http'),
-    st         = require('st'),
-    livereload = require('gulp-livereload'),
-    replace    = require('gulp-replace'),
-    copy       = require('gulp-copy'),
-    webserver  = require('gulp-webserver'),
-    fs         = require('fs'),
-    util       = require("gulp-util"),
-    del        = require('del');
+import connect from 'gulp-connect';
+const webserver =  connect.server;
+const livereload = connect.reload;
 
 let publisherId = 'yanivsegev'
 try{
     publisherId = fs.readFileSync('publisherid', 'utf8');
-    util.log('Publisher id set to "' + publisherId + '"');
+    log('Publisher id set to "' + publisherId + '"');
 }catch(e){
-    util.log('If your publisher id from microsoft visual studio is not "' + publisherId + '", create a file at the root of the project with your publisher id inside');
+    log('If your publisher id from microsoft visual studio is not "' + publisherId + '", create a file at the root of the project with your publisher id inside');
 }
 
 let css = {
-    sourceFiles: ['Styles/main.css', 'Styles/jquery-ui.css'],
+    sourceFiles: ['Styles/main.css', 'node_modules/jquery-ui/dist/themes/base/jquery-ui.min.css'],
     fileName: 'dropPlan',
     environment: {
         dev:{
@@ -45,8 +42,8 @@ let js = {
         ,"scripts/components/SprintData.js"
         ,"scripts/components/Workitem.js"
         ,"scripts/components/VSSRepository.js"
-        ,"scripts/jquery-1.12.1.min.js"
-        ,"scripts/jquery-ui.min.js"
+        ,"node_modules/jquery/dist/jquery.min.js"
+        ,"node_modules/jquery-ui/dist/jquery-ui.min.js"
         ,"node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"
         ,"scripts/TableLock.js"
         ,"scripts/DateHealpers.js"
@@ -114,11 +111,16 @@ function clean(){
 }
 function copyStaticFiles(env){
     return function CopyEnvStaticFiles(){
-        return gulp.src(['Styles/*.css', '!Styles/jquery-ui.css',
-                        'images/*',
-                        'README.md',
-                        'LICENSE'])
-        .pipe(copy('./dist/' + env + '/'));
+        return gulp.src(
+            [
+                'Styles/*.css', '!Styles/jquery-ui.css',
+                'images/*',
+                'README.md',
+                'LICENSE'
+            ],
+            { base: '.' }
+        )
+        .pipe(gulp.dest('./dist/' + env + '/'));
     }
 }
 function copyDynamicFiles(env, templateData){
@@ -132,9 +134,9 @@ function copyDynamicFiles(env, templateData){
         return task;
     }
 }
-exports.watch = function(done){
+let watch = function(done){
     build( () => {
-        livereload.listen();
+        /*livereload.listen();*/
         gulp.watch('scripts/**/*.js', Development.Scripts);
         gulp.watch('Styles/**/*.css', Development.Styles);
         gulp.watch('Styles/**/*.css', copyStaticFiles(Development.Env));
@@ -148,47 +150,50 @@ exports.watch = function(done){
             {Key: '#{isMinified}', Value: ''}
         ]));
 
-        gulp.src('./dist/dev')
-            .pipe(webserver({
-                livereload: false,
+        webserver({
+                root: './dist/dev',
+                livereload: true,
                 directoryListing: false,
                 open: false,
                 https: true,
                 port: 8080
-            }));
+            });
 
+        done();
     });
 }
 let build = gulp.series(
-        clean,
-        gulp.parallel(
-            Development.Styles,
-            Development.Scripts,
-            copyStaticFiles(Development.Env),
-            copyStaticFiles(Production.Env),
-            copyDynamicFiles(Development.Env, [
-                {Key: '#{now}', Value: new Date().toJSON()},
-                {Key: '#{testing-flag}', Value: '-test'},
-                {Key: '"public": false', Value: '"public": false'},
-                {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
-                {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
-                {Key: '#{isMinified}', Value: ''}
-            ]),
-            copyDynamicFiles(Production.Env, [
-                {Key: '#{now}', Value: new Date().toJSON()},
-                {Key: '#{testing-flag}', Value: ''},
-                {Key: '"public": false', Value: '"public": true'},
-                //{Key: '"yanivsegev"', Value: '"yanivsegev"'},
-                //{Key: '"uri": "index.html"', Value: '"uri": "index.html"'},
-                {Key: '#{isMinified}', Value: '.min'}
-            ])),
-            gulp.parallel(
-                Production.Scripts,
-                Production.Styles
-            ));
+    clean,
+    gulp.parallel(
+        Development.Styles,
+        Development.Scripts,
+        copyStaticFiles(Development.Env),
+        copyStaticFiles(Production.Env),
+        copyDynamicFiles(Development.Env, [
+            {Key: '#{now}', Value: new Date().toJSON()},
+            {Key: '#{testing-flag}', Value: '-test'},
+            {Key: '"public": false', Value: '"public": false'},
+            {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
+            {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
+            {Key: '#{isMinified}', Value: ''}
+        ]),
+        copyDynamicFiles(Production.Env, [
+            {Key: '#{now}', Value: new Date().toJSON()},
+            {Key: '#{testing-flag}', Value: ''},
+            {Key: '"public": false', Value: '"public": true'},
+            //{Key: '"yanivsegev"', Value: '"yanivsegev"'},
+            //{Key: '"uri": "index.html"', Value: '"uri": "index.html"'},
+            {Key: '#{isMinified}', Value: '.min'}
+        ])
+    ),
+    gulp.parallel(
+        Production.Scripts,
+        Production.Styles
+    )
+);
 
-exports.default = build;
-exports.buildAll = build;
-exports.clean = clean
-exports.styles = Development.Styles
-exports.scripts = Development.Scripts
+const styles = Development.Styles;
+const scripts = Development.Scripts;
+
+export default build;
+export {watch as watch, build as buildAll, clean, styles, scripts};
