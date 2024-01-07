@@ -22,22 +22,21 @@
                 </div>
                 <div>
                     <input id="showPBIs" type="checkbox" onclick="switchViewByTasks(!($('#showPBIs').prop('checked')));" />
-                    <label for="showPBIs">View by PBIs</label>
-                </div>
-                <div>
-                    <input id="showPlanningIssues" type="checkbox" onclick="switchPlanningIssues(!($('#showPlanningIssues').prop('checked')));" checked/>
-                    <label for="showPlanningIssues">Highlight out of order tasks</label>
+                    <label for="showPBIs">View by Parent</label>
                 </div>
                 <div>
                     <input id="filterBy" type="text" placeholder="Filter by keyword">
                     on
                     <select id="filterArea">
                         <option value="AllSearchable">All</option>
+                        <option value="Activity">Activity</option>
                         <option value="AreaPath">AreaPath</option>
                         <option value="AssignedTo">AssignedTo</option>
                         <option value="Title">Title</option>
+                        <option value="ParentTags">Parent Tags</option>
                         <option value="ParentTitle">Parent Title</option>
                         <option value="State">State</option>
+                        <option value="Tags">Tags</option>
                     </select>
                 </div>
                 <div class="alignToLeft">
@@ -71,16 +70,14 @@
 </body>
 
 <script src="scripts/dropPlan#{isMinified}.js?l=#{now}"></script>
-<script>
+<script type="text/template">
 
 (function(){
-    
     var js = document.createElement('script')
     js.src = "https://cdn.logrocket.io/LogRocket.min.js";
     js.crossorigin = "anonymous";
     var fjs = document.getElementsByTagName('script')[0];
     fjs.parentNode.insertBefore(js,fjs);
-    
 })();
 
 </script>

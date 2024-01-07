@@ -43,9 +43,6 @@ function switchViewByTasks(viewByTasks){
     processWorkItems(sprint.RawWits, false);
 }
 
-function switchPlanningIssues(planningIssues) {
-    sprint.PlanningIssues = planningIssues;
-}
 
 var timerid;
 $("#filterBy").on("input", function(e) {
@@ -68,10 +65,9 @@ function reportProgress(msg){
 }
 
 function reportFailure(msg){
-
     var messages = document.getElementById("messageBoxInner");
     messages.innerHTML = "<h1>" + msg + "</h1>";
-}    
+}
 
 function BuildDropPlan() {
     try{

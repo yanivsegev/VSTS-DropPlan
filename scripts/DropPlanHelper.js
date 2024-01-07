@@ -187,7 +187,17 @@ function render(isSaving, data) {
                             }
                         }
 
-                        result = result + "<div class='taskTitle'><span class='openWit'>" + task.workItem.Title + "</span></div>";
+                        result = result + "<div class='taskTitle'>"
+                        if (warnings.length){
+                            // style='width: min(" + (colWidth*2.5) + "px, max(" + contentWidth + "px, " + (colWidth * 1.5) + "px))'
+                            result = result + "<div class='taskWarning'><div class='taskWarningIcon'>⚠</div><div class='taskWarningTooltip' >";
+                            warnings.forEach(function (warning){
+                                result = result + "<p>" + warning +"</p>";
+                            });
+                            result = result + "</div></div>"
+                        }
+                        
+                        result = result + "<span class='openWit'>" + task.workItem.Title + "</span></div>";
                         if (parentWit){
                             let relatedItems = [];
                             parentWit.Relations.forEach(
@@ -240,14 +250,6 @@ function render(isSaving, data) {
 
                         if (task.isWitTask){
                             if (remain != "") result = result + "<div class='taskRemainingWork'>" + remain + "</div>";
-                        }
-                        if (warnings.length){
-                            // style='width: min(" + (colWidth*2.5) + "px, max(" + contentWidth + "px, " + (colWidth * 1.5) + "px))'
-                            result = result + "<div class='taskWarning'><div class='taskWarningIcon'>⚠</div><div class='taskWarningTooltip' >";
-                            warnings.forEach(function (warning){
-                                result = result + "<p>" + warning +"</p>";
-                            });
-                            result = result + "</div></div>"
                         }
                         result = result + "</div>";
                     }

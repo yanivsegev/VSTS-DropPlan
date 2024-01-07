@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <link href="styles/dropPlan#{isMinified}.css?l=#{now}" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <div id="settingsRoot">
+            <h1>Drop Plan Settings</h1>
+            <p>Set the settings for the project that Drop Pan will use for all users.</p>
+            <hr>
+            <h3>Task planning sequence issues</h3>
+            <div>
+                <p>Highlight and warn when either activities are in the wrong order, or when tasks do not match their parent preceding/succeeding sequence.<br/>
+                E.g., QA completing prior to Development starting.<br/>
+                E.g., Story 1 should be completed before Story 2, but the tasks for Story 2 are planned prior to the tasks for Story 1.</p>
+                <input id="showPlanningIssues" type="checkbox" onclick="switchPlanningIssues(!($('#showPlanningIssues').prop('checked')));" checked/>
+                <label for="showPlanningIssues">Highlight out of order tasks</label>
+            </div>
+            <p>Set the activity order for your project.  Any activities that you do not wish to be in a strict sequence can be moved to the "Not In Use" area.<br/>
+            If you have two activities that can happen at the same time, place them on the same line.<br/>
+            E.g., Requirements and Design can be placed on the same line if you just want them to happen prior to Development.</p>
+            <p>Activity Order:</p>
+            <div class="sortableListContainer" title="first">
+                <ul class="sortableList" title="Required activity order">
+                    <li class="listItem">
+                        <div class="details" title="{{item}}">{{item}}</div>
+                    </li>
+                    <li class="listItem">
+                        <div class="details">Name of things2</div>
+                    </li>
+                    <li class="listItem">
+                        <div class="details">Name of things3</div>
+                    </li>
+                </ul>
+                <ul class="sortableList" title="No order enforced" singleItemPerRow></ul>
+            </div>
+        </div>
+        <div class="messageBoxContainer" id="messageBoxContainer">
+            <div class="messageBox">
+                <div id="messageBoxInner" class="messageBoxInner">
+                    <h2>Please wait while loading data ...</h2>
+                    <p id="messages"></p>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <script src="scripts/dropPlan-settings#{isMinified}.js?l=#{now}"></script>
+    </body>
+</html>

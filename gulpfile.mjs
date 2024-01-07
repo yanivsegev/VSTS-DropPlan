@@ -8,6 +8,8 @@ import sourcemaps from 'gulp-sourcemaps';
 import fs from 'fs'
 import log from 'fancy-log'
 
+import mergeStream from 'merge-stream';
+
 import connect from 'gulp-connect';
 const webserver =  connect.server;
 const livereload = connect.reload;
@@ -36,23 +38,37 @@ let css = {
 };
 
 let js = {
-    sourceFiles: [
-        "scripts/Promise.js"
-        ,"scripts/Polyfill.js"
-        ,"scripts/components/SprintData.js"
-        ,"scripts/components/Workitem.js"
-        ,"scripts/components/VSSRepository.js"
-        ,"node_modules/jquery/dist/jquery.min.js"
-        ,"node_modules/jquery-ui/dist/jquery-ui.min.js"
-        ,"node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"
-        ,"scripts/TableLock.js"
-        ,"scripts/DateHealpers.js"
-        ,"scripts/DropPlanHelper.js"
-        ,"scripts/arrows.js"
-        ,"scripts/themes.js"
-        ,"scripts/DropPlanVSS.js"
-    ],
-    fileName: 'dropPlan',
+    "outputFiles":[{
+        sourceFiles: [
+            "scripts/Promise.js"
+            ,"scripts/Polyfill.js"
+            ,"scripts/components/SprintData.js"
+            ,"scripts/components/Workitem.js"
+            ,"scripts/components/VSSRepository.js"
+            ,"node_modules/jquery/dist/jquery.min.js"
+            ,"node_modules/jquery-ui/dist/jquery-ui.min.js"
+            ,"node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"
+            ,"scripts/TableLock.js"
+            ,"scripts/DateHealpers.js"
+            ,"scripts/DropPlanHelper.js"
+            ,"scripts/arrows.js"
+            ,"scripts/themes.js"
+            ,"scripts/DropPlanVSS.js"
+        ],
+        fileName: 'dropPlan',
+    },{
+        sourceFiles: [
+            //"scripts/Promise.js"
+            //,"scripts/Polyfill.js"
+            "scripts/components/VSSSettingsRepository.js"
+            ,"node_modules/jquery/dist/jquery.min.js"
+            ,"node_modules/jquery-ui/dist/jquery-ui.min.js"
+            ,"node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"
+            ,"scripts/SortableLists.js"
+            ,"scripts/DropPlanVSS-Settings.js"
+        ],
+        fileName: 'dropPlan-settings',
+    }],
     environment: {
         dev: {
             path: './dist/dev/scripts/',
@@ -71,12 +87,19 @@ let js = {
 
 let Development = {
     Scripts: function(){
-        return gulp.src(js.sourceFiles)
-          .pipe(concat(js.fileName + js.environment.dev.extension))
-          .pipe(sourcemaps.init({loadMaps: true}))
-          .pipe(sourcemaps.write('.', {addComment: false}))
-          .pipe(gulp.dest(js.environment.dev.path))
-          .pipe(livereload());
+        const tasks = js.outputFiles.map(
+            (outputfile)=>{
+                console.log(outputfile.fileName + js.environment.dev.extension)
+                return gulp.src(outputfile.sourceFiles)
+                .pipe(concat(outputfile.fileName + js.environment.dev.extension))
+                .pipe(sourcemaps.init({loadMaps: true}))
+                .pipe(sourcemaps.write('.', {addComment: false}))
+                .pipe(gulp.dest(js.environment.dev.path))
+                .pipe(livereload());
+            }
+        )
+        console.log("here")
+        return mergeStream(tasks);
     },
     Styles: function(){
         return gulp.src(css.sourceFiles)
@@ -88,15 +111,15 @@ let Development = {
 };
 let Production = {
     Scripts: function(){
-        return gulp.src([
-            js.environment.prod.sourceFiles[0]
-          , js.environment.prod.sourceFiles[1]
-          , js.environment.dev.path + js.fileName + js.environment.dev.extension])
-          .pipe(concat(js.fileName + js.environment.prod.extension))
-          .pipe(sourcemaps.init({loadMaps: true}))
-          //.pipe(uglify())
-          .pipe(sourcemaps.write('.', {addComment: false}))
-          .pipe(gulp.dest(js.environment.prod.path));
+        return mergeStream(js.outputFiles.map((source)=>{
+            return gulp.src(js.environment.prod.sourceFiles.concat([js.environment.dev.path + source.fileName + js.environment.dev.extension]))
+                .pipe(concat(source.fileName + js.environment.prod.extension))
+                .pipe(sourcemaps.init({loadMaps: true}))
+                //.pipe(uglify())
+                .pipe(sourcemaps.write('.', {addComment: false}))
+                .pipe(gulp.dest(js.environment.prod.path))
+            })
+        )
     },
     Styles: function(){
         return gulp.src([css.environment.dev.path + css.fileName + css.environment.dev.extension])
@@ -109,6 +132,24 @@ let Production = {
 function clean(){
     return del('dist');
 }
+
+function loadBuildVersion(){
+    let buildVersion=0;
+    try{
+        buildVersion = parseInt(fs.readFileSync('buildVersion', 'utf8'))+1;
+        log('Build version set to "' + buildVersion + '"');
+    }catch(e){
+        log('unable to load build version'+e);
+    }
+    try{
+        fs.writeFileSync('buildVersion', ''+buildVersion);
+        log('Build version written to disk');
+    }catch(e){
+        log('unable to save build version' + e);
+    }
+    return buildVersion
+}
+
 function copyStaticFiles(env){
     return function CopyEnvStaticFiles(){
         return gulp.src(
@@ -119,13 +160,21 @@ function copyStaticFiles(env){
                 'LICENSE'
             ],
             { base: '.' }
-        )
-        .pipe(gulp.dest('./dist/' + env + '/'));
+        ).pipe(gulp.dest('./dist/' + env + '/'));
     }
 }
+
+function copyNodeScripts(env){
+    return function CopyEnvNodeScripts(){
+        return gulp.src(
+            ['node_modules/vss-web-extension-sdk/lib/*']
+        ).pipe(gulp.dest('./dist/' + env + '/lib/'));
+    }
+}
+
 function copyDynamicFiles(env, templateData){
     return function BuildAndCopyDynamicFiles(){
-        let task = gulp.src(['index.html', 'vss-extension.json'])
+        let task = gulp.src(['index.html', 'dropPlan-settings.html','vss-extension.json'])
 
         templateData.forEach(function(data, index){
             task.pipe(replace(data.Key, data.Value));
@@ -144,9 +193,11 @@ let watch = function(done){
         gulp.watch('*.html', copyDynamicFiles(Development.Env, [
             {Key: '#{now}', Value: new Date().toJSON()},
             {Key: '#{testing-flag}', Value: '-test'},
+            {Key: '#{beta-flag}', Value: '.0'},
             {Key: '"public": false', Value: '"public": false'},
             {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
             {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
+            {Key: '"uri": "dropPlan-settings.html"', Value: '"uri": "https://localhost:8080/dropPlan-settings.html"'},
             {Key: '#{isMinified}', Value: ''}
         ]));
 
@@ -167,19 +218,23 @@ let build = gulp.series(
     gulp.parallel(
         Development.Styles,
         Development.Scripts,
+        copyNodeScripts(Development.Env),
         copyStaticFiles(Development.Env),
         copyStaticFiles(Production.Env),
         copyDynamicFiles(Development.Env, [
             {Key: '#{now}', Value: new Date().toJSON()},
             {Key: '#{testing-flag}', Value: '-test'},
+            {Key: '#{beta-flag}', Value: '.'+loadBuildVersion()},
             {Key: '"public": false', Value: '"public": false'},
             {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
             {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
+            {Key: '"uri": "dropPlan-settings.html"', Value: '"uri": "https://localhost:8080/dropPlan-settings.html"'},
             {Key: '#{isMinified}', Value: ''}
         ]),
         copyDynamicFiles(Production.Env, [
             {Key: '#{now}', Value: new Date().toJSON()},
             {Key: '#{testing-flag}', Value: ''},
+            {Key: '#{beta-flag}', Value: ''},
             {Key: '"public": false', Value: '"public": true'},
             //{Key: '"yanivsegev"', Value: '"yanivsegev"'},
             //{Key: '"uri": "index.html"', Value: '"uri": "index.html"'},
@@ -196,4 +251,4 @@ const styles = Development.Styles;
 const scripts = Development.Scripts;
 
 export default build;
-export {watch as watch, build as buildAll, clean, styles, scripts};
+export {watch, build as buildAll, clean, styles, scripts};

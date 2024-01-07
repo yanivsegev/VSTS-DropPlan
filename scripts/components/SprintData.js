@@ -12,7 +12,7 @@ function SprintData(workitems, repository, existingSprint) {
     this.FilterArea = '';
 
     this.ViewByTasks = true;
-    this.PlanningIssues = true;
+    this.PlanningIssues = this.Repository.GetSettings().highlightPlanningIssues;
     this.nameById = [];
 
     if (existingSprint){
@@ -58,6 +58,7 @@ function SprintData(workitems, repository, existingSprint) {
                 var parent = _this.GetWorkitemByIdFromAll(parentId);
                 if (parent) {
                     item.ParentTitle = parent.Title;
+                    item.ParentTags = parent.Tags;
                     const activity = item.Activity || "";
 
                     let childActivity=parent.childActivities[activity]
@@ -81,7 +82,7 @@ function SprintData(workitems, repository, existingSprint) {
         filterArea = this.FilterArea;
 
         return items.filter(function (a) {
-            a.AllSearchable = a.AreaPath + ' ' + a.AssignedTo + ' ' + a.Title + ' ' + a.ParentTitle + ' ' + a.State;
+            a.AllSearchable = a.AreaPath + ' ' + a.AssignedTo + ' ' + a.Title + ' ' + a.ParentTitle + ' ' + a.State + ' ' + a.Activity + ' ' + a.Tags + ' ' + a.ParentTags;
 
             return filterTerm == '' ||
                    filterTerm == undefined ||

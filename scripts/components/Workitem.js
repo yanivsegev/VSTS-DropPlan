@@ -67,6 +67,8 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
 
         this.Activity = workitem.fields["Microsoft.VSTS.Common.Activity"];
         this.childActivities={};
+
+        this.Tags = workitem.fields["System.Tags"];
     }
 
     this.GetParentId = function () {
