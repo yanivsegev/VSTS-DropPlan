@@ -1,0 +1,24 @@
+.mainBody {
+	background-color: white;
+	color: black;
+}
+
+#actualContent {
+    opacity: 1;
+}
+
+label {
+	color: rgba(0,0,0,.55);
+}
+
+input, select {
+	background-color: rgba(255,255,255,1);
+}
+
+.rowHeader{
+	background: white;
+}
+
+.taskColumn {
+    background: white;
+}

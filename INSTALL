@@ -1,28 +1,40 @@
-Step 1: Clone this git repository
-Step 2: Install NodeJs, either version
-Step 3: using a command line, browse to the root of the repository
-Step 4: npm install
-Step 5: gulp
+# Development #
+
+## Installation ##
+
+Step 1: Clone this git repository  
+Step 2: Install NodeJs (currently supports up to version 14)  
+Step 3: using a command line, browse to the root of the repository  
+Step 4: `npm install`  
+Step 5: `npm run build`  
+
+## Publisher configuration ##
+
+In order to test your plugin you will need to create or have a visual studio account.  
+On that account you will need to create a extension publisher.
 
 If you want to change your publisher id in the dev environment, create a file named 'publisherid' and put your publisher id inside
+See <https://docs.microsoft.com/en-us/vsts/extend/publish/overview> for details.  
 
--- https://docs.microsoft.com/en-us/vsts/extend/publish/overview
-Setp 6: npm i -g tfx-cli
-Inorder to test your plugin you will need to create or have a visual studio account.
-On that account you will need to create a extension publisher.
-Update the publisher id, in the vss-extention.json file.
+Install the tfx command line tool: `npm i -g tfx-cli`
 
-Once your test extension is deployed to your local visual studio instance, share the extension with your project / account.
-Once that is done you can install it.
+Once your test extension is deployed to your local visual studio instance, share the extension with your project / account.  
+Once that is done you can install it into your own Organisation.  
 
-Once installed you will see the new 'Drop Down-test' but it will not work.
-It is looking for a local instance of the service that will host the extension.
+After installation you will see the new 'Drop Down-test', but it will not work.  
+It is looking for a local instance of the service that will host the extension.  
 This allows you to update the js and css files for rapid development.
 
-Other Commands:
-npm test - create extension package for a debugging  instance
-npm prod - create extension package for a production instance
+Run: `npm run watch`  
+Go to <https://localhost:8080> and allow the self-signed certificate (you may need to to this each time you restart gulp)  
+Refresh Azure Devops to see the live development instance.
 
-gulp       - build the dev and prod projects (dist directory is created)
-gulp watch - sets up a web service https instance that allows the extension to function (https://localhost:8080)
+This includes Live Refresh, so after any changes the plan will refresh automatically.
 
+If you want to publish the extension yourself, update the publisher id in the vss-extension.json file.
+
+## Commands ##
+
+`npm run gulp`       - build the dev and prod projects (dist directory is created)  
+`npm run build`      - build the dev and prod projects, and create the VSIX package  
+`npm run watch`      - sets up a web service https instance that allows the extension to function (<https://localhost:8080>)  

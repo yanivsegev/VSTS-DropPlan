@@ -4,3 +4,4 @@ node_modules/
 dist/
 publisherid
 npm-debug.log
+buildVersion
