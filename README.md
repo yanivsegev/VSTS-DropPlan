@@ -16,6 +16,10 @@ Sprint Drop Plan is an organizational tool that helps team members to sync their
 
 ![Image](images/DropPlanWithHelp.PNG)
 
+- See when tasks are planned out of sequence (e.g., Testing before Development.)
+
+![Image](images/DropPlanWithWarningsInDarkTheme.png)
+
 ## Quick steps to get started ##
 
 1. Navigate to your sprint.

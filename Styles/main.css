@@ -167,6 +167,7 @@ body{
     float: right;
     font-size: x-large;
     cursor: help;
+    text-shadow: 0 0 5px black;
 }
 
 .taskWarning .taskWarningTooltip {
