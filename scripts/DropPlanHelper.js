@@ -77,58 +77,60 @@ function render(isSaving, data) {
                         if (task.isWitTask){
                             parentId = task.workItem.GetParentId();
                             parentWit = sprint.GetWorkitemByIdFromAll(parentId);
-                            partnerWorktemId = sprint.AllWits.indexOf(parentWit);
-                            result = result + " witParentId=" + parentId + " class='task tooltip ";
+                            if(parentWit){
+                                partnerWorktemId = sprint.AllWits.indexOf(parentWit);
+                                result = result + " witParentId=" + parentId + " class='task tooltip ";
 
-                            if(task.workItem.Activity && parentWit.childActivities) {
-                                const activityIndex = activityTypeOrder.findIndex(
-                                    function(activities){
-                                        return activities.indexOf(task.workItem.Activity) !== -1;
-                                    }
-                                );
-                                for(const activities of activityTypeOrder.slice(0,activityIndex)){
-                                    for(const activity of activities){
-                                        if (allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MinStart > task.workItem.StartDate){
-                                            warnings.push(`${task.workItem.Activity} starting before ${activity} has started!`);
+                                if(task.workItem.Activity && parentWit.childActivities) {
+                                    const activityIndex = activityTypeOrder.findIndex(
+                                        function(activities){
+                                            return activities.indexOf(task.workItem.Activity) !== -1;
                                         }
-                                        if (!allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MaxFinish > task.workItem.StartDate){
-                                            warnings.push(`${task.workItem.Activity} starting before ${activity} has finished!`);
-                                        }
-                                        if (parentWit.childActivities[activity] && parentWit.childActivities[activity].MaxFinish > task.workItem.FinishDate){
-                                            warnings.push(`${task.workItem.Activity} finishing before ${activity} has finished!`);
-                                        }
-                                    }
-                                }
-                                for(const activities of activityTypeOrder.slice(activityIndex+1)){
-                                    for(const activity of activities){
-                                        if (allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MinStart < task.workItem.StartDate){
-                                            warnings.push(`${activity} starting before ${task.workItem.Activity} has started!`);
-                                        }
-                                        if (!allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MinStart < task.workItem.FinishDate){
-                                            warnings.push(`${activity} starting before ${task.workItem.Activity} has finished!`);
-                                        }
-                                        if (parentWit.childActivities[activity] && parentWit.childActivities[activity].MaxFinish < task.workItem.FinishDate){
-                                            warnings.push(`${activity} finishing before ${task.workItem.Activity} has finished!`);
+                                    );
+                                    for(const activities of activityTypeOrder.slice(0,activityIndex)){
+                                        for(const activity of activities){
+                                            if (allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MinStart > task.workItem.StartDate){
+                                                warnings.push(`${task.workItem.Activity} starting before ${activity} has started!`);
+                                            }
+                                            if (!allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MaxFinish > task.workItem.StartDate){
+                                                warnings.push(`${task.workItem.Activity} starting before ${activity} has finished!`);
+                                            }
+                                            if (parentWit.childActivities[activity] && parentWit.childActivities[activity].MaxFinish > task.workItem.FinishDate){
+                                                warnings.push(`${task.workItem.Activity} finishing before ${activity} has finished!`);
+                                            }
                                         }
                                     }
+                                    for(const activities of activityTypeOrder.slice(activityIndex+1)){
+                                        for(const activity of activities){
+                                            if (allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MinStart < task.workItem.StartDate){
+                                                warnings.push(`${activity} starting before ${task.workItem.Activity} has started!`);
+                                            }
+                                            if (!allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MinStart < task.workItem.FinishDate){
+                                                warnings.push(`${activity} starting before ${task.workItem.Activity} has finished!`);
+                                            }
+                                            if (parentWit.childActivities[activity] && parentWit.childActivities[activity].MaxFinish < task.workItem.FinishDate){
+                                                warnings.push(`${activity} finishing before ${task.workItem.Activity} has finished!`);
+                                            }
+                                        }
+                                    }
+                                    if(warnings.length){
+                                        result = result + " taskOutOfSequence ";
+                                    }
                                 }
-                                if(warnings.length){
-                                    result = result + " taskOutOfSequence ";
-                                }
-                            }
 
-                            const predecessors = sprint.GetWorkitemsByIdsFromAll(parentWit.GetPredecessorIds());
-                            for(const predecessor of predecessors){
-                                const lastChild=predecessor.GetLastChild(useActivityTypeInDependencyTracking ? task.workItem.Activity : undefined);
-                                if(lastChild && lastChild.MaxFinish > task.workItem.StartDate){
-                                    warnings.push(`${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity : 'Task'} starting before predecessor "${predecessor.Title}" ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity.toLowerCase() : ''} has finished!`);
+                                const predecessors = sprint.GetWorkitemsByIdsFromAll(parentWit.GetPredecessorIds());
+                                for(const predecessor of predecessors){
+                                    const lastChild=predecessor.GetLastChild(useActivityTypeInDependencyTracking ? task.workItem.Activity : undefined);
+                                    if(lastChild && lastChild.MaxFinish > task.workItem.StartDate){
+                                        warnings.push(`${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity : 'Task'} starting before predecessor "${predecessor.Title}" ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity.toLowerCase() : ''} has finished!`);
+                                    }
                                 }
-                            }
-                            const successors = sprint.GetWorkitemsByIdsFromAll(parentWit.GetSuccessorIds());
-                            for(const successor of successors){
-                                const firstChild=successor.GetFirstChild(useActivityTypeInDependencyTracking ? task.workItem.Activity : undefined);
-                                if(firstChild && firstChild.MinStart < task.workItem.FinishDate){
-                                    warnings.push(`Successor "${successor.Title}" ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity : ''} starting before ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity.toLowerCase() : 'task'} has finished!`);
+                                const successors = sprint.GetWorkitemsByIdsFromAll(parentWit.GetSuccessorIds());
+                                for(const successor of successors){
+                                    const firstChild=successor.GetFirstChild(useActivityTypeInDependencyTracking ? task.workItem.Activity : undefined);
+                                    if(firstChild && firstChild.MinStart < task.workItem.FinishDate){
+                                        warnings.push(`Successor "${successor.Title}" ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity : ''} starting before ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity.toLowerCase() : 'task'} has finished!`);
+                                    }
                                 }
                             }
                         }else{

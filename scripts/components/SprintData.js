@@ -143,7 +143,7 @@ function SprintData(workitems, repository, existingSprint) {
     this.GetWorkitemsByIdsFromAll = function (ids) {
         return ids.map(
             (id)=> this.GetWorkitemByIdFromAll(id)
-        );
+        ).filter((workItem) => workItem);
     }
 
     this.GetAssignToNameById = function(id){
