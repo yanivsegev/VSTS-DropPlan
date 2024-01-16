@@ -17,5 +17,6 @@ steps:
 
 - script: |
     npm install
+    npm i gulp-mjs
     npm run gulp
   displayName: 'npm install and run gulp'
