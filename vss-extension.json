@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "Drop-plan-extension#{testing-flag}",
-    "version": "1.6.9",
+    "version": "2.0.0#{beta-flag}",
     "name": "Sprint Drop Plan#{testing-flag}",
     "description": "Plan and track your sprint with a calendar based view.",
     "publisher": "yanivsegev",
@@ -16,7 +16,7 @@
         "Collaborate"
     ],
     "categories": [
-        "Plan and track"
+        "Azure Boards"
     ],
     "content": {
         "details": {
@@ -56,6 +56,19 @@
                 "order": 99,
                 "uri": "index.html"
             }
+        },
+        {
+            "id": "DropPlan-settings-hub#{testing-flag}",
+            "type": "ms.vss-web.hub",
+            "targets": [
+                "ms.vss-web.project-admin-hub-group"
+            ],
+            "properties": {
+                "name": "Drop Plan Settings#{testing-flag}",
+                "order": 10,
+                "uri": "dropPlan-settings.html",
+                "icon": "images/logo.png"
+            }
         }
     ],
     "files": [
@@ -73,6 +86,10 @@
         },
         {
             "path": "images",
+            "addressable": true
+        },
+        {
+            "path": "dropPlan-settings.html",
             "addressable": true
         }
     ],

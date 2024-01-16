@@ -111,3 +111,25 @@ function isDayInRange(range, date){
     });
     return inRange;
 }
+
+function minDate(first, second){
+    if(first && second) {
+        return new Date(Math.min(first, second));
+    } else if (first) {
+        return first;
+    } else {
+        // if second is undefined, then first must also be, so return undefined.
+        return second;
+    }
+}
+
+function maxDate(first, second){
+    if(first && second) {
+        return new Date(Math.max(first, second));
+    } else if (first) {
+        return first;
+    } else {
+        // if second is undefined, then first must also be, so return undefined.
+        return second;
+    }
+}

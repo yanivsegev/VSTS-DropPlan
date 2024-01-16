@@ -1,0 +1,115 @@
+:root{
+    --taskOverDue: rgb(255, 121, 121);
+    --taskBlocked: orange;
+    --taskDone: #0d07; /*darkgreen;*/
+    --relatedTaskOpacity: 0.5;
+    --currentTaskOpacity: 1;
+}
+
+#actualContent {
+    opacity: 1;
+}
+
+.taskColumn {
+    background: var(--background-color);
+}
+
+.task {
+    background: var(--background-color);
+    border-radius: 5px;
+}
+
+.taskStart:before {
+    border-radius: 5px 0 0 5px;
+}
+
+.taskTd
+{
+    background: var(--border-subtle-color);
+    border-left: 4px solid var(--background-color);
+}
+
+.taskDayOff{
+    background:repeating-linear-gradient(15deg, var(--component-label-default-color-hover), var(--border-subtle-color) 10px, var(--border-subtle-color) 10px, var(--component-label-default-color-hover) 20px);
+}
+
+.relatedTask {
+    background: darkgrey;
+}
+
+.relatedTaskBox {
+    background: white;
+}
+
+.taskToday{
+    background: var(--component-grid-selected-row-color)
+}
+
+.taskToday.taskDayOff{
+    background: repeating-linear-gradient(15deg, var(--component-label-default-color-hover), var(--border-subtle-color) 10px, var(--border-subtle-color) 10px, var(--component-label-default-color-hover) 20px);
+}
+
+.taskWarning .taskWarningTooltip {
+    background: var(--background-color);
+}
+
+.rowHeader{
+	background: var(--background-color);
+}
+
+.rowHeaderSpace{
+    background: var(--background-color);
+}
+
+/* Tooltip text */
+.tooltiptext {
+    background: var(--background-color);
+    border-right: 1px solid #c8c8c8;
+    border-top: 1px solid #c8c8c8;
+    border-bottom: 1px solid #c8c8c8;
+}
+
+
+.options{
+    background: var(--background-color);
+}
+
+input, select {
+    color: inherit;
+}
+
+input::placeholder {
+    color: var(--text-disabled-color);
+}
+
+
+.showareapath .taskAreaPath1 {
+    background:#E0FFFF77;
+}
+.showareapath .taskAreaPath2 {
+    background:#FAFAD277;
+}
+.showareapath .taskAreaPath3 {
+    background:#90EE9077;
+}
+.showareapath .taskAreaPath4 {
+    background:#87CEFA77;
+}
+.showareapath .taskAreaPath5 {
+    background:#98FB9877;
+}
+.showareapath .taskAreaPath6 {
+    background:#D8BFD877;
+}
+.showareapath .taskAreaPath7 {
+    background:#FFC0CB77;
+}
+.showareapath .taskAreaPath8 {
+    background:#7FFFD477;
+}
+.showareapath .taskAreaPath9 {
+    background:#ADD8E677;
+}
+.showareapath .taskAreaPath10 {
+    background:#F0808077;
+}

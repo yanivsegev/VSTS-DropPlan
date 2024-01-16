@@ -1,5 +1,27 @@
+body{
+    background-color: var(--background-color,rgba(255, 255, 255, 1));
+    color: rgba(var(--palette-neutral-100,0, 0, 0),1);
+}
+
+:root{
+    --taskOverDue: rgb(255, 121, 121);
+    --taskBlocked: orange;
+    --taskDone: lightgreen;
+    --relatedTaskOpacity: 1;
+    --currentTaskOpacity: 0.5;
+}
+
+#actualContent {
+    opacity: 0;
+}
+
+@keyframes fadeinslow {
+    0% { opacity: 0;    }
+    100% {        opacity: 1;    }
+}
+
 .taskColumn {
-    background: white;
+
 }
 
 .taskHeader{
@@ -24,7 +46,6 @@
     width:6px;
     left:0px;
     top: -1px;
-
 }
 
 .PBItaskStart:before {
@@ -97,6 +118,7 @@
     margin-left: 1px;
     margin-right: 1px;
     background: darkgrey;
+    opacity: var(--relatedTaskOpacity);
 }
 
 .relatedTaskBox {
@@ -109,20 +131,65 @@
     padding: 2px;
 }
 
-.taskOverDue{
-    background: rgb(255, 121, 121);
+.taskOverDue[style]{
+    background: var(--taskOverDue);
 }
 
-.taskBlocked{
-    background: orange;
+.taskBlocked[style]{
+    background: var(--taskBlocked);
 }
 
-.taskDone{
-    background: lightgreen;
+.taskDone[style]{
+    background: var(--taskDone);
 }
 
-.taskCurrent{
-    opacity: 0.5;
+.taskCurrent {
+    opacity: var(--currentTaskOpacity);
+}
+
+.taskOutOfSequence {
+
+}
+.taskWarning {
+    /*position: absolute;
+    top: -12px;
+    right: -15px;*/
+    float: right;
+    margin-top: -10px;
+    margin-right: -5px;
+    overflow: visible;
+}
+
+.taskWarningIcon {
+    /*position: absolute;
+    top: 0;
+    right: 0;*/
+    float: right;
+    font-size: x-large;
+    cursor: help;
+    text-shadow: 0 0 5px black;
+}
+
+.taskWarning .taskWarningTooltip {
+    display: none;
+    position: absolute;
+    border: solid 1px var(--taskBlocked);
+    background: white;
+    right: 5px;
+    top: 25px;
+    z-index: 1001;  /*make it above most things on the page*/
+    user-select: none;
+    width: fit-content;
+    min-width: 260px;
+}
+
+.taskWarning .taskWarningTooltip p {
+    margin: 5px;
+}
+
+
+.taskWarning:hover .taskWarningTooltip {
+    display: block;
 }
 
 .taskRemainingWork{
@@ -140,7 +207,7 @@
 }
 
 .taskToday.taskDayOff{
-    background:repeating-linear-gradient(  15deg,  #dadada,  #fff4ce 10px,  #fff4ce 10px,  #dadada 20px)
+    background: repeating-linear-gradient(  15deg,  #dadada,  #fff4ce 10px,  #fff4ce 10px,  #dadada 20px)
 }
 
 .assignedToAvatar{
@@ -183,17 +250,14 @@ canvas {
     position: absolute;
     pointer-events: none;
 }
-    
+
 .rowHeader{
-    background: white;
     padding: 10px;
     height: 100%;
     z-index: 30;
-    border-right: 4px solid white;
 }
 
 .rowHeaderSpace{
-    background: white;
     height: 100%;
 }
 
@@ -219,7 +283,6 @@ canvas {
     margin-right: 27px;
     height: 23px;
     display: flex;
-    
 }
 
 .tooltiptextPBI{
@@ -412,7 +475,6 @@ canvas {
 
 .messageBox{
     border: 1px solid #eaeaea;
-    background: #ffffff;
     margin: 0 auto;
     text-align: center;
     margin: 0px 50px;
@@ -431,9 +493,7 @@ canvas {
     height: 38px;
     width: 100%;
     position: fixed;
-    background: white;
     z-index: 1001;
-    
 }
 
 .optionsInner{
@@ -454,7 +514,7 @@ canvas {
     margin-left: 10px;
 }
 
-.optionsInner .alignToLeft{ 
+.optionsInner .alignToLeft{
     margin-left: auto;
     margin-right: 10px;
 }
@@ -463,4 +523,59 @@ canvas {
 .updateTime{
     padding-left: 4px;
     padding-right: 14px;
+}
+
+#settingsRoot {
+    display: none;
+    padding: 0 25px 0 25px;
+}
+
+.sortableListContainer {
+    display: flex;
+}
+
+.sortableList {
+    width: 300px;
+    border: 1px solid grey;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 5px;
+    min-height: 200px;
+}
+
+.sortableList[title]::before {
+    content: attr(title);
+    /* then add some nice styling as needed, eg: */
+    display: block;
+    font-weight: bold;
+    margin-top: -20px;
+    margin-bottom: 20px;
+    background: var(--background-color);
+    border: 1px grey solid;
+    border-radius: 5px;
+    padding: 0 5px 0 5px;
+    width: fit-content;
+}
+
+.sortableList .listItem {
+    list-style: none;
+    display: flex;
+    margin: 7px 7px 15px 7px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.listItem .details {
+    display: flex;
+    align-items: center;
+    border: 1px solid grey;
+    border-radius: 5px;
+    padding: 10px 13px;
+    margin-right: 15px;
+    cursor: move;
+}
+
+.sortableList .listItem .dragging {
+    opacity: 0;
+    visibility: hidden;
 }

@@ -1,11 +1,24 @@
 var repository = new VSSRepository();
-    
+
 var sprint, container;
 var _scrollToToday = true;
 var autoRefresh;
 var showFailAlearts = true;
 
 window.addEventListener("message", receiveMessage, false);
+
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        console.log("background refresh only")
+        PauseAutoRefresh();
+        // Reduce the number of refreshes if the tab is in the background to once every 7 minutes (prime number)
+        ResumeAutoRefresh(420000);
+        showFailAlearts = false;
+    } else {
+        console.log("foreground refresh")
+        SetAutoRefresh()
+    }
+});
 
 function receiveMessage(event) {
     try {
@@ -30,6 +43,7 @@ function switchViewByTasks(viewByTasks){
     processWorkItems(sprint.RawWits, false);
 }
 
+
 var timerid;
 $("#filterBy").on("input", function(e) {
   sprint.FilterTerm = $('#filterBy').val();
@@ -51,13 +65,11 @@ function reportProgress(msg){
 }
 
 function reportFailure(msg){
-
     var messages = document.getElementById("messageBoxInner");
     messages.innerHTML = "<h1>" + msg + "</h1>";
-}    
+}
 
 function BuildDropPlan() {
-
     try{
         repository.reportProgress = reportProgress;
         repository.reportFailure = reportFailure;
@@ -65,7 +77,7 @@ function BuildDropPlan() {
         repository.WorkItemsLoaded = WorkItemsLoaded;
         repository.Init();
     } catch (error) {
-        alertUser(error);                
+        alertUser(error);
     }
 }
 
@@ -77,7 +89,6 @@ function WorkItemsLoaded(workItems){
     else{
         processWorkItems(workItems, false);
     }
-    
 }
 
 
@@ -124,25 +135,23 @@ function processWorkItems(workItems, isSaving) {
         SetAutoRefresh();
     
     } catch (error) {
-        alertUser(error);                
+        alertUser(error);
     }
 }
 
 function SetAutoRefresh(){
-
     PauseAutoRefresh();
     ResumeAutoRefresh();
     showFailAlearts = true;
 }
 
 function PauseAutoRefresh(){
-
     clearTimeout(autoRefresh);
 }
 
-function ResumeAutoRefresh(){
-
-    autoRefresh = setTimeout(autoRefreshPlan, 5000);
+function ResumeAutoRefresh(refreshTime = 17000){
+    // using a prime number for scheduling reduces the chance of multiple things running at once.
+    autoRefresh = setTimeout(autoRefreshPlan, refreshTime);
 }
 
 function isWitInUpdate(id) {

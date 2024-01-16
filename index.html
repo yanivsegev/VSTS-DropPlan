@@ -2,81 +2,82 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-        <link href="styles/dropPlan#{isMinified}.css?l=#{now}" rel="stylesheet" type="text/css">
+    <link href="styles/dropPlan#{isMinified}.css?l=#{now}" rel="stylesheet" type="text/css">
     </link>
 </head>
 
 <body class='mainBody'>
-    <canvas id="canvas1" width="2000" height="1000"></canvas>
-    <canvas id="canvas2" width="2000" height="1000"></canvas>
-    <div id="options" style="display:none; " class="options">
-        <div class="optionsInner">
-            <div>
-                Last updated: <span id="updateTime">N/A</span>
-                <!-- <button class='refreshPlanBtn' onclick='refreshPlan();'>Refresh Tasks</button> -->
-            </div>
-            <div>
-                <input id="showAreaPath" type="checkbox" onclick="$('body').toggleClass('showareapath');" />
-                <label for="showAreaPath">Highlight same area path</label>
-            </div>
-            <div>
-                <input id="showPBIs" type="checkbox" onclick="switchViewByTasks(!($('#showPBIs').prop('checked')));" />
-                <label for="showPBIs">View by PBIs</label>
-            </div>
-            <div>
-                <input id="filterBy" type="text" placeholder="Filter by keyword">
-                on
-                <select id="filterArea">
-                    <option value="AllSearchable">All</option>
-                    <option value="AreaPath">AreaPath</option>
-                    <option value="AssignedTo">AssignedTo</option>
-                    <option value="Title">Title</option>
-                    <option value="ParentTitle">Parent Title</option>
-                    <option value="State">State</option>
-                </select>
-            </div>
-            <div class="alignToLeft">
-                Theme:
-                <select id='themes' onchange="changeTheme(this.options[this.selectedIndex].value, true)">
-                    <option value="">Classic</option>
-                    <option value="styles/fun.css">Colorful</option>
-                    <option value="styles/solid.css">Solid</option>
-                </select>
-            </div>
-            <div>
-                <input id="resetTasksBtn" type="button" onclick="ResetTasks();" value="Rearrange tasks" />
-            </div>
-        </div>
-    </div>
-    <div class="optionsspace">&nbsp;</div>
-
-    <div id="grid-container">
-        <div class="messageBoxContainer">
-            <div class="messageBox">
-                <div id="messageBoxInner" class="messageBoxInner">
-                    <h2>Please wait while loading data ...</h2>
-                    <p id="messages"></p>
+    <div id="actualContent">
+        <canvas id="canvas1" width="2000" height="1000"></canvas>
+        <canvas id="canvas2" width="2000" height="1000"></canvas>
+        <div id="options" style="display:none; " class="options">
+            <div class="optionsInner">
+                <div>
+                    Last updated: <span id="updateTime">N/A</span>
+                    <!-- <button class='refreshPlanBtn' onclick='refreshPlan();'>Refresh Tasks</button> -->
+                </div>
+                <div>
+                    <input id="showAreaPath" type="checkbox" onclick="$('body').toggleClass('showareapath');" />
+                    <label for="showAreaPath">Highlight same area path</label>
+                </div>
+                <div>
+                    <input id="showPBIs" type="checkbox" onclick="switchViewByTasks(!($('#showPBIs').prop('checked')));" />
+                    <label for="showPBIs">View by Parent</label>
+                </div>
+                <div>
+                    <input id="filterBy" type="text" placeholder="Filter by keyword">
+                    on
+                    <select id="filterArea">
+                        <option value="AllSearchable">All</option>
+                        <option value="Activity">Activity</option>
+                        <option value="AreaPath">AreaPath</option>
+                        <option value="AssignedTo">AssignedTo</option>
+                        <option value="Title">Title</option>
+                        <option value="ParentTags">Parent Tags</option>
+                        <option value="ParentTitle">Parent Title</option>
+                        <option value="State">State</option>
+                        <option value="Tags">Tags</option>
+                    </select>
+                </div>
+                <div class="alignToLeft">
+                    Theme:
+                    <select id='themes' onchange="changeTheme(this.options[this.selectedIndex].value, true)">
+                        <option value="modern">Modern</option>
+                        <option value="classic">Classic</option>
+                        <option value="fun">Colorful</option>
+                        <option value="solid">Solid</option>
+                    </select>
+                </div>
+                <div>
+                    <input id="resetTasksBtn" type="button" onclick="ResetTasks();" value="Rearrange tasks" />
                 </div>
             </div>
         </div>
+        <div class="optionsspace">&nbsp;</div>
+
+        <div id="grid-container">
+        </div>
     </div>
-
+    <div class="messageBoxContainer" id="messageBoxContainer">
+        <div class="messageBox">
+            <div id="messageBoxInner" class="messageBoxInner">
+                <h2>Please wait while loading data ...</h2>
+                <p id="messages"></p>
+            </div>
+        </div>
+    </div>
     <br/>
-
-
 </body>
 
 <script src="scripts/dropPlan#{isMinified}.js?l=#{now}"></script>
-<script>
+<script type="text/template">
 
 (function(){
-    
     var js = document.createElement('script')
     js.src = "https://cdn.logrocket.io/LogRocket.min.js";
     js.crossorigin = "anonymous";
     var fjs = document.getElementsByTagName('script')[0];
     fjs.parentNode.insertBefore(js,fjs);
-    
 })();
 
 </script>
