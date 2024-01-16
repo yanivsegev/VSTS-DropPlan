@@ -77,9 +77,9 @@ function render(isSaving, data) {
                         if (task.isWitTask){
                             parentId = task.workItem.GetParentId();
                             parentWit = sprint.GetWorkitemByIdFromAll(parentId);
+                            result = result + " witParentId=" + parentId + " class='task tooltip ";
                             if(parentWit){
                                 partnerWorktemId = sprint.AllWits.indexOf(parentWit);
-                                result = result + " witParentId=" + parentId + " class='task tooltip ";
 
                                 if(task.workItem.Activity && parentWit.childActivities) {
                                     const activityIndex = activityTypeOrder.findIndex(
