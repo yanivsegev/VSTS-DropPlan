@@ -27,7 +27,7 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
         const completedWork = workitem.fields["Microsoft.VSTS.Scheduling.CompletedWork"];
         const remainingWork = workitem.fields["Microsoft.VSTS.Scheduling.RemainingWork"];
 
-        if (workitem.fields["Microsoft.VSTS.Scheduling.CompletedWork"] != 1) {
+        if (!workitem.fields["Microsoft.VSTS.Common.ClosedBy"]) {
             // If the task is incomplete...
 
             if(completedWork != undefined && remainingWork != undefined) {
@@ -36,8 +36,8 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
                 this.TotalWork = (completedWork > this.OriginalEstimate) ? completedWork : this.OriginalEstimate;
             }
 
-            // if we don't have a Completed work, calculate it from TotalWork and remaining which we worked out above.
-            this.CompletedWork = completedWork || (this.TotalWork - this.RemainingWork) || 0;
+            // if we don't have a Completed work, calculate it from TotalWork and remaining.
+            this.CompletedWork = completedWork || (this.TotalWork - remainingWork) || 0;
 
             // If we don't have a remaining work, but we do have a completed work, then we can calculate the remaining from the TotalWork
             this.RemainingWork = remainingWork || (this.TotalWork - this.CompletedWork) || 0;
@@ -63,7 +63,12 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
         this.isPBIWit = jQuery.grep( _workItemPBITypes , function(element){ return element.name == workitem.fields["System.WorkItemType"]; }).length > 0;
 
         let workItemType = _workItemTypes.find(function(itemType){ return itemType.name == workitem.fields["System.WorkItemType"]; });
-        this.stateColor = workItemType ? workItemType.states.find(function(itemState){ return itemState.name == workitem.fields["System.State"]}).color : undefined;
+        this.stateColor=undefined;
+        if(workItemType && workItemType.states) {
+            this.stateColor = workItemType.states.find(function(itemState){ return itemState.name == workitem.fields["System.State"]}).color;
+        } else if(workItemType) {
+            console.error(`_workItemTypes doesn't contain an entry for ${workitem.fields["System.WorkItemType"]}`, _workItemTypes)
+        }
 
         this.Activity = workitem.fields["Microsoft.VSTS.Common.Activity"];
         this.childActivities={};
