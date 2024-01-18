@@ -1,7 +1,7 @@
 :root{
     --taskOverDue: rgb(255, 121, 121);
     --taskBlocked: orange;
-    --taskDone: #0d07; /*darkgreen;*/
+    --taskDone: #0d0; /*darkgreen;*/
     --relatedTaskOpacity: 0.5;
     --currentTaskOpacity: 1;
 }
@@ -39,6 +39,10 @@
 
 .relatedTaskBox {
     background: white;
+}
+
+.taskDone[style]{
+    background: color-mix(in srgb, var(--taskDone), var(--background-color) 35%);
 }
 
 .taskToday{
