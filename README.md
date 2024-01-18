@@ -27,6 +27,3 @@ Sprint Drop Plan is an organizational tool that helps team members to sync their
 3. Start organizing your tasks.
 
 Happy coding :-)
-
-P.S.
-Internet Explorer and other old browsers are not supported.
