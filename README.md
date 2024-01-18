@@ -6,7 +6,7 @@ Sprint Drop Plan is an organizational tool that helps team members to sync their
 
 ## Review your sprint plan ##
 
-![Image](images/DropPlan.PNG)
+![Screenshot of drop plan](images/DropPlan.PNG)
 
 ## Arrange and track sprint progress ##
 
@@ -14,16 +14,23 @@ Sprint Drop Plan is an organizational tool that helps team members to sync their
 - Visualize your progress by colors on the calendar.
 - Highlight tasks on the same requirement by hovering on one of them.
 
-![Image](images/DropPlanWithHelp.PNG)
+![Annotated screenshot of drop plan](images/DropPlanWithHelp.PNG)
 
 - See when tasks are planned out of sequence (e.g., Testing before Development.)
 
-![Image](images/DropPlanWithWarningsInDarkTheme.png)
+![Task showing a sequencing Warning](images/DropPlanWithWarningsInDarkTheme.png)
+
+- If you use Effort (Hours), you can see the progress of individual tasks.
+
+![Task showing progress](images/DropPlanWithProgress.png)
 
 ## Quick steps to get started ##
 
 1. Navigate to your sprint.
 2. Click on the "Drop plan" tab.
 3. Start organizing your tasks.
+
+An optional step is Configuring your project activity order in Drop Plan Settings.  
+Drop Plan settings are available from "Project Settings" under "Extensions".
 
 Happy coding :-)

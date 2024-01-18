@@ -57,7 +57,7 @@ input, select {
     padding-right: 8px;
 }
 
-.taskBlocked{
+.taskDiv > .taskBlocked{
     background:white;
 }
 
@@ -69,7 +69,7 @@ input, select {
 	opacity: 1;
 }
 
-.taskBlocked:after{
+.taskDiv > .taskBlocked:after{
     font-size: 110%;
     content: "Blocked !";
     position:absolute;
@@ -82,12 +82,11 @@ input, select {
     transform: rotate(25deg);
 }
 
-.taskOverDue {
+.taskDiv > .taskOverDue {
     background:white;
-
 }
 
-.taskOverDue:after{
+.taskDiv > .taskOverDue:after{
     font-size: 150%;
     text-align:center;
     content: "Overdue";
@@ -101,16 +100,15 @@ input, select {
 
     border: 1px solid lightgray;
     border-radius: 5px;
-    
 }
 
 
-.taskDone{
+.taskDiv > .taskDone {
     background:white;
 }
 
 
-.taskDone:after{
+.taskDiv > .taskDone:after{
     font-size: 150%;
     text-align:center;
     content: "Done";
