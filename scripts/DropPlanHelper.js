@@ -165,7 +165,7 @@ function render(isSaving, data) {
                             var remain = task.workItem.RemainingWork;
                             //grab the percentage, but don't let it go over 90% so that it's visually obvious that the ticket isn't complete
                             const percentComplete = Math.min(Math.floor((task.workItem.CompletedWork / task.workItem.TotalWork) *100), 90);
-                            if (remain != undefined && remain != "") result = `${result}background-image: linear-gradient(90deg, color-mix(in srgb, var(--taskDone), transparent 33%) calc(${percentComplete}% + 6px), #FFFFFF00 0);`;
+                            if (remain != undefined && remain != "") result = `${result}background-image: linear-gradient(90deg, color-mix(in srgb, var(--taskDone), transparent 50%) calc(${percentComplete}% + 6px), #FFFFFF00 0);`;
                         }
 
                         result = result + "'>";
@@ -229,8 +229,9 @@ function render(isSaving, data) {
 
                                 relatedItems.forEach(function(item,index) {
                                     result = result + "<div class='relatedTask ";
-
-                                    if (item.FinishDate < _today) result = result + "taskOverDue ";
+                                    if (item.FinishDate < _today) {
+                                        result = result + "taskOverDue ";
+                                    }
 
                                     switch (item.Blocked) {
                                         case "Yes": result = result + "taskBlocked "; break;
@@ -243,7 +244,11 @@ function render(isSaving, data) {
 
                                     if (item.Id == task.workItem.Id) result = result + "taskCurrent ";
 
-                                    result = result + "' style='background-color:#"+item.stateColor+"'>&nbsp</div>";
+                                    result = result + "' style='"
+                                    if (!(item.FinishDate < _today)) {
+                                        result = result + "background-color:#"+item.stateColor+"";
+                                    }
+                                    result = result + "'>&nbsp</div>";
                                 });
 
                                 result = result + "</div>";
@@ -427,7 +432,7 @@ function attachEvents() {
             function (event) {
                 event.stopPropagation();
         
-                var witId = $(this).parent().parent().attr("witId");
+                var witId = parseInt($(this).parent().parent().attr("witId"));
         
                 if ($(this).parent().hasClass('noclick')) {
                     $(this).parent().removeClass('noclick');
