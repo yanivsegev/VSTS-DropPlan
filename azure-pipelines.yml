@@ -15,8 +15,12 @@ steps:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
 
-- script: |
-    npm install
-    npm i gulp-mjs
-    npm run gulp
-  displayName: 'npm install and run gulp-mjs'
+- task: Npm@1
+  inputs:
+    command: 'install'
+- task: gulp@0
+  inputs:
+    gulpFile: 'gulpfile.mjs'
+    targets: 
+    gulpjs: 'node_modules/gulp/bin/gulp.js'
+    enableCodeCoverage: false
