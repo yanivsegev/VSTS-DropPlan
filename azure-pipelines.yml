@@ -27,7 +27,8 @@ steps:
     
 - task: CmdLine@2
   inputs:
-    script: |
+    script: 
+      npm i tfx-cli
       cd dist/dev
       tfx extension create --manifest-globs vss-extension.json 
       cd ../qa
