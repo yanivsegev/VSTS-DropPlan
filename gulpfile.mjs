@@ -195,6 +195,7 @@ function copyStaticFiles(env){
                 'Styles/*.css', '!Styles/jquery-ui.css',
                 'images/*',
                 'README.md',
+                'PrivacyPolicy.md',
                 'LICENSE'
             ],
             { base: '.' }

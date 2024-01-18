@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gberman/VSTS-DropPlan.git"
+    "url": "git+https://github.com/yanivsegev/VSTS-DropPlan.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gberman/VSTS-DropPlan/issues"
+    "url": "https://github.com/yanivsegev/VSTS-DropPlan/issues"
   },
-  "homepage": "https://github.com/gberman/VSTS-DropPlan#readme",
+  "homepage": "https://github.com/yanivsegev/VSTS-DropPlan#readme",
   "dependencies": {
     "jquery": "^3.7.1",
     "jquery-ui": "^1.13.2"
