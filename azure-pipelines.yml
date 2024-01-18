@@ -24,3 +24,12 @@ steps:
     targets: 
     gulpjs: 'node_modules/gulp/bin/gulp.js'
     enableCodeCoverage: false
+    
+- task: CmdLine@2
+  inputs:
+    script: |
+      cd dist/dev
+      tfx extension create --manifest-globs vss-extension.json 
+      cd ../qa
+      tfx extension create --manifest-globs vss-extension.json
+      cd ../prod && tfx extension create --manifest-globs vss-extension.json
