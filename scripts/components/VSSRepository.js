@@ -241,7 +241,7 @@ function VSSRepository() {
                     result = value.activities.reduce(
                         function (runningTotal, current){
                             return runningTotal + current.capacityPerDay;
-                        }, value.activities[0].capacityPerDay
+                        }, 0
                     ) || 6;
                 }
             }
