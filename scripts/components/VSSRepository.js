@@ -71,8 +71,8 @@ function VSSRepository() {
 
                             return true; // Ensure error gets sent
                         }
-                    }
-                    /** @type { "vss-web-extension-sdk":"TFS/Work/RestClient":WorkHttpClient3_1 } */
+                                             }
+                                        /** @type { "vss-web-extension-sdk":"TFS/Work/RestClient":WorkHttpClient3_1 } */
                     let workClient = TFS_Work.getClient();
                     let otherClient = TFS_Wit_WebApi.getClient();
 
@@ -142,7 +142,7 @@ function VSSRepository() {
                                     }
                                 );
                             }, _this._data.failToCallVss)
-                        });
+                        }, _this._data.failToCallVss);
                     }
                     else
                     {
