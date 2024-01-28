@@ -147,7 +147,7 @@ function SprintData(workitems, repository, existingSprint) {
     }
 
     this.GetAssignToNameById = function(id){
-        return this.nameById[id].Name;
+        return this.nameById[id];
     }
 
     this.Init();
@@ -187,7 +187,7 @@ function SprintData(workitems, repository, existingSprint) {
                 }
 
                 result.push(newName);
-                this.nameById[names[workItem.AssignedTo].id] = { Name: workItem.AssignedTo };
+                this.nameById[names[workItem.AssignedTo].id] = { Name: workItem.AssignedTo, SystemAssignedTo: workItem.SystemAssignedTo };
             }
 
             personRow = result[names[workItem.AssignedTo].id];
