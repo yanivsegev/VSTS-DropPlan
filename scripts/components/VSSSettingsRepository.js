@@ -49,7 +49,7 @@ function VSSSettingsRepository() {
         VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient", "TFS/WorkItemTracking/Contracts"],
 
             function (/** @type VSSService */ VSS_Service, /** @type WITRestClient */ TFS_Wit_WebApi, /** @type  WorkRestClient */ TFS_Work, /** @type WITContracts */ TFS_Wit_Contracts) {
-                console.log("start VSSrequire. (" + (performance.now() - _this._data.t0) + " ms.)");
+                console.log("start Settings VSSrequire. (" + (performance.now() - _this._data.t0) + " ms.)");
                 try {
                     var extVersion = VSS.getExtensionContext().version;
                     _this._data.VssContext = VSS.getWebContext();

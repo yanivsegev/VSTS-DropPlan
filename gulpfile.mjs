@@ -275,8 +275,7 @@ let build = gulp.series(
         ]),
         copyDynamicFiles(QA.Env, [
             {Key: '#{now}', Value: new Date().toJSON()},
-            {Key: '#{testing-flag}', Value: '-test'},
-            {Key: '#{testing-flag}', Value: ''},
+            {Key: '#{testing-flag}', Value: '-test-qa'},
             {Key: '#{beta-flag}', Value: '.'+loadBuildVersion()},
             {Key: '"public": false', Value: '"public": false'},
             {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},

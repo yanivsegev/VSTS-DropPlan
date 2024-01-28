@@ -210,7 +210,7 @@ function updateWorkItemInVSS() {
                     [{
                         "op": "add",
                         "path": "/fields/System.AssignedTo",
-                        "value": workItem.SystemAssignedTo.uniqueName
+                        "value": workItem.SystemAssignedTo?.uniqueName || workItem.AssignedTo
                     },
                     {
                         "op": "add",
