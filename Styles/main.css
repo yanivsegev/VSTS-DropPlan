@@ -267,7 +267,6 @@ canvas {
 
 /* Tooltip text */
 .tooltiptext {
-    visibility: hidden;
     width: calc(100% - 15px);
     position: absolute;
     z-index: 1;
@@ -278,12 +277,18 @@ canvas {
     border-top: 1px solid #c8c8c8;
     border-bottom: 1px solid #c8c8c8;
     opacity: 0;
-    transition: opacity 1s;
+    transition: 0s opacity 0s;
     margin-top: -26px;
     margin-right: 27px;
     height: 23px;
     display: flex;
 }
+
+.expandToolTip {
+    margin-top: -60px;
+    height: 57px;
+}
+
 
 .tooltiptextPBI{
     border-left: 6px solid rgb(0, 156, 204);
@@ -296,8 +301,8 @@ canvas {
 
 /* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
-    visibility: visible;
     opacity: 1;
+    transition: 1s opacity 0.3s;
 }
 
 .pbiText{
@@ -316,10 +321,14 @@ canvas {
     text-align: right;
 }
 
-#canvas2{
+.relations{
     opacity: 0;
-    transition: opacity 1s;
+    transition: 0s opacity 0s;
+}
 
+.showRelations{
+    opacity: 1;
+    transition: 1s opacity 0.3s;
 }
 
 
@@ -457,6 +466,7 @@ canvas {
 #tasksTable .sameParent{
     /*background: bisque;*/
     box-shadow: 0 0 20px 4px rgba(81, 203, 238, 1);
+    transition: 1s all 0.3s;
 }
 
 .taskSaving{
