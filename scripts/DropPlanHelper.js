@@ -347,7 +347,7 @@ function dettachEvents(){
 
 function attachEvents() {
     console.log("Attach events")
-    $(".taskStart").hover( //:not(.PBItaskStart)
+    $(".taskStart:not(.taskSaving)").hover( //:not(.PBItaskStart)
         function (In) {
             if (!$(".activeTask")[0]) {
                 var current = $(In.target).closest(".taskStart");
@@ -530,9 +530,8 @@ function attachEvents() {
 }
 
 function SetNoClick(obj) {
-    $(".sameParent").removeClass("sameParent");
+    ResetRelations();
     $(obj).find(".taskTitle").addClass('noclick');
-    clearRelations();
     $(obj).addClass("taskChanged");
 }
 

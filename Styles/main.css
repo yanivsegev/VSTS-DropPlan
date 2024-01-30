@@ -300,7 +300,7 @@ canvas {
 
 
 /* Show the tooltip text when you mouse over the tooltip container */
-.tooltip:hover .tooltiptext {
+.tooltip:hover:not(.taskSaving):not(.taskChanged) .tooltiptext {
     opacity: 1;
     transition: 1s opacity 0.3s;
 }
