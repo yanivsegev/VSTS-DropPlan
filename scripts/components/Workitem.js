@@ -19,6 +19,7 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
         this.AssignedTo = this.AssignedTo.displayName || this.AssignedTo;
         this.SystemAssignedTo = this.AssignedTo;
         this.AssignedTo = this.AssignedTo.split("<")[0].trim();
+        this.InitialAssignedTo = this.SystemAssignedTo;
 
         this.AreaPath = workitem.fields["System.AreaPath"] || "";
 
@@ -59,6 +60,9 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
 
         if (this.OriginalStartDate) this.StartDate = new Date(this.OriginalStartDate).getGMT();
         if (this.OriginalFinishDate) this.FinishDate = new Date(this.OriginalFinishDate).getGMT();
+
+        this.InitialStartDate = this.StartDate;
+        this.InitialFinishDate = this.FinishDate;
 
         this.isTaskWit = jQuery.grep( _workItemTypes , function(element){ return element.name == workitem.fields["System.WorkItemType"]; }).length > 0;
         this.isPBIWit = jQuery.grep( _workItemPBITypes , function(element){ return element.name == workitem.fields["System.WorkItemType"]; }).length > 0;
