@@ -192,12 +192,11 @@ function updateWorkItemInVSS() {
             var workItem = sprint.GetWorkitemByIdFromAll(item);
             if (workItem){
                 var wijson = [];
-
-                if (workItem.SystemAssignedTo != workItem.InitialAssignedTo){
+                if (workItem.AssignedToComboName != workItem.InitialAssignedToComboName){
                     wijson.push({
                         "op": "add",
                         "path": "/fields/System.AssignedTo",
-                        "value": workItem.SystemAssignedTo
+                        "value": workItem.AssignedToComboName
                     });
                 }
 

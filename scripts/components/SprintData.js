@@ -82,7 +82,7 @@ function SprintData(workitems, repository, existingSprint) {
         filterArea = this.FilterArea;
 
         return items.filter(function (a) {
-            a.AllSearchable = a.AreaPath + ' ' + a.AssignedTo + ' ' + a.Title + ' ' + a.ParentTitle + ' ' + a.State + ' ' + a.Activity + ' ' + a.Tags + ' ' + a.ParentTags;
+            a.AllSearchable = a.AreaPath + ' ' + a.AssignedToComboName + ' ' + a.Title + ' ' + a.ParentTitle + ' ' + a.State + ' ' + a.Activity + ' ' + a.Tags + ' ' + a.ParentTags;
 
             return filterTerm == '' ||
                    filterTerm == undefined ||
@@ -163,21 +163,21 @@ function SprintData(workitems, repository, existingSprint) {
             var workItem = this.Wits[i];
             var personRow;
 
-            if (!names[workItem.AssignedTo]) {
-                names[workItem.AssignedTo] = { id: result.length, days: [] };
+            if (!names[workItem.AssignedToComboName]) {
+                names[workItem.AssignedToComboName] = { id: result.length, days: [] };
                 var newName = {
-                    Name: workItem.AssignedTo,
-                    Capacity: this.Repository.GetCapacity(workItem.AssignedTo),
+                    Name: workItem.AssignedToDisplayName,
+                    Capacity: this.Repository.GetCapacity(workItem.OriginalAssignedTo),
                     TotalCapacity: 0,
                     TatalTasks: 0,
-                    assignedTo: workItem.AssignedTo,
-                    avatar: this.Repository.GetMemberImage(workItem.AssignedTo),
+                    assignedTo: workItem.AssignedToComboName,
+                    avatar: this.Repository.GetMemberImage(workItem.OriginalAssignedTo),
                     assignedToId: result.length,
                     hasItems: false,
                 };
                 for (var colIndex = 0; colIndex < this.Dates.length; colIndex++) {
                     var currentDate = this.Dates[colIndex];
-                    var isDayOff = this.Repository.IsDayOff(workItem.AssignedTo, currentDate.yyyymmdd(), currentDate.getDay());
+                    var isDayOff = this.Repository.IsDayOff(workItem.OriginalAssignedTo, currentDate.yyyymmdd(), currentDate.getDay());
                     newName[currentDate.yyyymmdd()] = [];
                     newName[currentDate.yyyymmdd()].isDayOff = isDayOff;
 
@@ -187,10 +187,10 @@ function SprintData(workitems, repository, existingSprint) {
                 }
 
                 result.push(newName);
-                this.nameById[names[workItem.AssignedTo].id] = { Name: workItem.AssignedTo, SystemAssignedTo: workItem.SystemAssignedTo };
+                this.nameById[names[workItem.AssignedToComboName].id] = { OriginalAssignedTo: workItem.OriginalAssignedTo };
             }
 
-            personRow = result[names[workItem.AssignedTo].id];
+            personRow = result[names[workItem.AssignedToComboName].id];
 
             var remainingWork = 0;
 
@@ -220,8 +220,8 @@ function SprintData(workitems, repository, existingSprint) {
                     if (!workItem.StartDate) {
                         witChanged = true;
                         this.Dates.forEach(function (item, index) {
-                            var tasksPerDay = names[workItem.AssignedTo].days[item.yyyymmdd()] || 0;
-                            if ((tasksPerDay < capacity || capacity == 0) && !workItem.StartDate && !repository.IsDayOff(workItem.AssignedTo, item.yyyymmdd(), item.getDay()) && (item >= _today)) {
+                            var tasksPerDay = names[workItem.AssignedToComboName].days[item.yyyymmdd()] || 0;
+                            if ((tasksPerDay < capacity || capacity == 0) && !workItem.StartDate && !repository.IsDayOff(workItem.OriginalAssignedTo, item.yyyymmdd(), item.getDay()) && (item >= _today)) {
                                 workItem.StartDate = item;
                             }
                         });
@@ -236,9 +236,9 @@ function SprintData(workitems, repository, existingSprint) {
                         var remainingWorkLeft = remainingWork;
                         var dates = getDates(workItem.StartDate, sprint.EndDate);
                         dates.forEach(function (item, index) {
-                            var tasksPerDay = names[workItem.AssignedTo].days[item.yyyymmdd()] || 0;
+                            var tasksPerDay = names[workItem.AssignedToComboName].days[item.yyyymmdd()] || 0;
 
-                            if ((tasksPerDay < capacity || capacity == 0) && !repository.IsDayOff(workItem.AssignedTo, item.yyyymmdd(), item.getDay()) && !workItem.FinishDate) {
+                            if ((tasksPerDay < capacity || capacity == 0) && !repository.IsDayOff(workItem.OriginalAssignedTo, item.yyyymmdd(), item.getDay()) && !workItem.FinishDate) {
 
                                 var todayPart = remainingWorkLeft;
                                 if (tasksPerDay + todayPart > capacity && capacity > 0) {
@@ -326,14 +326,14 @@ function SprintData(workitems, repository, existingSprint) {
                 
                     while (selectedRow >= personDateCell.length) personDateCell.push({ Type: 0 });
 
-                    if (!this.Repository.IsDayOff(workItem.AssignedTo, dates[colIndex].yyyymmdd(), dates[colIndex].getDay())) {
-                        var todayTasks = (names[workItem.AssignedTo].days[date] || 0);
+                    if (!this.Repository.IsDayOff(workItem.OriginalAssignedTo, dates[colIndex].yyyymmdd(), dates[colIndex].getDay())) {
+                        var todayTasks = (names[workItem.AssignedToComboName].days[date] || 0);
                         var todayPart = remainingWork;
                         if (todayTasks + remainingWork > capacity) {
                             todayPart = capacity - todayTasks;
                         }
                         remainingWork = remainingWork - todayPart;
-                        names[workItem.AssignedTo].days[date] = todayTasks + todayPart;
+                        names[workItem.AssignedToComboName].days[date] = todayTasks + todayPart;
                     }
 
                     if (colIndex == 0) {

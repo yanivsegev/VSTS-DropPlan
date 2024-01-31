@@ -6,6 +6,14 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
 
     this.Init();
 
+    this.SetOriginalAssignedTo = SetOriginalAssignedToFunc;
+    
+    function SetOriginalAssignedToFunc(value){
+        this.OriginalAssignedTo = value;
+        this.AssignedToDisplayName = this.OriginalAssignedTo?.displayName?.split("<")[0].trim() || "";
+        this.AssignedToComboName = this.OriginalAssignedTo?.displayName ? this.OriginalAssignedTo.displayName + "<" + this.OriginalAssignedTo.uniqueName + ">" : "";
+    }
+
     function InitFunc(){
         var workitem = this._workitem;
 
@@ -15,11 +23,11 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
         this.OriginalFinishDate = workitem.fields["Microsoft.VSTS.Scheduling.FinishDate"]; 
 
         this.BacklogPriority = workitem.fields["Microsoft.VSTS.Common.BacklogPriority"];
-        this.AssignedTo = workitem.fields["System.AssignedTo"] || "";
-        this.AssignedTo = this.AssignedTo.displayName || this.AssignedTo;
-        this.SystemAssignedTo = this.AssignedTo;
-        this.AssignedTo = this.AssignedTo.split("<")[0].trim();
-        this.InitialAssignedTo = this.SystemAssignedTo;
+
+        this.OriginalAssignedTo = workitem.fields["System.AssignedTo"];
+        this.AssignedToDisplayName = this.OriginalAssignedTo?.displayName?.split("<")[0].trim() || "";
+        this.AssignedToComboName = this.OriginalAssignedTo?.displayName ? this.OriginalAssignedTo.displayName + "<" + this.OriginalAssignedTo.uniqueName + ">" : "";
+        this.InitialAssignedToComboName = this.AssignedToComboName;
 
         this.AreaPath = workitem.fields["System.AreaPath"] || "";
 
@@ -161,7 +169,7 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
         }else{
             this._workitem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = this.FinishDate;
         }
-        this._workitem.fields["System.AssignedTo"] = this.AssignedTo;
+        this._workitem.fields["System.AssignedTo"] = this.OriginalAssignedTo;
     }
 
 }

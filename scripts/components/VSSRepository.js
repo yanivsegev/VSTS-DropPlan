@@ -233,43 +233,32 @@ function VSSRepository() {
         }
     }
 
-    this.GetCapacity = function (name) {
+    this.GetCapacity = function (member) {
         var result = 0;
-        $.each(this._data.teamMemberCapacities, function (index, value) {
-            if (value.teamMember.displayName.split("<")[0].trim() == name) {
-                if (value.activities.length >0 ){
-                    result = value.activities.reduce(
-                        function (runningTotal, current){
-                            return runningTotal + current.capacityPerDay;
-                        }, 0
-                    ) || 6;
-                }
-            }
-        });
+        const teamMember = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id)
+        if (teamMember?.activities.length > 0 ){
+            result = teamMember.activities.reduce(
+                function (runningTotal, current){
+                    return runningTotal + current.capacityPerDay;
+                }, 0
+            ) || 6;
+        }
+
         return result;
     }
 
-    this.IsDayOff = function (name, date, day) {
+    this.IsDayOff = function (member, date, day) {
         var dayOff = false;
-        $.each(this._data.teamMemberCapacities, function (index, value) {
-            if (value.teamMember.displayName.split("<")[0].trim() == name) {
-                if (isDayInRange(value.daysOff, date)) dayOff = true;
-            }
-        });
-
+        const teamMember = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id)
+        if (teamMember && isDayInRange(teamMember.daysOff, date)) dayOff = true;
         if (isDayInRange(this._data.daysOff.daysOff, date)) dayOff = true;
-
         if ($.inArray(day, this._data.teamSettings.workingDays) == -1) dayOff = true;
-
         return dayOff;
     }
 
-    this.GetMemberImage = function (name) {
-        var img = "";
-        $.each(this._data.teamMemberCapacities, function (index, value) {
-            if (value.teamMember.displayName.split("<")[0].trim() == name) img = value.teamMember.imageUrl;
-        });
-        return img;
+    this.GetMemberImage = function (member) {
+        const teamMember = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id)
+        return teamMember?.imageUrl || "";
     }
 
 
