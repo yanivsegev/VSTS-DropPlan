@@ -232,9 +232,11 @@ function updateWorkItemInVSS() {
                     }
                 }
                 
-                workItem.UpdateRawData();
-                pushWitInUpdate(workItem.Id);
-                promises.push(repository.UpdateWorkItem(wijson, workItem.Id));
+                if (wijson.length > 0){
+                    workItem.UpdateRawData();
+                    pushWitInUpdate(workItem.Id);
+                    promises.push(repository.UpdateWorkItem(wijson, workItem.Id));
+                }
             }
         });
     }

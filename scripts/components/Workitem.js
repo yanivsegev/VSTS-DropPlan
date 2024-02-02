@@ -79,8 +79,6 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
         this.stateColor=undefined;
         if(workItemType && workItemType.states) {
             this.stateColor = workItemType.states.find(function(itemState){ return itemState.name == workitem.fields["System.State"]}).color;
-        } else if(workItemType) {
-            console.error(`_workItemTypes doesn't contain an entry for ${workitem.fields["System.WorkItemType"]}`, _workItemTypes)
         }
 
         this.Activity = workitem.fields["Microsoft.VSTS.Common.Activity"];
