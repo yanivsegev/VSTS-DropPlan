@@ -11,7 +11,7 @@ function render(isSaving, data) {
 
     for (const element of sprint.Dates) {
         const date = element.ConvertGMTToServerTimeZone();
-        result = result + "<td class='column_class_name'><div class='taskColumn taskHeader' style='width:" + colWidth + "px'>" + 
+        result = result + "<td class='column_class_name'><div class='taskColumn taskHeader ' style='width:" + colWidth + "px;'>" + 
                             VSS.Core.convertValueToDisplayString(date, "dddd") + "<br>";
 
         result = result + VSS.Core.convertValueToDisplayString(date, "d") + "</div></td>";
@@ -19,10 +19,17 @@ function render(isSaving, data) {
     result = result + "</tr><tbody>"
 
     for (const personRow of data) {
-        if (personRow.hasItems){
+        if (personRow.hasItems || personRow.Capacity){
+            var personWarnings="";
 
             result = result + "<tr class='taskTr taskTrSpace'><td class='row_class_name'><div class='assignToColumn rowHeaderSpace'/></td><td colspan='" + (sprint.Dates.length) + "'/></tr>";
             result = result + "<tr class='taskTr taskTrContent' >";
+
+            if(personRow.hasEndsOnNonWorkingDay && !repository.GetUserSettings().ShowTeamNonWorkingDays){
+                personWarnings = personWarnings +  "<div class='taskWarning'><div class='taskWarningIcon'>⚠</div><div class='taskWarningTooltip taskWarningAlignRight' >";
+                personWarnings = personWarnings + "<p>Some tasks may not show as they are scheduled on a team non-working day!</p>"
+                personWarnings = personWarnings + "</div></div>"
+            }
 
             if (personRow.assignedTo) {
 
@@ -30,6 +37,7 @@ function render(isSaving, data) {
                 if (personRow.avatar) {
                     result = result +  "<img class='assignedToAvatar' src='" + personRow.avatar + "'/>"
                 }
+                result = result + personWarnings;
                 result = result + "<div class='assignedToName'>" + personRow.assignedTo + "</div>"
 
                 if (personRow.TotalCapacity > 0) {
@@ -48,15 +56,20 @@ function render(isSaving, data) {
                     result = result + "<div class='visual-progress-top-container'><div class='visual-progress-container'><div class='" + cssClassOut + "' style='width: 100%;'><div class='" + cssClass + "' style='width: " + precent + "%;'></div></div></div><div class='progress-text'>(" + personRow.TatalTasks + " of " + personRow.TotalCapacity + "h)</div></div></div></td>";
                 }
             } else {
-                result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='assignToColumn rowHeader'><div class='assignedToName'>Unassigned</div></div></td>";
+                result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='assignToColumn rowHeader'><div class='assignedToName'>Unassigned</div>"
+                result = result + personWarnings;
+                result = result + "</div></td>";
             }
-
-            for (const element of sprint.Dates) {
-                let date = element.yyyymmdd();
+            var previousDate;
+            for (const columnDate of sprint.Dates) {
+                let date = columnDate.yyyymmdd();
                 personDateCell = personRow[date];
                 result = result + "<td class='taskTd ";
                 if (personDateCell.isDayOff) result = result + "taskDayOff "
                 if (date == _today.yyyymmdd()) result = result + "taskToday "
+                // 86400000 is the number of seconds in a day, I'm not 100% sure if these dates are Summer time/DST safe (i.e., all in UTC)
+                // so I'm padding it and multiplying by 1.5
+                if (previousDate && ((columnDate - previousDate) > 129600000)) result = result + "previousDayOff "
 
                 result = result + "'>";
 
@@ -150,10 +163,11 @@ function render(isSaving, data) {
                             case "Closed": result = result + "taskDone "; break;
                         }
 
-                        
                         result = result + " taskStart";
                         if (!task.isWitTask){
-                            result = result + " PBItaskStart";
+                            result = result + ` PBItaskStart TaskType${task.workItem.workItemConfig.cssName}`;
+                        } else {
+                            result = result + ` TaskType${task.workItem.workItemConfig.cssName}`;
                         }
 
 
@@ -189,7 +203,7 @@ function render(isSaving, data) {
                             }
                         }
 
-                        result = result + "<div class='taskTitle'>"
+                        result = result + "<div class='taskTitle'><div class='taskTypeIcon'></div>"
                         if (warnings.length){
                             // style='width: min(" + (colWidth*2.5) + "px, max(" + contentWidth + "px, " + (colWidth * 1.5) + "px))'
                             result = result + "<div class='taskWarning'><div class='taskWarningIcon'>⚠</div><div class='taskWarningTooltip' >";
@@ -265,6 +279,7 @@ function render(isSaving, data) {
 
                 }
                 result = result + "</td>";
+                previousDate=columnDate;
             }
             result = result + "</tr>";
         }
@@ -540,8 +555,14 @@ function updateWorkItemDates(witId, changeStartDays, changeEndDays) {
         var workItem = sprint.GetWorkitemByIdFromAll(witId);
 
         if (workItem.StartDate) {
-            workItem.StartDate = workItem.StartDate.addDays(changeStartDays);
-            workItem.FinishDate = workItem.FinishDate.addDays(changeEndDays);
+            // If hiding non-working days we need to move the start end within the sprint, so find the day in the sprint
+            let currentStartDate=sprint.Dates.findIndex((day)=>day.getTime()>=workItem.StartDate.getTime())
+            let currentFinishDate=sprint.Dates.findIndex((day)=>day.getTime()>=workItem.FinishDate.getTime())
+            if(currentFinishDate==-1){
+                currentFinishDate=currentStartDate;
+            }
+            workItem.StartDate = sprint.Dates[currentStartDate+changeStartDays];
+            workItem.FinishDate = sprint.Dates[currentFinishDate+changeEndDays];
             pushWitToSave(witId);
         }
     }

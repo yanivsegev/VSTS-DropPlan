@@ -55,6 +55,7 @@ body{
 .task {
     height: 65px;
     background: white;
+    z-index: 3;
 }
 
 .taskDiv
@@ -74,6 +75,7 @@ body{
 }
 
 .taskTr{
+    position: relative;
 }
 
 .taskTrSpace{
@@ -155,7 +157,7 @@ body{
     top: -12px;
     right: -15px;*/
     float: right;
-    margin-top: -10px;
+    margin-top: -8px;
     margin-right: -5px;
     overflow: visible;
 }
@@ -175,12 +177,18 @@ body{
     position: absolute;
     border: solid 1px var(--taskBlocked);
     background: white;
-    right: 5px;
+    right: 2px;
     top: 25px;
     z-index: 1001;  /*make it above most things on the page*/
     user-select: none;
     width: fit-content;
     min-width: 260px;
+}
+
+.taskWarning .taskWarningAlignRight {
+    left: 95px;
+    right: unset;
+    top: 30px;
 }
 
 .taskWarning .taskWarningTooltip p {
@@ -208,6 +216,26 @@ body{
 
 .taskToday.taskDayOff{
     background: repeating-linear-gradient(  15deg,  #dadada,  #fff4ce 10px,  #fff4ce 10px,  #dadada 20px)
+}
+
+.previousDayOff::before {
+    border: 1px solid #dadada;
+    border-width: 0 1px;
+    content: " ";
+    position: absolute;
+    height: 100%;
+    margin-left: -5px;
+    background:repeating-linear-gradient(  15deg,  #dadada,  rgb(242, 242, 242) 10px,  rgb(242, 242, 242) 10px,  #dadada 20px);
+    width: 4px;
+}
+
+
+.taskTypeIcon {
+    width: 20px;
+    height: 20px;
+    display: none;
+    position: absolute;
+    left: 0;
 }
 
 .assignedToAvatar{
@@ -513,7 +541,7 @@ canvas {
     margin-Right: 10px;
     display: flex;
     width: 100%;
-    min-width: 900px;
+    min-width: 1050px;
 }
 .optionsspace{
     height: 38px;

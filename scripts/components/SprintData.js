@@ -6,6 +6,8 @@ function SprintData(workitems, repository, existingSprint) {
     this.Repository = repository;
     this.StartDate = new Date(repository.IterationStartDate.toISOString()).getGMT();
     this.EndDate = new Date(repository.IterationFinishDate.toISOString()).getGMT();
+    this.FirstWorkingDay = new Date(repository.IterationFirstWorkingDate.toISOString()).getGMT();
+    this.LastWorkingDay = new Date(repository.IterationLastWorkingDate.toISOString()).getGMT();
 
     this.Dates;
     this.FilterTerm = '';
@@ -74,7 +76,7 @@ function SprintData(workitems, repository, existingSprint) {
 
         this.Wits = SortWits(this.FilerWits(items));
 
-        this.Dates = getDates(this.StartDate, this.EndDate);
+        this.Dates = getDates(this.StartDate, this.EndDate, repository.IncludeDayOnPlan);
     }
 
     this.FilerWits = function (items) {
@@ -159,36 +161,17 @@ function SprintData(workitems, repository, existingSprint) {
         var areaPaths = {};
         var areaPathsId = 1;
 
+        repository.GetMembersWithCapacity().forEach(
+            (member)=>{
+            AddPersonToResults.call(this, names, member.name, member.displayName, member, result);
+            }
+        );
+
         for (var i = 0; i < this.Wits.length; i++) {
             var workItem = this.Wits[i];
             var personRow;
-
-            if (!names[workItem.AssignedToComboName]) {
-                names[workItem.AssignedToComboName] = { id: result.length, days: [] };
-                var newName = {
-                    Name: workItem.AssignedToDisplayName,
-                    Capacity: this.Repository.GetCapacity(workItem.OriginalAssignedTo),
-                    TotalCapacity: 0,
-                    TatalTasks: 0,
-                    assignedTo: workItem.AssignedToComboName,
-                    avatar: this.Repository.GetMemberImage(workItem.OriginalAssignedTo),
-                    assignedToId: result.length,
-                    hasItems: false,
-                };
-                for (var colIndex = 0; colIndex < this.Dates.length; colIndex++) {
-                    var currentDate = this.Dates[colIndex];
-                    var isDayOff = this.Repository.IsDayOff(workItem.OriginalAssignedTo, currentDate.yyyymmdd(), currentDate.getDay());
-                    newName[currentDate.yyyymmdd()] = [];
-                    newName[currentDate.yyyymmdd()].isDayOff = isDayOff;
-
-                    if (currentDate >= _today && !isDayOff) {
-                        newName.TotalCapacity = newName.TotalCapacity + newName.Capacity;
-                    }
-                }
-
-                result.push(newName);
-                this.nameById[names[workItem.AssignedToComboName].id] = { OriginalAssignedTo: workItem.OriginalAssignedTo };
-            }
+            
+            AddPersonToResults.call(this, names, workItem.AssignedToDisplayName, workItem.AssignedToComboName, workItem.OriginalAssignedTo, result);
 
             personRow = result[names[workItem.AssignedToComboName].id];
 
@@ -227,14 +210,14 @@ function SprintData(workitems, repository, existingSprint) {
                         });
 
                         if (!workItem.StartDate) {
-                            workItem.StartDate = sprint.EndDate;
+                            workItem.StartDate = sprint.LastWorkingDay;
                         }
                     }
 
                     if (!workItem.FinishDate) {
                         witChanged = true;
                         var remainingWorkLeft = remainingWork;
-                        var dates = getDates(workItem.StartDate, sprint.EndDate);
+                        var dates = getDates(workItem.StartDate, sprint.EndDate, repository.IncludeDayOnPlan);
                         dates.forEach(function (item, index) {
                             var tasksPerDay = names[workItem.AssignedToComboName].days[item.yyyymmdd()] || 0;
 
@@ -254,7 +237,7 @@ function SprintData(workitems, repository, existingSprint) {
 
 
                         if (!workItem.FinishDate) {
-                            workItem.FinishDate = sprint.EndDate;
+                            workItem.FinishDate = sprint.LastWorkingDay;
                         }
 
                     }
@@ -298,12 +281,16 @@ function SprintData(workitems, repository, existingSprint) {
 
                 }
 
-                if (workItem.StartDate < sprint.StartDate) workItem.StartDate = sprint.StartDate;
-                if (workItem.StartDate > sprint.EndDate) workItem.StartDate = sprint.EndDate;
-                if (workItem.FinishDate > sprint.EndDate) workItem.FinishDate = sprint.EndDate;
+                if (workItem.StartDate < sprint.FirstWorkingDay) workItem.StartDate = sprint.FirstWorkingDay;
+                if (workItem.StartDate > sprint.LastWorkingDay) workItem.StartDate = sprint.LastWorkingDay;
+                if (workItem.FinishDate > sprint.LastWorkingDay) workItem.FinishDate = sprint.LastWorkingDay;
                 if (workItem.FinishDate < workItem.StartDate) workItem.FinishDate = workItem.StartDate;
 
-                dates = getDates(workItem.StartDate, workItem.FinishDate);
+                dates = getDates(workItem.StartDate, workItem.FinishDate, repository.IncludeDayOnPlan);
+
+                if (!personRow.hasEndsOnNonWorkingDay){
+                    personRow.hasEndsOnNonWorkingDay = repository.IsTeamDayOff(workItem.FinishDate) || repository.IsTeamDayOff(workItem.StartDate);
+                }
 
                 let selectedRow = -1;
                 let found = false;
@@ -323,7 +310,7 @@ function SprintData(workitems, repository, existingSprint) {
                 for (var colIndex = 0; colIndex < dates.length; colIndex++) {
                     var date = dates[colIndex].yyyymmdd();
                     personDateCell = personRow[date];
-                
+
                     while (selectedRow >= personDateCell.length) personDateCell.push({ Type: 0 });
 
                     if (!this.Repository.IsDayOff(workItem.OriginalAssignedTo, dates[colIndex].yyyymmdd(), dates[colIndex].getDay())) {
@@ -355,5 +342,35 @@ function SprintData(workitems, repository, existingSprint) {
         }
 
         return result.sort(function (a, b) { return a.assignedTo.localeCompare(b.assignedTo) });
+    }
+
+    function AddPersonToResults(names, AssignedToDisplayName, AssignedToComboName, OriginalAssignedTo, result) {
+        if (!names[AssignedToComboName]) {
+            names[AssignedToComboName] = { id: result.length, days: [] };
+            var newName = {
+                Name: AssignedToDisplayName,
+                Capacity: this.Repository.GetCapacity(OriginalAssignedTo),
+                TotalCapacity: 0,
+                TatalTasks: 0,
+                assignedTo: AssignedToComboName,
+                avatar: this.Repository.GetMemberImage(OriginalAssignedTo),
+                assignedToId: result.length,
+                hasItems: false,
+                hasEndsOnNonWorkingDay: false,
+            };
+            for (var colIndex = 0; colIndex < this.Dates.length; colIndex++) {
+                var currentDate = this.Dates[colIndex];
+                var isDayOff = this.Repository.IsDayOff(OriginalAssignedTo, currentDate.yyyymmdd(), currentDate.getDay());
+                newName[currentDate.yyyymmdd()] = [];
+                newName[currentDate.yyyymmdd()].isDayOff = isDayOff;
+
+                if (currentDate >= _today && !isDayOff) {
+                    newName.TotalCapacity = newName.TotalCapacity + newName.Capacity;
+                }
+            }
+
+            result.push(newName);
+            this.nameById[names[AssignedToComboName].id] = { OriginalAssignedTo: {...OriginalAssignedTo, displayName:OriginalAssignedTo?.displayName?.split("<")[0].trim() || ""} };
+        }
     }
 }

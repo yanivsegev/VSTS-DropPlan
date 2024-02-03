@@ -25,6 +25,10 @@
                     <label for="showPBIs">View by Parent</label>
                 </div>
                 <div>
+                    <input id="showNonWorkingTeamDays" type="checkbox" onclick="switchViewNonWorkingTeamDays(($('#showNonWorkingTeamDays').prop('checked')));" />
+                    <label for="showNonWorkingTeamDays">Non-working days</label>
+                </div>
+                <div>
                     <input id="filterBy" type="text" placeholder="Filter by keyword">
                     on
                     <select id="filterArea">

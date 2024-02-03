@@ -82,6 +82,15 @@ input, select {
 	opacity: 1;
 }
 
+.taskTypeIcon {
+    display: block;
+    float: left;
+    position: relative;
+    left: -7px;
+    width: 16px;
+    height: 16px;
+}
+
 .sameParent{
     background: bisque;
 }
@@ -90,10 +99,12 @@ input, select {
     border: 1px solid red;
 }
 
-.taskStart:before {
+.taskDiv .taskStart:before {
     background:transparent;
 }
 
 .PBItaskStart:before {
     background:transparent;
 }
+
+

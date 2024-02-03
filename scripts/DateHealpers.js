@@ -1,5 +1,4 @@
- Date.prototype.addDays = function(days) {
-  
+Date.prototype.addDays = function(days) {
     var z = this.getTimezoneOffset()
     var x = new Date(this.valueOf() + days * 24 * 60 * 60000);
     var diff = z - x.getTimezoneOffset();
@@ -13,29 +12,32 @@ Date.prototype.yyyymmdd = function() {
     var mm = this.getMonth() + 1; // getMonth() is zero-based
     var dd = this.getDate();
 
-    return [this.getFullYear(),
-          (mm>9 ? '' : '0') + mm,
-          (dd>9 ? '' : '0') + dd
-         ].join('');
+    return [
+        this.getFullYear(),
+        (mm>9 ? '' : '0') + mm,
+        (dd>9 ? '' : '0') + dd
+    ].join('');
 };
 
 Date.prototype.yyyy_mm_dd = function() {
     var mm = this.getMonth() + 1; // getMonth() is zero-based
     var dd = this.getDate();
 
-    return [this.getFullYear(),
-          (mm>9 ? '' : '0') + mm,
-          (dd>9 ? '' : '0') + dd
-         ].join('/');
+    return [
+        this.getFullYear(),
+        (mm>9 ? '' : '0') + mm,
+        (dd>9 ? '' : '0') + dd
+    ].join('/');
 };
 
 Date.prototype.mmdd = function() {
-  var mm = this.getMonth() + 1; // getMonth() is zero-based
-  var dd = this.getDate();
+    var mm = this.getMonth() + 1; // getMonth() is zero-based
+    var dd = this.getDate();
 
-  return [(mm>9 ? '' : '0') + mm,
-          (dd>9 ? '' : '0') + dd
-         ].join('/');
+    return [
+        (mm>9 ? '' : '0') + mm,
+        (dd>9 ? '' : '0') + dd
+    ].join('/');
 };
 
 
@@ -45,22 +47,24 @@ Date.prototype.HHmmss = function() {
     var mm = this.getMinutes();
     var ss = this.getSeconds();
   
-    return [(HH>9 ? '' : '0') + HH,
-            (mm>9 ? '' : '0') + mm,
-            (ss>9 ? '' : '0') + ss
-           ].join(':');
-  };
+    return [
+        (HH>9 ? '' : '0') + HH,
+        (mm>9 ? '' : '0') + mm,
+        (ss>9 ? '' : '0') + ss
+    ].join(':');
+};
 
 
 //"2018-01-25T00:00:00Z"
 Date.prototype.tfsFormat = function() {
     var mm = this.getMonth() + 1; // getMonth() is zero-based
     var dd = this.getDate();
-  
-    return [this.getFullYear(),
-            (mm>9 ? '' : '0') + mm,
-            (dd>9 ? '' : '0') + dd
-           ].join('-') + "T00:00:00Z";
+
+    return [
+        this.getFullYear(),
+        (mm>9 ? '' : '0') + mm,
+        (dd>9 ? '' : '0') + dd
+    ].join('-') + "T00:00:00Z";
   };
 
 
@@ -92,11 +96,13 @@ Date.prototype.ConvertGMTToServerTimeZone = function() {
 
 
 
-function getDates(startDate, stopDate) {
+function getDates(startDate, stopDate, includeDateFunction) {
     var dateArray = new Array();
     var currentDate = startDate;
     while (currentDate <= stopDate) {
-        dateArray.push( new Date (currentDate) )
+        if(!includeDateFunction || includeDateFunction(currentDate)){
+            dateArray.push( new Date (currentDate) )
+        }
         currentDate = currentDate.addDays(1);
     }
     return dateArray;

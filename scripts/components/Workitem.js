@@ -11,7 +11,7 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
     function SetOriginalAssignedToFunc(value){
         this.OriginalAssignedTo = value;
         this.AssignedToDisplayName = this.OriginalAssignedTo?.displayName?.split("<")[0].trim() || "";
-        this.AssignedToComboName = this.OriginalAssignedTo?.displayName ? this.OriginalAssignedTo.displayName + "<" + this.OriginalAssignedTo.uniqueName + ">" : "";
+        this.AssignedToComboName = this.OriginalAssignedTo?.displayName ? this.OriginalAssignedTo.displayName + " <" + this.OriginalAssignedTo.uniqueName + ">" : "";
     }
 
     function InitFunc(){
@@ -26,7 +26,7 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
 
         this.OriginalAssignedTo = workitem.fields["System.AssignedTo"];
         this.AssignedToDisplayName = this.OriginalAssignedTo?.displayName?.split("<")[0].trim() || "";
-        this.AssignedToComboName = this.OriginalAssignedTo?.displayName ? this.OriginalAssignedTo.displayName + "<" + this.OriginalAssignedTo.uniqueName + ">" : "";
+        this.AssignedToComboName = this.OriginalAssignedTo?.displayName ? this.OriginalAssignedTo.displayName + " <" + this.OriginalAssignedTo.uniqueName + ">" : "";
         this.InitialAssignedToComboName = this.AssignedToComboName;
 
         this.AreaPath = workitem.fields["System.AreaPath"] || "";
@@ -75,10 +75,12 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
         this.isTaskWit = jQuery.grep( _workItemTypes , function(element){ return element.name == workitem.fields["System.WorkItemType"]; }).length > 0;
         this.isPBIWit = jQuery.grep( _workItemPBITypes , function(element){ return element.name == workitem.fields["System.WorkItemType"]; }).length > 0;
 
-        let workItemType = _workItemTypes.find(function(itemType){ return itemType.name == workitem.fields["System.WorkItemType"]; });
+        let workItemConfig = (this.isTaskWit ? _workItemTypes : _workItemPBITypes).find(function(itemType){ return itemType.name == workitem.fields["System.WorkItemType"]; });
+
         this.stateColor=undefined;
-        if(workItemType && workItemType.states) {
-            this.stateColor = workItemType.states.find(function(itemState){ return itemState.name == workitem.fields["System.State"]}).color;
+        this.workItemConfig=workItemConfig;
+        if (workItemConfig && workItemConfig.states) {
+            this.stateColor = workItemConfig.states.find(function(itemState){ return itemState.name == workitem.fields["System.State"]}).color;
         }
 
         this.Activity = workitem.fields["Microsoft.VSTS.Common.Activity"];

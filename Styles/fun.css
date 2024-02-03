@@ -121,6 +121,9 @@ input, select {
     transform: rotate(-5deg);
 }
 
+.taskTypeIcon {
+    display: block;
+}
 
 .sameParent{
     background: bisque;
@@ -131,6 +134,11 @@ input, select {
 }
 
 
-.taskStart:before {
-     background:transparent;
+.taskDiv .taskStart:before {
+    background:transparent;
+}
+
+
+.taskWarning {
+    margin-right: 0;
 }
