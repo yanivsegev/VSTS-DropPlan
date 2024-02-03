@@ -9,10 +9,10 @@ window.addEventListener("message", receiveMessage, false);
 
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
-        console.log("background refresh only")
+        console.log("Pause refresh in background");
         PauseAutoRefresh();
-        // Reduce the number of refreshes if the tab is in the background to once every 7 minutes (prime number)
-        ResumeAutoRefresh(420000);
+        /*// Reduce the number of refreshes if the tab is in the background to once every 7 minutes (prime number)
+        ResumeAutoRefresh(420000);*/
         showFailAlearts = false;
     } else {
         console.log("foreground refresh")
