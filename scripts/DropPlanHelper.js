@@ -66,12 +66,13 @@ function render(isSaving, data) {
                 personDateCell = personRow[date];
                 result = result + "<td class='taskTd ";
                 if (personDateCell.isDayOff) result = result + "taskDayOff "
+                if (personDateCell.isTeamDayOff) result = result + "taskTeamDayOff "
                 if (date == _today.yyyymmdd()) result = result + "taskToday "
                 // 86400000 is the number of seconds in a day, I'm not 100% sure if these dates are Summer time/DST safe (i.e., all in UTC)
                 // so I'm padding it and multiplying by 1.5
                 if (previousDate && ((columnDate - previousDate) > 129600000)) result = result + "previousDayOff "
 
-                result = result + "'>";
+                result = result + "' cellDate='" + columnDate.tfsFormat() + "'>";
 
                 for (let taskIndex = 0; taskIndex < (personDateCell.MaxDataRow || 0); taskIndex++) {
                     const task = personDateCell[taskIndex];
@@ -380,6 +381,7 @@ function attachEvents() {
     $("body").click(function () {
         ResetRelations();
         $(".activeTask").removeClass("activeTask");
+        $(".right-click-menu").remove();
     });
 
 
@@ -391,6 +393,37 @@ function attachEvents() {
             if ($(this).hasClass("activeTask")) {
                 DrawRelations($(this));
             }
+        }
+    );
+
+    $(".taskTd").on("contextmenu",
+        function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $(".right-click-menu").remove();
+            if (event.target != this){
+                // if clicking on a task we get the parent td, which will always be the starting td.  To stop this marking the wrong day we're just going to ignore anything where the event target doesn't match the element where we attached the event.
+                return;
+            }
+            var member = sprint.GetAssignToNameById($(this).closest('tr')[0].cells[0].attributes["assignedtoid"].value)?.OriginalAssignedTo;
+
+            const currentCell=$(this).closest('td');
+            var date = new Date(currentCell[0].attributes["cellDate"].value);
+            let menuItems = [];
+            if (currentCell.hasClass("taskDayOff") && !currentCell.hasClass("taskTeamDayOff")) {
+                menuItems.push({text:'Remove Day off', onClick:()=>{
+                    repository.RemoveMemberDayOff(member, date);
+                    processWorkItems(sprint.RawWits, false);
+                }})
+            } else if (!currentCell.hasClass("taskDayOff") && !currentCell.hasClass("taskTeamDayOff")) {
+                menuItems.push({text:'Mark as Day off', onClick:()=>{
+                    repository.SetMemberDayOff(member, date);
+                    processWorkItems(sprint.RawWits, false);
+                }});
+            }
+            // want to add more right click features in future.
+            handleRightClick(event, menuItems);
+            return false;
         }
     );
 

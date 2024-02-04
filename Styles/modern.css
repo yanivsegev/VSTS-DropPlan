@@ -129,3 +129,12 @@ input::placeholder {
 .showareapath .taskAreaPath10 {
     background:#F0808077;
 }
+
+/* Style for the right-click menu */
+.right-click-menu {
+    background-color: var(--background-color,rgba(255, 255, 255, 1));
+}
+
+.right-click-menu li:hover {
+    background-color: var(--border-subtle-color,rgba(255, 255, 255, 1));
+}

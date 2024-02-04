@@ -82,6 +82,7 @@ function VSSRepository() {
                                         /** @type { "vss-web-extension-sdk":"TFS/Work/RestClient":WorkHttpClient3_1 } */
                     let workClient = TFS_Work.getClient();
                     let otherClient = TFS_Wit_WebApi.getClient();
+                    _this._data.workClient = workClient;
 
                     var teamContext = { projectId: _this._data.VssContext.project.id, teamId: _this._data.VssContext.team.id, project: "", team: "" };
                     var configuration = VSS.getConfiguration();
@@ -417,6 +418,39 @@ function VSSRepository() {
     this.GetUserSettings = function(){
         return this._data.userSettings;
     }
+
+    this.SetMemberDayOff = function(member, date){
+        const teamContext = { projectId: this._data.VssContext.project.id, teamId: this._data.VssContext.team.id, project: "", team: "" };
+        const memberCapacity = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id);
+        memberCapacity.daysOff.push({start: date, end: date});
+
+        return this._data.workClient.updateCapacity(memberCapacity, teamContext, this._data.iteration.id, member.id);
+    }
+
+    this.RemoveMemberDayOff = function(member, date){
+        const teamContext = { projectId: this._data.VssContext.project.id, teamId: this._data.VssContext.team.id, project: "", team: "" };
+        const memberCapacity = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id);
+
+        const dateTime = date.getTime();
+        let daysOffRange = memberCapacity.daysOff.find((daysOffRange)=>daysOffRange.start <= date && date <= daysOffRange.end);
+        const startTime= daysOffRange.start.getTime(), endTime= daysOffRange.end.getTime();
+
+        if (startTime == dateTime && endTime == dateTime) {
+            // if it's the only day off, remove the whole range.
+            memberCapacity.daysOff = memberCapacity.daysOff.filter((daysOffRange)=>daysOffRange.start.getTime() != dateTime);
+        }else if(startTime == dateTime){
+            daysOffRange.start = date.addDays(1);
+        } else if(endTime == dateTime){
+            daysOffRange.end = date.addDays(-1);
+        } else {
+            // in the middle of a range, split it into two.
+            memberCapacity.daysOff.push({start: date.addDays(1), end: daysOffRange.end});
+            daysOffRange.end = date.addDays(-1);
+        }
+
+        return this._data.workClient.updateCapacity(memberCapacity, teamContext, this._data.iteration.id, member.id);
+    }
+
 
     function RegisterThemeEvent(themeChanged){
         XDM.globalObjectRegistry.register("DevOps.SdkClient", function () {

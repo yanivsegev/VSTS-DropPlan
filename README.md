@@ -26,8 +26,10 @@ Sprint Drop Plan is an organizational tool that helps team members to sync their
 
 - If you assign capacity to a user they will show on the calendar even if they have no tasks
 - You can select to see/hide team non-working days (configured weekends/team days off)
+- You can right click on a cell to add/remove it as a "Day off"
+- Tasks on the plan will use the configured colour of the task, so that you can easily tell the difference between bugs/tasks/any custom task types.
 
-![Plan showing a user without tasks, and with the weekend hidden](images/DropPlanWithWeekendHidden.png)
+![Plan showing a user without tasks, and with the weekend hidden](images/DropPlanHiddenWeekendCustomItemTypeRightClickMenu.png)
 
 ## Quick steps to get started ##
 
@@ -47,9 +49,10 @@ Happy coding :-)
 1. See task type from icon or colour (theme dependant) (#59)
 2. Add option to hide team non-working days (e.g., hide weekends/national holidays) (#9, #57)
 3. See all people on the plan with allocated capacity. (#73)
-4. Bugfixes #111, Not showing avatar image.
+4. Add ability to right click to add/remove individual team members as on leave for that day.
+5. Bugfixes #111, Not showing avatar image.
 
-### 2.0.1 -> 2.0.13 ###
+### 2.0.1 -> 2.0.14 ###
 
 Bugfixes #75, #84, #98, #97, #102, #106, #108, #110.
 

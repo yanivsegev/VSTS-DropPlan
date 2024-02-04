@@ -617,3 +617,28 @@ canvas {
     opacity: 0;
     visibility: hidden;
 }
+
+
+/* Style for the right-click menu */
+.right-click-menu {
+    position: absolute;
+    z-index: 1000;
+    padding: 10px 0;
+    background-color: rgba(255, 255, 255, 1);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    list-style-type: none;
+}
+
+/* Style for the menu items */
+.right-click-menu li {
+    padding: 10px 20px;
+    cursor: pointer;
+    width: max-content;
+}
+
+/* Style for the menu items on hover */
+.right-click-menu li:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+}

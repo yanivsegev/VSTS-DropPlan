@@ -361,8 +361,10 @@ function SprintData(workitems, repository, existingSprint) {
             for (var colIndex = 0; colIndex < this.Dates.length; colIndex++) {
                 var currentDate = this.Dates[colIndex];
                 var isDayOff = this.Repository.IsDayOff(OriginalAssignedTo, currentDate.yyyymmdd(), currentDate.getDay());
+                var isTeamDayOff = this.Repository.IsTeamDayOff(currentDate);
                 newName[currentDate.yyyymmdd()] = [];
                 newName[currentDate.yyyymmdd()].isDayOff = isDayOff;
+                newName[currentDate.yyyymmdd()].isTeamDayOff = isTeamDayOff;
 
                 if (currentDate >= _today && !isDayOff) {
                     newName.TotalCapacity = newName.TotalCapacity + newName.Capacity;
