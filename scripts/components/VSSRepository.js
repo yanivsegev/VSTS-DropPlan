@@ -139,8 +139,13 @@ function VSSRepository() {
                                 _this._data.teamValues = values[4];
                                 if (values.length > 5) {
                                     _this._data.backlogConfigurations = values[5];
-                                    _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
-                                    _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+                                    if (!_this._data.settings.usePBILevelForTasks){
+                                        _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
+                                        _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+                                    } else {
+                                        _this.WorkItemTypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+                                        _this.WorkItemPBITypes = _this._data.backlogConfigurations.portfolioBacklogs.map((PBIType)=>PBIType.workItemTypes).flat();
+                                    }
                                 } else {
                                     _this.WorkItemTypes = [{ name: "Task" }];
                                     _this.WorkItemPBITypes = [{ name: 'Product Backlog Item' }, { name: 'Bug' }];
@@ -272,9 +277,9 @@ function VSSRepository() {
         merged = merged.sort(function (a, b) { return a.id - b.id});
 
         if (tasks.length == 0) {
-            _this.reportFailure("No work items of type 'Task' found.");
-        }
-        else {
+            const taskTypeNames=_this.WorkItemTypes.map((item)=>item.name).join(', ').replace(/, ([^,]*)$/, ', or $1');
+            _this.reportFailure(`No work items of type ${taskTypeNames} found.`);
+        } else {
             _this.WorkItemsLoaded(merged);
         }
     }
@@ -399,6 +404,7 @@ function VSSRepository() {
             console.log(settings);
             this._data.settings={
                     highlightPlanningIssues: true,
+                    usePBILevelForTasks: false,
                     activityOrder: [
                         ["Requirements"],
                         ["Design"],

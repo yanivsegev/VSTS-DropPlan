@@ -14,7 +14,7 @@
                 <p>Highlight and warn when either activities are in the wrong order, or when tasks do not match their parent preceding/succeeding sequence.<br/>
                 E.g., QA completing prior to Development starting.<br/>
                 E.g., Story 1 should be completed before Story 2, but the tasks for Story 2 are planned prior to the tasks for Story 1.</p>
-                <input id="showPlanningIssues" type="checkbox" onclick="switchPlanningIssues(!($('#showPlanningIssues').prop('checked')));" checked/>
+                <input id="showPlanningIssues" type="checkbox" onclick="switchPlanningIssues(($('#showPlanningIssues').prop('checked')));" checked/>
                 <label for="showPlanningIssues">Highlight out of order tasks</label>
             </div>
             <p>Set the activity order for your project.  Any activities that you do not wish to be in a strict sequence can be moved to the "Not In Use" area.<br/>
@@ -34,6 +34,15 @@
                     </li>
                 </ul>
                 <ul class="sortableList" title="No order enforced" singleItemPerRow></ul>
+            </div>
+            <h3>Item types used for sprint</h3>
+            <div>
+                <p>If your team doesn't use the lowest level Task types for sprint work, you can enable this option to show item types that are the next level up (Portfolio Backlog Level).<br/>
+                E.g., Stories/Bugs/etc. will be visible on the Drop Plan.<br/>
+                Please note, you will need to have Bugs configured to be managed with Requirements, or they will not appear on the Drop Plan.
+                </p>
+                <input id="usePBILevelForTasks" type="checkbox" onclick="switchUsePBILevelForTasks(($('#usePBILevelForTasks').prop('checked')));"/>
+                <label for="usePBILevelForTasks">Show stories and not tasks on Drop Plan</label>
             </div>
         </div>
         <div class="messageBoxContainer" id="messageBoxContainer">

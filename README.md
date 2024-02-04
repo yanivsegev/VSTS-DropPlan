@@ -50,7 +50,8 @@ Happy coding :-)
 2. Add option to hide team non-working days (e.g., hide weekends/national holidays) (#9, #57)
 3. See all people on the plan with allocated capacity. (#73)
 4. Add ability to right click to add/remove individual team members as on leave for that day.
-5. Bugfixes #111, Not showing avatar image.
+5. Add ability to use Stories instead of Tasks on the Drop Plan for teams that do not use the lowest level of work item type.
+6. Bugfixes #111, Not showing avatar image.
 
 ### 2.0.1 -> 2.0.14 ###
 
