@@ -405,21 +405,25 @@ function attachEvents() {
                 // if clicking on a task we get the parent td, which will always be the starting td.  To stop this marking the wrong day we're just going to ignore anything where the event target doesn't match the element where we attached the event.
                 return;
             }
-            var member = sprint.GetAssignToNameById($(this).closest('tr')[0].cells[0].attributes["assignedtoid"].value)?.OriginalAssignedTo;
-
-            const currentCell=$(this).closest('td');
-            var date = new Date(currentCell[0].attributes["cellDate"].value);
             let menuItems = [];
-            if (currentCell.hasClass("taskDayOff") && !currentCell.hasClass("taskTeamDayOff")) {
-                menuItems.push({text:'Remove Day off', onClick:()=>{
-                    repository.RemoveMemberDayOff(member, date);
-                    processWorkItems(sprint.RawWits, false);
-                }})
-            } else if (!currentCell.hasClass("taskDayOff") && !currentCell.hasClass("taskTeamDayOff")) {
-                menuItems.push({text:'Mark as Day off', onClick:()=>{
-                    repository.SetMemberDayOff(member, date);
-                    processWorkItems(sprint.RawWits, false);
-                }});
+            
+            var member = sprint.GetAssignToNameById($(this).closest('tr')[0].cells[0].attributes["assignedtoid"].value)?.OriginalAssignedTo;
+            const memberCapacity = repository._data.teamMemberCapacities.find((e)=>e.teamMember.id == member?.id);
+        
+            if(memberCapacity){
+                const currentCell=$(this).closest('td');
+                var date = new Date(currentCell[0].attributes["cellDate"].value);
+                if (currentCell.hasClass("taskDayOff") && !currentCell.hasClass("taskTeamDayOff")) {
+                    menuItems.push({text:'Remove Day off', onClick:()=>{
+                        repository.RemoveMemberDayOff(member, date);
+                        processWorkItems(sprint.RawWits, false);
+                    }})
+                } else if (!currentCell.hasClass("taskDayOff") && !currentCell.hasClass("taskTeamDayOff")) {
+                    menuItems.push({text:'Mark as Day off', onClick:()=>{
+                        repository.SetMemberDayOff(member, date);
+                        processWorkItems(sprint.RawWits, false);
+                    }});
+                }
             }
             // want to add more right click features in future.
             handleRightClick(event, menuItems);
