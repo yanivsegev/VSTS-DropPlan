@@ -1,9 +1,4 @@
-
-
-function loadThemes()
-{
-    repository.GetValueInExtensionDataPerUser("DropPlanTheme");
-}
+// We now load the theme as a "UserSetting" in the repo.
 
 function changeTheme(css, save){
     $("#themeCss").remove();

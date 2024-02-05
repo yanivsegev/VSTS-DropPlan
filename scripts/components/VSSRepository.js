@@ -6,7 +6,14 @@ function VSSRepository() {
     this.reportFailure;
     this.failToCallVss;
     this.WorkItemsLoaded;
-    this._data = { t0: performance.now() };
+    // Add defaults for userSettings here.
+    this._data = { 
+        t0: performance.now(), 
+        userSettings:{
+            DropPlanTheme:'modern',
+            ShowTeamNonWorkingDays: true
+        }
+    };
     this.LoadWorkItems = function () { OnLoadWorkItems(this) };
 
     this.Init = function () { _init(this); }
@@ -75,6 +82,7 @@ function VSSRepository() {
                                         /** @type { "vss-web-extension-sdk":"TFS/Work/RestClient":WorkHttpClient3_1 } */
                     let workClient = TFS_Work.getClient();
                     let otherClient = TFS_Wit_WebApi.getClient();
+                    _this._data.workClient = workClient;
 
                     var teamContext = { projectId: _this._data.VssContext.project.id, teamId: _this._data.VssContext.team.id, project: "", team: "" };
                     var configuration = VSS.getConfiguration();
@@ -85,8 +93,13 @@ function VSSRepository() {
                         const extensionDataReady = new Promise(function(resolve,reject){
                             VSS.getService(VSS.ServiceIds.ExtensionData).then(function (res){
                                 _this._data.dataService = res;
-                                _this.LoadSettings().then(resolve)
-                                loadThemes();
+                                // Load the user settings, theme and Non-working day visibility.
+                                // If we get more of these, we should switch over to a document.
+                                const userSettingsPromises=Object.keys(_this._data.userSettings).map((key)=>_this.GetValueInExtensionDataPerUser(key));
+                                Promise.all(userSettingsPromises).then(()=>{
+                                    _this.reportProgress("User settings loaded.");
+                                    _this.LoadSettings().then(resolve);
+                                })
                             });
                         })
 
@@ -114,23 +127,61 @@ function VSSRepository() {
                                 _this.IterationStartDate = _this._data.iteration.attributes.startDate;
                                 _this.IterationFinishDate = _this._data.iteration.attributes.finishDate;
 
+                                _this.IterationFirstWorkingDate = new Date(_this._data.iteration.attributes.startDate);
+                                while (_this.IterationFirstWorkingDate<_this.IterationFinishDate && _this.IsTeamDayOff(_this.IterationFirstWorkingDate)){
+                                    _this.IterationFirstWorkingDate = _this.IterationFirstWorkingDate.addDays(1);
+                                }
+                                _this.IterationLastWorkingDate = new Date(_this._data.iteration.attributes.finishDate);
+                                while (_this.IterationFinishDate > _this.IterationFirstWorkingDate && _this.IsTeamDayOff(_this.IterationLastWorkingDate)){
+                                    _this.IterationLastWorkingDate = _this.IterationLastWorkingDate.addDays(-1);
+                                }
+
                                 _this._data.teamValues = values[4];
                                 if (values.length > 5) {
                                     _this._data.backlogConfigurations = values[5];
-                                    _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
-                                    _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+                                    if (!_this._data.settings.usePBILevelForTasks){
+                                        _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
+                                        _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+                                    } else {
+                                        _this.WorkItemTypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+                                        _this.WorkItemPBITypes = _this._data.backlogConfigurations.portfolioBacklogs.map((PBIType)=>PBIType.workItemTypes).flat();
+                                    }
                                 } else {
                                     _this.WorkItemTypes = [{ name: "Task" }];
                                     _this.WorkItemPBITypes = [{ name: 'Product Backlog Item' }, { name: 'Bug' }];
                                 }
-                                const taskStatePromises = _this.WorkItemTypes.map(
+                                const taskConfigPromises = _this.WorkItemTypes.map(
                                     function (itemType) {
-                                        return otherClient.getWorkItemTypeStates(teamContext.projectId, itemType.name);
+                                        return otherClient.getWorkItemType(teamContext.projectId, itemType.name);
                                     }
                                 );
-                                Promise.all(taskStatePromises ).then(function(taskTypeStates){
-                                    taskTypeStates.forEach(function(taskTypeState, index, arr) {
-                                        _this.WorkItemTypes[index].states=taskTypeState
+                                Promise.all(taskConfigPromises).then(function(taskTypeConfigs){
+                                    taskTypeConfigs.forEach(function(taskTypeConfig, index, arr) {
+                                        const cssName=_this.WorkItemTypes[index].name.replace(/([^a-zA-Z0-9-_])/ig,'');
+                                        _this.WorkItemTypes[index].states=taskTypeConfig.states;
+                                        _this.WorkItemTypes[index].iconUrl=taskTypeConfig.icon.url;
+                                        _this.WorkItemTypes[index].color=taskTypeConfig.color;
+                                        _this.WorkItemTypes[index].cssName=cssName
+                                        SetWorkItemTypeCss(_this.WorkItemTypes[index]);
+                                        SetCssVariable(`${cssName}IconUrl`, taskTypeConfig.icon.url);
+                                        SetCssVariable(`${cssName}IconColor`, taskTypeConfig.color);
+                                    })
+                                })
+                                const pbiConfigPromises = _this.WorkItemPBITypes.map(
+                                    function (itemType) {
+                                        return otherClient.getWorkItemType(teamContext.projectId, itemType.name);
+                                    }
+                                );
+                                Promise.all(pbiConfigPromises).then(function(pbiTypeConfigs){
+                                    pbiTypeConfigs.forEach(function(pbiTypeConfig, index, arr) {
+                                        const cssName=_this.WorkItemPBITypes[index].name.replace(/([^a-zA-Z0-9-_])/ig,'');
+                                        _this.WorkItemPBITypes[index].states=pbiTypeConfig.states
+                                        _this.WorkItemPBITypes[index].iconUrl=pbiTypeConfig.icon.url
+                                        _this.WorkItemPBITypes[index].color=pbiTypeConfig.color
+                                        _this.WorkItemPBITypes[index].cssName=cssName
+                                        SetWorkItemTypeCss(_this.WorkItemPBITypes[index]);
+                                        SetCssVariable(`${cssName}IconUrl`, pbiTypeConfig.icon.url);
+                                        SetCssVariable(`${cssName}IconColor`, pbiTypeConfig.color);
                                     })
                                 })
                                 VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
@@ -226,25 +277,41 @@ function VSSRepository() {
         merged = merged.sort(function (a, b) { return a.id - b.id});
 
         if (tasks.length == 0) {
-            _this.reportFailure("No work items of type 'Task' found.");
-        }
-        else {
+            const taskTypeNames=_this.WorkItemTypes.map((item)=>item.name).join(', ').replace(/, ([^,]*)$/, ', or $1');
+            _this.reportFailure(`No work items of type ${taskTypeNames} found.`);
+        } else {
             _this.WorkItemsLoaded(merged);
         }
     }
 
+    SetCssVariable = function(variableName, value){
+        if(!this.SetCssVariable.rootStyles){
+            this.SetCssVariable.rootStyles = document.querySelector(':root');
+        }
+        this.SetCssVariable.rootStyles.style.setProperty(`--${variableName}`, value);
+    }
+
+    SetWorkItemTypeCss = function(WorkItem){
+        document.styleSheets[0].insertRule(`.taskDiv > .TaskType${WorkItem.cssName}:before {background:#${WorkItem.color};}`);
+        document.styleSheets[0].insertRule(`.taskDiv > .TaskType${WorkItem.cssName} .taskTypeIcon {background-image:url(${WorkItem.iconUrl};}`);
+    }
+
     this.GetCapacity = function (member) {
         var result = 0;
-        const teamMember = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id)
+        const teamMember = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id);
         if (teamMember?.activities.length > 0 ){
             result = teamMember.activities.reduce(
                 function (runningTotal, current){
                     return runningTotal + current.capacityPerDay;
                 }, 0
-            ) || 6;
+            ) || 0;
         }
 
         return result;
+    }
+
+    this.GetMembersWithCapacity = function(){
+        return this._data.teamMemberCapacities.map((member)=>({...member.teamMember, name: member.teamMember.displayName.split("<")[0].trim()}));
     }
 
     this.IsDayOff = function (member, date, day) {
@@ -256,9 +323,33 @@ function VSSRepository() {
         return dayOff;
     }
 
+    this.IsTeamDayOff = (dateToCheck) => {
+        const date=dateToCheck.yyyymmdd(), day=dateToCheck.getDay()
+        var dayOff = false;
+
+        if (isDayInRange(this._data.daysOff.daysOff, date)) dayOff = true;
+
+        if ($.inArray(day, this._data.teamSettings.workingDays) == -1) dayOff = true;
+
+        return dayOff;
+    }
+
+    this.IncludeDayOnPlan = (dateToCheck) => {
+        if (this._data.userSettings.ShowTeamNonWorkingDays){
+            return true;
+        }
+        const date=dateToCheck.yyyymmdd(), day=dateToCheck.getDay()
+
+        if (isDayInRange(this._data.daysOff.daysOff, date)) return false;
+
+        if ($.inArray(day, this._data.teamSettings.workingDays) == -1) return false;
+
+        return true;
+    }
+
     this.GetMemberImage = function (member) {
-        const teamMember = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id)
-        return teamMember?.imageUrl || "";
+        const teamMember = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id);
+        return teamMember?.teamMember?.imageUrl || "";
     }
 
 
@@ -267,22 +358,35 @@ function VSSRepository() {
     }
 
     this.SetValueInExtensionDataPerUser = function(key, value){
-        this._data.dataService.setValue(key, value, {scopeType: "User"});
+        // save the value to devops then update our value, also return the promise so that we can initiate a reload once saved.
+        return this._data.dataService.setValue(key, value, {scopeType: "User"}).then(()=>{
+            this._data.userSettings[key]=value;
+        });
     }
 
     this.getActivityOrder = function(){
         return this._data.settings.activityOrder;
     }
 
-    this.GetValueInExtensionDataPerUser = function(key){
-        this._data.dataService.getValue(key, {scopeType: "User"}).then(function(c) {
-            c=c || "modern";
-            // Attempt to set the value, but if it's not in the list revert to "modern"
-            if(c !== $("#themes").val(c).val()){
-                c="modern";
-                $("#themes").val(c);
-            };
-            changeTheme(c, false);
+    this.GetValueInExtensionDataPerUser = function (key) {
+        const _data=this._data;
+        return this._data.dataService.getValue(key, {scopeType: "User"}).then(function(storedValue) {
+            // this picks up the stored value, or uses the existing (which will be the default value the first time loaded)
+            storedValue = storedValue ?? _data.userSettings[key];
+            // this feels like it's in the wrong place, shouldn't be updating the UI from in the Repo.
+            if(key=='DropPlanTheme'){
+                // Attempt to set the value, but if it's not in the list revert to "modern"
+                if(storedValue !== $("#themes").val(storedValue).val()){
+                    storedValue="modern";
+                    $("#themes").val(storedValue);
+                };
+                changeTheme(storedValue, false);
+            } else if (key=='ShowTeamNonWorkingDays'){
+                $('#showNonWorkingTeamDays').prop('checked', storedValue);
+            }
+            if(storedValue!==undefined){
+                _data.userSettings[key]=storedValue;
+            }
         });
     }
 
@@ -300,6 +404,7 @@ function VSSRepository() {
             console.log(settings);
             this._data.settings={
                     highlightPlanningIssues: true,
+                    usePBILevelForTasks: false,
                     activityOrder: [
                         ["Requirements"],
                         ["Design"],
@@ -309,12 +414,47 @@ function VSSRepository() {
                         ["Deployment"]
                     ]
                 , ...settings}
-            console.log(this._data.settings);
         })
     }
 
     this.GetSettings = function(){
         return this._data.settings;
+    }
+
+    this.GetUserSettings = function(){
+        return this._data.userSettings;
+    }
+
+    this.SetMemberDayOff = function(member, date){
+        const teamContext = { projectId: this._data.VssContext.project.id, teamId: this._data.VssContext.team.id, project: "", team: "" };
+        const memberCapacity = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id);
+        memberCapacity.daysOff.push({start: date, end: date});
+
+        return this._data.workClient.updateCapacity(memberCapacity, teamContext, this._data.iteration.id, member.id);
+    }
+
+    this.RemoveMemberDayOff = function(member, date){
+        const teamContext = { projectId: this._data.VssContext.project.id, teamId: this._data.VssContext.team.id, project: "", team: "" };
+        const memberCapacity = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id);
+
+        const dateTime = date.getTime();
+        let daysOffRange = memberCapacity.daysOff.find((daysOffRange)=>daysOffRange.start <= date && date <= daysOffRange.end);
+        const startTime= daysOffRange.start.getTime(), endTime= daysOffRange.end.getTime();
+
+        if (startTime == dateTime && endTime == dateTime) {
+            // if it's the only day off, remove the whole range.
+            memberCapacity.daysOff = memberCapacity.daysOff.filter((daysOffRange)=>daysOffRange.start.getTime() != dateTime);
+        }else if(startTime == dateTime){
+            daysOffRange.start = date.addDays(1);
+        } else if(endTime == dateTime){
+            daysOffRange.end = date.addDays(-1);
+        } else {
+            // in the middle of a range, split it into two.
+            memberCapacity.daysOff.push({start: date.addDays(1), end: daysOffRange.end});
+            daysOffRange.end = date.addDays(-1);
+        }
+
+        return this._data.workClient.updateCapacity(memberCapacity, teamContext, this._data.iteration.id, member.id);
     }
 
 

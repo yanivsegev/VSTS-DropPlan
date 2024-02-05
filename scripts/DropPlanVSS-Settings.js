@@ -34,6 +34,14 @@ function alertUser(msg, e){
     alert(msg);
 }
 
+function switchPlanningIssues(enabled){
+    repository.highlightPlanningIssues = enabled;
+}
+
+function switchUsePBILevelForTasks(enabled){
+    repository.usePBILevelForTasks = enabled;
+}
+
 try{
 	repository.reportProgress = reportProgress;
 	repository.reportFailure = reportProgress;
@@ -45,9 +53,10 @@ try{
 		lists.setItems("first","Required activity order",repository.getActivityOrder());
 		lists.setItems("first","No order enforced",repository.getUnorderedActivities());
 		lists.onStateChanged=(newState) =>{
-			console.log(newState);
 			repository.SetActivityOrder(newState[0].columns[0].data);
 		}
+        $('showPlanningIssues').val(repository.highlightPlanningIssues);
+        $('usePBILevelForTasks').val(repository.usePBILevelForTasks);
 		$("#settingsRoot").css("display","block");
 		$(".messageBoxContainer").remove();
 	});

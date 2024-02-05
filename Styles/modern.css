@@ -53,6 +53,18 @@
     background: repeating-linear-gradient(15deg, var(--component-label-default-color-hover), var(--border-subtle-color) 10px, var(--border-subtle-color) 10px, var(--component-label-default-color-hover) 20px);
 }
 
+.previousDayOff::before {
+    border: 2px solid var(--background-color);
+    border-width: 0 2px;
+    content: " ";
+    position: absolute;
+    height: 100%;
+    margin-left: -5px;
+    background:repeating-linear-gradient(15deg, var(--component-label-default-color-hover), var(--border-subtle-color) 10px, var(--border-subtle-color) 10px, var(--component-label-default-color-hover) 20px);
+    width: 4px;
+}
+
+
 .taskWarning .taskWarningTooltip {
     background: var(--background-color);
 }
@@ -116,4 +128,13 @@ input::placeholder {
 }
 .showareapath .taskAreaPath10 {
     background:#F0808077;
+}
+
+/* Style for the right-click menu */
+.right-click-menu {
+    background-color: var(--background-color,rgba(255, 255, 255, 1));
+}
+
+.right-click-menu li:hover {
+    background-color: var(--border-subtle-color,rgba(255, 255, 255, 1));
 }

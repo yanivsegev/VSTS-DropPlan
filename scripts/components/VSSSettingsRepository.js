@@ -155,6 +155,26 @@ function VSSSettingsRepository() {
         return this._data.activityAllowedValues.filter((activity)=>!flatActivityOrder.includes(activity)).map((activity)=> [activity]);
     }
 
+    Object.defineProperty(this, 'highlightPlanningIssues', {
+        get: function() {
+            return this._data.settings.highlightPlanningIssues;
+        },
+        set: function(highlightPlanningIssues) {
+            this._data.settings.highlightPlanningIssues = highlightPlanningIssues;
+            this.SaveSettings();
+        }
+    });
+
+    Object.defineProperty(this, 'usePBILevelForTasks', {
+        get: function() {
+            return this._data.settings.usePBILevelForTasks;
+        },
+        set: function(usePBILevelForTasks) {
+            this._data.settings.usePBILevelForTasks = usePBILevelForTasks;
+            this.SaveSettings();
+        }
+    });
+
     this.GetValueInExtensionDataPerUser = function(key){
         this._data.dataService.getValue(key, {scopeType: "User"}).then(function(c) {
             c=c || "modern";
@@ -190,6 +210,7 @@ function VSSSettingsRepository() {
             console.log(settings);
             this._data.settings={
                     highlightPlanningIssues: true,
+                    usePBILevelForTasks: false,
                     activityOrder: [
                         ["Requirements"],
                         ["Design"],

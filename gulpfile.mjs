@@ -48,6 +48,7 @@ let js = {
             "scripts/Promise.js"
             ,"scripts/Polyfill.js"
             ,"scripts/components/SprintData.js"
+            ,"scripts/components/RightClick.js"
             ,"scripts/components/Workitem.js"
             ,"scripts/components/VSSRepository.js"
             ,"node_modules/jquery/dist/jquery.min.js"

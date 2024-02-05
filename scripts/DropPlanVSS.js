@@ -43,6 +43,12 @@ function switchViewByTasks(viewByTasks){
     processWorkItems(sprint.RawWits, false);
 }
 
+function switchViewNonWorkingTeamDays(showNonWorkingTeamDays){
+    repository.SetValueInExtensionDataPerUser("ShowTeamNonWorkingDays", showNonWorkingTeamDays).then(()=>{
+        processWorkItems(sprint.RawWits, false);
+    });
+}
+
 
 var timerid;
 $("#filterBy").on("input", function(e) {
@@ -112,7 +118,7 @@ function processWorkItems(workItems, isSaving) {
         
         container = document.getElementById("grid-container");
 
-        var data = sprint.GetData();
+        const data = sprint.GetData();
         
         dettachEvents();
 
