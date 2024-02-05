@@ -1,9 +1,12 @@
 function handleRightClick(event, menuItems) {
+	if(menuItems.length==0){
+		return true;
+	}
+debugger
 	// Prevent the default context menu from appearing
 	event.preventDefault();
-	if(menuItems.length==0){
-		return;
-	}
+	event.stopPropagation();
+	
 	// Create a new <ul> element for the right-click menu
 	const menu = document.createElement('ul');
 	menu.classList.add('right-click-menu');
@@ -22,5 +25,6 @@ function handleRightClick(event, menuItems) {
 
 	// Append the menu to the document body
 	document.body.appendChild(menu);
+	return false;
 }
 

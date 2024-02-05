@@ -398,8 +398,6 @@ function attachEvents() {
 
     $(".taskTd").on("contextmenu",
         function (event) {
-            event.preventDefault();
-            event.stopPropagation();
             $(".right-click-menu").remove();
             if (event.target != this){
                 // if clicking on a task we get the parent td, which will always be the starting td.  To stop this marking the wrong day we're just going to ignore anything where the event target doesn't match the element where we attached the event.
@@ -426,8 +424,7 @@ function attachEvents() {
                 }
             }
             // want to add more right click features in future.
-            handleRightClick(event, menuItems);
-            return false;
+            return handleRightClick(event, menuItems);
         }
     );
 

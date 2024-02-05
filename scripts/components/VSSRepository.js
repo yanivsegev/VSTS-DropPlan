@@ -348,8 +348,7 @@ function VSSRepository() {
     }
 
     this.GetMemberImage = function (member) {
-        const teamMember = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id);
-        return teamMember?.teamMember?.imageUrl || "";
+        return member?.imageUrl || "";
     }
 
 
