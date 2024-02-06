@@ -80,7 +80,7 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
         this.stateColor=undefined;
         this.workItemConfig=workItemConfig;
         if (workItemConfig && workItemConfig.states) {
-            this.stateColor = workItemConfig.states.find(function(itemState){ return itemState.name == workitem.fields["System.State"]}).color;
+            this.stateColor = workItemConfig.states.find(function(itemState){ return itemState.name == workitem.fields["System.State"]})?.color;
         }
 
         this.Activity = workitem.fields["Microsoft.VSTS.Common.Activity"];

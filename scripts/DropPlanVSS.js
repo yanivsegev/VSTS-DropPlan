@@ -4,19 +4,22 @@ var sprint, container;
 var _scrollToToday = true;
 var autoRefresh;
 var showFailAlearts = true;
+var dropPlanLoaded = false;
 
 window.addEventListener("message", receiveMessage, false);
 
 document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-        console.log("Pause refresh in background");
-        PauseAutoRefresh();
-        /*// Reduce the number of refreshes if the tab is in the background to once every 7 minutes (prime number)
-        ResumeAutoRefresh(420000);*/
-        showFailAlearts = false;
-    } else {
-        console.log("foreground refresh")
-        SetAutoRefresh()
+    if (dropPlanLoaded) {
+        if (document.hidden) {
+            console.log("Pause refresh in background");
+            PauseAutoRefresh();
+            /*// Reduce the number of refreshes if the tab is in the background to once every 7 minutes (prime number)
+            ResumeAutoRefresh(420000);*/
+            showFailAlearts = false;
+        } else {
+            console.log("foreground refresh")
+            SetAutoRefresh()
+        }
     }
 });
 
@@ -73,6 +76,7 @@ function reportProgress(msg){
 function reportFailure(msg){
     var messages = document.getElementById("messageBoxInner");
     messages.innerHTML = "<h1>" + msg + "</h1>";
+    console.log(msg);
 }
 
 function BuildDropPlan() {
@@ -138,6 +142,7 @@ function processWorkItems(workItems, isSaving) {
             $(window).scrollLeft($('.taskToday').offset().left - $(".assignToColumn").width() - $(".mainBody").width() / 2);
         }
 
+        dropPlanLoaded = true;
         SetAutoRefresh();
     
     } catch (error) {
@@ -280,7 +285,9 @@ function ResetTasks() {
 
 function failToCallVss(reason, shouldNotPauseAutoRefresh) {
     const failure = reason?.serverError?.value?.Message || reason?.message || "";
-    console.error("Call to server failed! " + failure, JSON.stringify(reason));
+    if (!(reason?.message?.indexOf('Status code 0: error.') > 0)){
+        console.error("Call to server failed! " + failure, JSON.stringify(reason));
+    }
     if (shouldNotPauseAutoRefresh != true) PauseAutoRefresh();
     
     if (showFailAlearts){
