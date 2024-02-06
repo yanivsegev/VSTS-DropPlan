@@ -284,8 +284,10 @@ function failToCallVss(reason, shouldNotPauseAutoRefresh) {
     if (shouldNotPauseAutoRefresh != true) PauseAutoRefresh();
     
     if (showFailAlearts){
-        if (!(failure.indexOf('Status code 0: error.') > 0)){
-            alertUser(failure, reason);
+        if (failure != ""){
+            if (!(failure.indexOf('Status code 0: error.') > 0)){
+                alertUser(failure, reason);
+            }
         }
         else{
             alertUser("Call to server failed! please refresh the page.", reason);
