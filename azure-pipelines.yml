@@ -21,6 +21,10 @@ steps:
   displayName: 'Npm Install'
 
 - script: |
+    npm install -g tfx-cli
+  displayName: 'Npm install -g tfx-cli'
+
+- script: |
     npm run build
   displayName: 'Npm Build'
 
