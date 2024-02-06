@@ -398,7 +398,7 @@ function VSSRepository() {
     }
 
     this.LoadSettings = function(){
-        return this.GetObjectFromVSS("Settings", "version 1", {}).then((settings)=>{
+        return this.GetObjectFromVSS(`Settings.${this._data.VssContext.project.id}`, "version 1", {}).then((settings)=>{
             this.reportProgress("Extension settings loaded.");
             console.log(settings);
             this._data.settings={

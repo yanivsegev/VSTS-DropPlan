@@ -44,7 +44,14 @@ Happy coding :-)
 
 ## Change Log ##
 
-### 2.1.0 ##
+### 2.1.1 -> 2.1.3 ###
+
+BugFixes:
+
+1. Improving error handling on saving
+2. Settings weren't scoped to project (#113)
+
+### 2.1.0 ###
 
 1. See task type from icon or colour (theme dependant) (#59)
 2. Add option to hide team non-working days (e.g., hide weekends/national holidays) (#9, #57)
