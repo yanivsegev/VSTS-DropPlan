@@ -2,7 +2,6 @@ function handleRightClick(event, menuItems) {
 	if(menuItems.length==0){
 		return true;
 	}
-debugger
 	// Prevent the default context menu from appearing
 	event.preventDefault();
 	event.stopPropagation();

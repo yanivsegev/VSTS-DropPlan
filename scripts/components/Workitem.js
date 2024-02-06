@@ -170,6 +170,7 @@ function Workitem(workitem, _workItemTypes, _workItemPBITypes){
             this._workitem.fields["Microsoft.VSTS.Scheduling.FinishDate"] = this.FinishDate;
         }
         this._workitem.fields["System.AssignedTo"] = this.OriginalAssignedTo;
+        this._workitem.rev = -1;
     }
 
 }
