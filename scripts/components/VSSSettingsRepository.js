@@ -202,11 +202,11 @@ function VSSSettingsRepository() {
     }
 
     this.SaveSettings = function(){
-        this.SetObjectFromVSS("Settings", this._data.settings, "version 1");
+        this.SetObjectFromVSS(`Settings.${this._data.VssContext.project.id}`, this._data.settings, "version 1");
     }
 
     this.LoadSettings = function(){
-        return this.GetObjectFromVSS("Settings", "version 1", {}).then((settings)=>{
+        return this.GetObjectFromVSS(`Settings.${this._data.VssContext.project.id}`, "version 1", {}).then((settings)=>{
             console.log(settings);
             this._data.settings={
                     highlightPlanningIssues: true,

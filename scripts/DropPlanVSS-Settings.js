@@ -55,8 +55,8 @@ try{
 		lists.onStateChanged=(newState) =>{
 			repository.SetActivityOrder(newState[0].columns[0].data);
 		}
-        $('showPlanningIssues').val(repository.highlightPlanningIssues);
-        $('usePBILevelForTasks').val(repository.usePBILevelForTasks);
+        $('#showPlanningIssues').prop('checked', repository.highlightPlanningIssues);
+        $('#usePBILevelForTasks').prop('checked', repository.usePBILevelForTasks);
 		$("#settingsRoot").css("display","block");
 		$(".messageBoxContainer").remove();
 	});
