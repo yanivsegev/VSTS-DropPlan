@@ -285,7 +285,7 @@ function failToCallVss(reason, shouldNotPauseAutoRefresh) {
     
     if (showFailAlearts){
         if (failure != ""){
-            if (!(failure.indexOf('Status code 0: error.') > 0)){
+            if (!(reason?.message?.indexOf('Status code 0: error.') > 0)){
                 alertUser(failure, reason);
             }
         }
