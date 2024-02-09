@@ -62,7 +62,7 @@ function VSSSettingsRepository() {
                     let otherClient = TFS_Wit_WebApi.getClient();
 
                     var teamContext = { projectId: _this._data.VssContext.project.id, teamId: _this._data.VssContext.team.id, project: "", team: "" };
-
+                    console.log("Team context ", teamContext);
                     const extensionDataReady = /** @type {Promise<void>} */(new Promise(function(resolve,reject){
                         VSS.getService(VSS.ServiceIds.ExtensionData).then(function (res){
                             _this._data.dataService = res;
