@@ -285,9 +285,7 @@ function ResetTasks() {
 
 function failToCallVss(reason, shouldNotPauseAutoRefresh) {
     const failure = reason?.serverError?.value?.Message || reason?.message || "";
-    if (!(reason?.message?.indexOf('Status code 0: error.') > 0)){
-        console.error("Call to server failed! " + failure, JSON.stringify(reason));
-    }
+    
     if (shouldNotPauseAutoRefresh != true) PauseAutoRefresh();
     
     if (showFailAlearts){
@@ -299,14 +297,20 @@ function failToCallVss(reason, shouldNotPauseAutoRefresh) {
         else{
             alertUser("Call to server failed! please refresh the page.", reason);
         }
+    }else{
+        if (!(reason?.message?.indexOf('Status code 0: error.') > 0)
+            && !(reason?.message?.indexOf('Rule Error') > 0)){
+            console.error("Call to server failed! " + failure, JSON.stringify(reason));
+        }
     }
 }
 
 function alertUser(msg, e){
     var logMsg = "Alert User: [" + msg + "]";
-    console.log(msg);
-    if (e) console.log(e);
-    if (window._trackJs && typeof trackJs != "undefined") { trackJs.track(logMsg); }
+    if (!(e?.message?.indexOf('Rule Error') > 0)) // don't log "rule validation" errors
+    {
+        console.error(logMsg, e);
+    }
     alert(msg);
 }
 

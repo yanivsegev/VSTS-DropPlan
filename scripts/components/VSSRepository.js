@@ -70,16 +70,19 @@ function VSSRepository() {
                     if (window._trackJs && typeof trackJs != "undefined") {
 
                         // other stuff
-                        window._trackJs.onError = function (payload, error){
-                            payload.metadata.push({
-                            key: "LogRocket URL",
-                            value: (LogRocket || {}).sessionURL
-                            });
-
-                            return true; // Ensure error gets sent
-                        }
-                                             }
-                                        /** @type { "vss-web-extension-sdk":"TFS/Work/RestClient":WorkHttpClient3_1 } */
+                        trackJs.configure({
+                            onError: function (payload, error){
+                            
+                                if (error?.message?.startsWith('400 : PATCH')){
+                                    // ignore update errors as they are logged with the detailed error later.
+                                    return false;
+                                }
+                                return true; // Ensure error gets sent
+                            }
+                        });
+                    }
+                    
+                    /** @type { "vss-web-extension-sdk":"TFS/Work/RestClient":WorkHttpClient3_1 } */
                     let workClient = TFS_Work.getClient();
                     let otherClient = TFS_Wit_WebApi.getClient();
                     _this._data.workClient = workClient;
