@@ -18,10 +18,20 @@ steps:
 - task: Npm@1
   inputs:
     command: 'install'
-- task: gulp@0
-  inputs:
-    gulpFile: 'gulpfile.mjs'
-    targets: 
-    gulpjs: 'node_modules/gulp/bin/gulp.js'
-    enableCodeCoverage: false
+  displayName: 'Npm Install'
+
+- script: |
+    npm install -g tfx-cli
+  displayName: 'Npm install -g tfx-cli'
+
+- script: |
+    npm run build
+  displayName: 'Npm Build'
+
+#- task: gulp@0
+#  inputs:
+#    gulpFile: 'gulpfile.mjs'
+#    targets: 
+#    gulpjs: 'node_modules/gulp/bin/gulp.js'
+#    enableCodeCoverage: false
  

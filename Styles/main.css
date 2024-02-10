@@ -133,6 +133,17 @@ body{
     padding: 2px;
 }
 
+.relatedTaskPCBox {
+    font-size: smaller;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: calc(100% - 22px);
+    padding-top: 0px;
+    border: 1px solid white;
+    height: 16px;
+}
+
 .taskOverDue[style]{
     background: var(--taskOverDue);
 }
