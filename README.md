@@ -44,12 +44,13 @@ Happy coding :-)
 
 ## Change Log ##
 
-### 2.1.1 -> 2.1.4 ###
+### 2.1.1 -> 2.1.5 ###
 
 BugFixes:
 
 1. Improving error handling on saving
 2. Settings weren't scoped to project (#113)
+3. Related tasks with more than 11 siblings spill the status outside the item.
 
 ### 2.1.0 ###
 

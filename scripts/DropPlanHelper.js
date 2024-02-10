@@ -239,7 +239,33 @@ function render(isSaving, data) {
                                 }
                             );
 
-                            if (relatedItems.length > 1){
+                            if (relatedItems.length > 10){
+                                //If more than 10 siblings, show a progress bar.
+                                const countOfSiblingStates=relatedItems.reduce((agg, item) => {
+                                    if (agg[item.State]){
+                                        agg[item.State].count++;
+                                    } else {
+                                        agg[item.State] = {count:1, stateColor: item.stateColor}
+                                    }
+                                    return agg;
+                                },{})
+
+                                // Produce the style and text for the progress bar, by calculating the percentage of each state and then using that to create a gradient.
+                                const siblingStyleAndText = (Object.keys(countOfSiblingStates).reduce((output, key)=>{
+                                    const state=countOfSiblingStates[key];
+                                    const percent=(state.count/relatedItems.length)*100;
+
+                                    output.style.push(`#${state.stateColor} ${output.lastPercent}%`);
+                                    output.style.push(`#${state.stateColor} ${(output.lastPercent+percent)}%`)
+                                    output.text.push(`${state.count} ${key}`)
+                                    output.lastPercent =+ percent;
+                                    return output;
+                                }, {style: [], text:[], lastPercent: 0}))
+
+                                result = result + "<div class='relatedTaskBox relatedTaskPCBox' style='background: linear-gradient(90deg, ";
+                                result = result + siblingStyleAndText.style.join(", ");
+                                result = result + `)'>${siblingStyleAndText.text.join(", ")}</div>`;
+                            } else if (relatedItems.length > 1){
                                 result = result + "<div class='relatedTaskBox'>";
 
                                 relatedItems.forEach(function(item,index) {
