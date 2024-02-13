@@ -574,6 +574,9 @@ canvas {
     padding-right: 14px;
 }
 
+.settingsBody{
+    overflow: auto;
+}
 #settingsRoot {
     display: none;
     padding: 0 25px 0 25px;

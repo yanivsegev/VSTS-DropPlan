@@ -74,6 +74,7 @@ function VSSRepository() {
                             onError: function (payload, error){
                             
                                 if (error?.message?.startsWith('400 : PATCH')){
+                                    console.log('Ignore 400 : PATCH error', error);
                                     // ignore update errors as they are logged with the detailed error later.
                                     return false;
                                 }
@@ -102,7 +103,7 @@ function VSSRepository() {
                                 Promise.all(userSettingsPromises).then(()=>{
                                     _this.reportProgress("User settings loaded.");
                                     _this.LoadSettings().then(resolve);
-                                })
+                                }, _this._data.failToCallVss)
                             });
                         })
 
@@ -162,14 +163,16 @@ function VSSRepository() {
                                     taskTypeConfigs.forEach(function(taskTypeConfig, index, arr) {
                                         const cssName=_this.WorkItemTypes[index].name.replace(/([^a-zA-Z0-9-_])/ig,'');
                                         _this.WorkItemTypes[index].states=taskTypeConfig.states;
-                                        _this.WorkItemTypes[index].iconUrl=taskTypeConfig.icon.url;
+                                        _this.WorkItemTypes[index].iconUrl=taskTypeConfig.icon?.url;
                                         _this.WorkItemTypes[index].color=taskTypeConfig.color;
                                         _this.WorkItemTypes[index].cssName=cssName
                                         SetWorkItemTypeCss(_this.WorkItemTypes[index]);
                                         SetCssVariable(`${cssName}IconUrl`, taskTypeConfig.icon.url);
                                         SetCssVariable(`${cssName}IconColor`, taskTypeConfig.color);
-                                    })
-                                })
+                                    });
+                                }).catch((error) => {
+                                    console.error(error);
+                                });
                                 const pbiConfigPromises = _this.WorkItemPBITypes.map(
                                     function (itemType) {
                                         return otherClient.getWorkItemType(teamContext.projectId, itemType.name);
@@ -179,14 +182,16 @@ function VSSRepository() {
                                     pbiTypeConfigs.forEach(function(pbiTypeConfig, index, arr) {
                                         const cssName=_this.WorkItemPBITypes[index].name.replace(/([^a-zA-Z0-9-_])/ig,'');
                                         _this.WorkItemPBITypes[index].states=pbiTypeConfig.states
-                                        _this.WorkItemPBITypes[index].iconUrl=pbiTypeConfig.icon.url
+                                        _this.WorkItemPBITypes[index].iconUrl=pbiTypeConfig.icon?.url
                                         _this.WorkItemPBITypes[index].color=pbiTypeConfig.color
                                         _this.WorkItemPBITypes[index].cssName=cssName
                                         SetWorkItemTypeCss(_this.WorkItemPBITypes[index]);
                                         SetCssVariable(`${cssName}IconUrl`, pbiTypeConfig.icon.url);
                                         SetCssVariable(`${cssName}IconColor`, pbiTypeConfig.color);
-                                    })
-                                })
+                                    });
+                                }).catch((error) => {
+                                    console.error(error);
+                                });
                                 VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
                                     function (VSS_Service, TFS_Wit_WebApi) {
 

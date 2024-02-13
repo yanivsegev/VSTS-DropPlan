@@ -113,9 +113,13 @@ function VSSSettingsRepository() {
                                     }
                                 })
                                 console.log(_this._data.activityAllowedValues)
+                            }).catch((error) => {
+                                console.error(error);
                             }),
                             _this.LoadSettings()
-                        ]).then(()=>_this._ready());
+                        ]).then(()=>_this._ready()).catch((error) => {
+                            console.error(error);
+                        });;
 
                         VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
                             function (VSS_Service, TFS_Wit_WebApi) {

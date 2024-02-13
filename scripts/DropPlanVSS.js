@@ -290,15 +290,19 @@ function failToCallVss(reason, shouldNotPauseAutoRefresh) {
     
     if (showFailAlearts){
         if (failure != ""){
-            if (!(reason?.message?.indexOf('Status code 0: error.') > 0)){
+            if (!(reason?.message?.indexOf('Status code 0:') > 0)){
                 alertUser(failure, reason);
             }
+            else{
+                console.log("Call to server failed! " + failure, JSON.stringify(reason));
+            }
+
         }
         else{
             alertUser("Call to server failed! please refresh the page.", reason);
         }
     }else{
-        if (!(reason?.message?.indexOf('Status code 0: error.') > 0)
+        if (!(reason?.message?.indexOf('Status code 0:') > 0)
             && !(reason?.message?.indexOf('Rule Error') > 0)){
             console.error("Call to server failed! " + failure, JSON.stringify(reason));
         }
