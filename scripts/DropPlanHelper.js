@@ -95,7 +95,7 @@ function render(isSaving, data) {
                             if(parentWit){
                                 partnerWorktemId = sprint.AllWits.indexOf(parentWit);
 
-                                if(task.workItem.Activity && parentWit.childActivities) {
+                                if(sprint.PlanningIssues && task.workItem.Activity && parentWit.childActivities) {
                                     const activityIndex = activityTypeOrder.findIndex(
                                         function(activities){
                                             return activities.indexOf(task.workItem.Activity) !== -1;
@@ -131,19 +131,20 @@ function render(isSaving, data) {
                                         result = result + " taskOutOfSequence ";
                                     }
                                 }
-
-                                const predecessors = sprint.GetWorkitemsByIdsFromAll(parentWit.GetPredecessorIds());
-                                for(const predecessor of predecessors){
-                                    const lastChild=predecessor.GetLastChild(useActivityTypeInDependencyTracking ? task.workItem.Activity : undefined);
-                                    if(lastChild && lastChild.MaxFinish > task.workItem.StartDate){
-                                        warnings.push(`${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity : 'Task'} starting before predecessor "${predecessor.Title}" ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity.toLowerCase() : ''} has finished!`);
+                                if (sprint.PlanningIssues){
+                                    const predecessors = sprint.GetWorkitemsByIdsFromAll(parentWit.GetPredecessorIds());
+                                    for(const predecessor of predecessors){
+                                        const lastChild=predecessor.GetLastChild(useActivityTypeInDependencyTracking ? task.workItem.Activity : undefined);
+                                        if(lastChild && lastChild.MaxFinish > task.workItem.StartDate){
+                                            warnings.push(`${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity : 'Task'} starting before predecessor "${predecessor.Title}" ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity.toLowerCase() : ''} has finished!`);
+                                        }
                                     }
-                                }
-                                const successors = sprint.GetWorkitemsByIdsFromAll(parentWit.GetSuccessorIds());
-                                for(const successor of successors){
-                                    const firstChild=successor.GetFirstChild(useActivityTypeInDependencyTracking ? task.workItem.Activity : undefined);
-                                    if(firstChild && firstChild.MinStart < task.workItem.FinishDate){
-                                        warnings.push(`Successor "${successor.Title}" ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity : ''} starting before ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity.toLowerCase() : 'task'} has finished!`);
+                                    const successors = sprint.GetWorkitemsByIdsFromAll(parentWit.GetSuccessorIds());
+                                    for(const successor of successors){
+                                        const firstChild=successor.GetFirstChild(useActivityTypeInDependencyTracking ? task.workItem.Activity : undefined);
+                                        if(firstChild && firstChild.MinStart < task.workItem.FinishDate){
+                                            warnings.push(`Successor "${successor.Title}" ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity : ''} starting before ${useActivityTypeInDependencyTracking && task.workItem.Activity ? task.workItem.Activity.toLowerCase() : 'task'} has finished!`);
+                                        }
                                     }
                                 }
                             }
