@@ -7,9 +7,9 @@
     "build": "(gulp && cd dist/dev && tfx extension create --manifest-globs vss-extension.json && cd ../qa && tfx extension create --manifest-globs vss-extension.json && cd ../prod && tfx extension create --manifest-globs vss-extension.json)",
     "gulp": "gulp",
     "watch": "gulp watch",
-    "publish-dev": "(gulp && cd dist/dev && tfx extension publish --manifest-globs vss-extension.json)",
-    "publish-qa": "(gulp && cd dist/qa && tfx extension publish --manifest-globs vss-extension.json)",
-    "publish-prod": "(gulp && cd dist/prod && tfx extension publish --manifest-globs vss-extension.json)"
+    "publish-dev": "gulp && cd dist/dev && tfx extension publish --manifest-globs vss-extension.json",
+    "publish-qa": "gulp && cd dist/qa && tfx extension publish --manifest-globs vss-extension.json",
+    "publish-prod": "gulp && cd dist/prod && tfx extension publish --manifest-globs vss-extension.json"
   },
   "repository": {
     "type": "git",
