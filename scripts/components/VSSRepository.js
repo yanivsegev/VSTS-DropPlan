@@ -300,8 +300,16 @@ function VSSRepository() {
     }
 
     SetWorkItemTypeCss = function(WorkItem){
-        document.styleSheets[0].insertRule(`.taskDiv > .TaskType${WorkItem.cssName}:before {background:#${WorkItem.color};}`);
-        document.styleSheets[0].insertRule(`.taskDiv > .TaskType${WorkItem.cssName} .taskTypeIcon {background-image:url(${WorkItem.iconUrl};}`);
+        const styleSheets = document.styleSheets;
+
+        for (let i = 0; i < styleSheets.length; i++) {
+            const styleSheet = styleSheets[i];
+            if (styleSheet.href?.includes("dropPlan.css")){
+                styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName}:before {background:#${WorkItem.color};}`);
+                styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName} .taskTypeIcon {background-image:url(${WorkItem.iconUrl};}`);
+                return;
+            }
+        }
     }
 
     this.GetCapacity = function (member) {
