@@ -340,7 +340,7 @@ function VSSRepository() {
     }
 
     this.IsTeamDayOff = (dateToCheck) => {
-        const date=dateToCheck.yyyymmdd(), day=dateToCheck.getDay()
+        const gmtDateToCheck=dateToCheck.getGMT(), date=gmtDateToCheck.yyyymmdd(), day=gmtDateToCheck.getDay()
         var dayOff = false;
 
         if (isDayInRange(this._data.daysOff.daysOff, date)) dayOff = true;
@@ -354,7 +354,7 @@ function VSSRepository() {
         if (this._data.userSettings.ShowTeamNonWorkingDays){
             return true;
         }
-        const date=dateToCheck.yyyymmdd(), day=dateToCheck.getDay()
+        const gmtDateToCheck=dateToCheck.getGMT(), date=gmtDateToCheck.yyyymmdd(), day=gmtDateToCheck.getDay()
 
         if (isDayInRange(this._data.daysOff.daysOff, date)) return false;
 
