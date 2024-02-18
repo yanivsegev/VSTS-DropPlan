@@ -55,7 +55,9 @@ body{
 .task {
     height: 65px;
     background: white;
-    z-index: 3;
+    /* 
+    Do not put a z-index on the task if you want the warning popovers to work in day 1 of the sprint.
+    */
 }
 
 .taskDiv
