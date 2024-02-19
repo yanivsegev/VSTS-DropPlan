@@ -15,6 +15,8 @@ function SprintData(workitems, repository, existingSprint) {
 
     this.ViewByTasks = true;
     this.PlanningIssues = this.Repository.GetSettings().highlightPlanningIssues;
+    this.allowSimultaneousSubsequentActivities = this.Repository.GetSettings().allowSimultaneousSubsequentActivities;
+    this.useActivityTypeInDependencyTracking = this.Repository.GetSettings().useActivityTypeInDependencyTracking;
     this.nameById = [];
 
     if (existingSprint){
@@ -22,6 +24,8 @@ function SprintData(workitems, repository, existingSprint) {
         this.FilterTerm = existingSprint.FilterTerm;
         this.FilterArea = existingSprint.FilterArea;
         this.PlanningIssues = existingSprint.PlanningIssues;
+        this.allowSimultaneousSubsequentActivities = existingSprint.allowSimultaneousSubsequentActivities;
+        this.useActivityTypeInDependencyTracking = existingSprint.useActivityTypeInDependencyTracking;
     }
 
 

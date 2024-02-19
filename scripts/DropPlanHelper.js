@@ -19,7 +19,7 @@ function render(isSaving, data) {
     result = result + "</tr><tbody>"
 
     for (const personRow of data) {
-        if (personRow.hasItems || personRow.Capacity){
+        if (personRow.hasItems || (personRow.Capacity && sprint.FilterTerm=="")) {
             var personWarnings="";
 
             result = result + "<tr class='taskTr taskTrSpace'><td class='row_class_name'><div class='assignToColumn rowHeaderSpace'/></td><td colspan='" + (sprint.Dates.length) + "'/></tr>";
@@ -85,8 +85,8 @@ function render(isSaving, data) {
                         var warnings = [];
                         result = result + "<div witId=" + task.workItem.Id;
 
-                        const allowSimultaneousSubsequentActivities =false;
-                        const useActivityTypeInDependencyTracking =false;
+                        const allowSimultaneousSubsequentActivities = sprint.allowSimultaneousSubsequentActivities;
+                        const useActivityTypeInDependencyTracking = sprint.useActivityTypeInDependencyTracking;
 
                         if (task.isWitTask){
                             parentId = task.workItem.GetParentId();
@@ -106,7 +106,7 @@ function render(isSaving, data) {
                                             if (allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MinStart > task.workItem.StartDate){
                                                 warnings.push(`${task.workItem.Activity} starting before ${activity} has started!`);
                                             }
-                                            if (!allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MaxFinish > task.workItem.StartDate){
+                                            if (!allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MaxFinish >= task.workItem.StartDate){
                                                 warnings.push(`${task.workItem.Activity} starting before ${activity} has finished!`);
                                             }
                                             if (parentWit.childActivities[activity] && parentWit.childActivities[activity].MaxFinish > task.workItem.FinishDate){
@@ -119,7 +119,7 @@ function render(isSaving, data) {
                                             if (allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MinStart < task.workItem.StartDate){
                                                 warnings.push(`${activity} starting before ${task.workItem.Activity} has started!`);
                                             }
-                                            if (!allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MinStart < task.workItem.FinishDate){
+                                            if (!allowSimultaneousSubsequentActivities && parentWit.childActivities[activity] && parentWit.childActivities[activity].MinStart <= task.workItem.FinishDate){
                                                 warnings.push(`${activity} starting before ${task.workItem.Activity} has finished!`);
                                             }
                                             if (parentWit.childActivities[activity] && parentWit.childActivities[activity].MaxFinish < task.workItem.FinishDate){

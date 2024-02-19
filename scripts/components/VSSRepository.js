@@ -420,6 +420,8 @@ function VSSRepository() {
             this._data.settings={
                     highlightPlanningIssues: true,
                     usePBILevelForTasks: false,
+                    allowSimultaneousSubsequentActivities: true,
+                    useActivityTypeInDependencyTracking: false,
                     activityOrder: [
                         ["Requirements"],
                         ["Design"],
