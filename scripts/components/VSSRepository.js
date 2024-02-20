@@ -52,25 +52,10 @@ function VSSRepository() {
                     _this.reportProgress("Framework loaded.");
 
                     if (window._trackJs && typeof trackJs != "undefined") {
-
-                        trackJs.configure({ version: extVersion, userId: _this._data.VssContext.user.uniqueName });
                         trackJs.addMetadata("VssSDKRestVersion", VSS.VssSDKRestVersion);
                         trackJs.addMetadata("VssSDKVersion", VSS.VssSDKVersion);
-                    }
-
-                    if (window.LogRocket) {
-                        window.LogRocket.init('ig33h1/drop-plan');
-                        LogRocket.identify(_this._data.VssContext.user.uniqueName, {
-                            name: _this._data.VssContext.user.uniqueName,
-                            VssSDKRestVersion: VSS.VssSDKRestVersion,
-                            VssSDKVersion: VSS.VssSDKVersion,
-                        });
-                    }
-
-                    if (window._trackJs && typeof trackJs != "undefined") {
-
-                        // other stuff
                         trackJs.configure({
+                            userId: _this._data.VssContext.user.uniqueName,
                             onError: function (payload, error){
                             
                                 if (error?.message?.startsWith('400 : PATCH')){
@@ -82,6 +67,16 @@ function VSSRepository() {
                             }
                         });
                     }
+
+
+                    if (window.LogRocket) {
+                        window.LogRocket.init('ig33h1/drop-plan');
+                        LogRocket.identify(_this._data.VssContext.user.uniqueName, {
+                            name: _this._data.VssContext.user.uniqueName,
+                            VssSDKRestVersion: VSS.VssSDKRestVersion,
+                            VssSDKVersion: VSS.VssSDKVersion,
+                        });
+                    }
                     
                     /** @type { "vss-web-extension-sdk":"TFS/Work/RestClient":WorkHttpClient3_1 } */
                     let workClient = TFS_Work.getClient();
@@ -90,7 +85,6 @@ function VSSRepository() {
 
                     var teamContext = { projectId: _this._data.VssContext.project.id, teamId: _this._data.VssContext.team.id, project: "", team: "" };
                     var configuration = VSS.getConfiguration();
-                    console.log("getConfiguration: " + JSON.stringify(configuration));
 
                     if (configuration && configuration.iterationId){
                         var iterationId = configuration.iterationId;
@@ -416,7 +410,6 @@ function VSSRepository() {
     this.LoadSettings = function(){
         return this.GetObjectFromVSS(`Settings.${this._data.VssContext.project.id}`, "version 1", {}).then((settings)=>{
             this.reportProgress("Extension settings loaded.");
-            console.log(settings);
             this._data.settings={
                     highlightPlanningIssues: true,
                     usePBILevelForTasks: false,

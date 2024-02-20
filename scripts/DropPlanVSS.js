@@ -314,6 +314,8 @@ function alertUser(msg, e){
     if (!(e?.message?.indexOf('Rule Error') > 0)) // don't log "rule validation" errors
     {
         console.error(logMsg, e);
+    }else{
+        console.log(logMsg, e);
     }
     alert(msg);
 }

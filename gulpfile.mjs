@@ -45,7 +45,8 @@ let css = {
 let js = {
     "outputFiles":[{
         sourceFiles: [
-            "scripts/Promise.js"
+            "node_modules/trackjs/t.js"
+            ,"scripts/Promise.js"
             ,"scripts/Polyfill.js"
             ,"scripts/components/SprintData.js"
             ,"scripts/components/RightClick.js"
@@ -66,7 +67,8 @@ let js = {
         sourceFiles: [
             //"scripts/Promise.js"
             //,"scripts/Polyfill.js"
-            "scripts/components/VSSSettingsRepository.js"
+            "node_modules/trackjs/t.js"
+            ,"scripts/components/VSSSettingsRepository.js"
             ,"node_modules/jquery/dist/jquery.min.js"
             ,"node_modules/jquery-ui/dist/jquery-ui.min.js"
             ,"node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"
@@ -78,7 +80,8 @@ let js = {
     environment: {
         dev: {
             path: './dist/dev/scripts/',
-            extension: '.js'
+            extension: '.js',
+            sourceFiles: []
         },
         qa: {
             path: './dist/qa/scripts/',
@@ -103,8 +106,8 @@ let Development = {
     Scripts: function(){
         const tasks = js.outputFiles.map(
             (outputfile)=>{
-                console.log(outputfile.fileName + js.environment.dev.extension)
-                return gulp.src(outputfile.sourceFiles)
+                return gulp.src(js.environment.dev.sourceFiles.concat(outputfile.sourceFiles))
+                .pipe(replace('#{TrackJSExtVer}', 'Dev '+loadExtVersion()+'.'+loadBuildVersion()))
                 .pipe(concat(outputfile.fileName + js.environment.dev.extension))
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(sourcemaps.write('.', {addComment: false}))
@@ -112,7 +115,6 @@ let Development = {
                 .pipe(livereload());
             }
         )
-        console.log("here")
         return mergeStream(tasks);
     },
     Styles: function(){
@@ -126,7 +128,8 @@ let Development = {
 let Production = {
     Scripts: function(){
         return mergeStream(js.outputFiles.map((source)=>{
-            return gulp.src(js.environment.prod.sourceFiles.concat([js.environment.dev.path + source.fileName + js.environment.dev.extension]))
+            return gulp.src(js.environment.prod.sourceFiles.concat(source.sourceFiles))
+                .pipe(replace('#{TrackJSExtVer}', loadExtVersion()))
                 .pipe(concat(source.fileName + js.environment.prod.extension))
                 .pipe(sourcemaps.init({loadMaps: true}))
                 //.pipe(uglify())
@@ -147,7 +150,8 @@ let Production = {
 let QA = {
     Scripts: function(){
         return mergeStream(js.outputFiles.map((source)=>{
-            return gulp.src(js.environment.qa.sourceFiles.concat([js.environment.dev.path + source.fileName + js.environment.dev.extension]))
+            return gulp.src(js.environment.qa.sourceFiles.concat(source.sourceFiles))
+                .pipe(replace('#{TrackJSExtVer}', 'QA '+loadExtVersion()+'.'+loadBuildVersion()))
                 .pipe(concat(source.fileName + js.environment.qa.extension))
                 .pipe(sourcemaps.init({loadMaps: true}))
                 //.pipe(uglify())
@@ -167,6 +171,12 @@ let QA = {
 
 function clean(){
     return del('dist');
+}
+
+function loadExtVersion(){
+    const vssFile = fs.readFileSync('vss-extension.json', 'utf8');
+    const ver = vssFile.toString().match(/"version": "(\d+.\d+.\d+)/);
+    return ver[1];
 }
 
 function loadBuildVersion(){

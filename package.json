@@ -23,7 +23,8 @@
   "homepage": "https://github.com/yanivsegev/VSTS-DropPlan#readme",
   "dependencies": {
     "jquery": "^3.7.1",
-    "jquery-ui": "^1.13.2"
+    "jquery-ui": "^1.13.2",
+    "trackjs": "^3.10.4"
   },
   "devDependencies": {
     "@types/del": "^4.0.0",
@@ -39,6 +40,5 @@
     "gulp-uglify": "^3.0.2",
     "merge-stream": "^2.0.0",
     "vss-web-extension-sdk": "^5.141.0"
-  },
-  "optionalDependencies": {}
+  }
 }
