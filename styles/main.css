@@ -73,7 +73,7 @@ body{
 {
     vertical-align: top;
     background: #f4f4f4;
-    border-left: 4px solid white;
+    border-left: 4px solid transparent;
 }
 
 .taskTr{
@@ -231,15 +231,20 @@ body{
     background: repeating-linear-gradient(  15deg,  #dadada,  #fff4ce 10px,  #fff4ce 10px,  #dadada 20px)
 }
 
+.previousDayOff {
+    border-left-width: 6px;
+}
+
 .previousDayOff::before {
     border: 1px solid #dadada;
     border-width: 0 1px;
     content: " ";
     position: absolute;
     height: 100%;
-    margin-left: -5px;
+    margin-left: -6px;
     background:repeating-linear-gradient(  15deg,  #dadada,  rgb(242, 242, 242) 10px,  rgb(242, 242, 242) 10px,  #dadada 20px);
     width: 4px;
+    z-index: -1;
 }
 
 

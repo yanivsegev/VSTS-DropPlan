@@ -179,6 +179,26 @@ function VSSSettingsRepository() {
         }
     });
 
+    Object.defineProperty(this, 'allowSimultaneousSubsequentActivities', {
+        get: function() {
+            return this._data.settings.allowSimultaneousSubsequentActivities;
+        },
+        set: function(allowSimultaneousSubsequentActivities) {
+            this._data.settings.allowSimultaneousSubsequentActivities = allowSimultaneousSubsequentActivities;
+            this.SaveSettings();
+        }
+    });
+
+    Object.defineProperty(this, 'useActivityTypeInDependencyTracking', {
+        get: function() {
+            return this._data.settings.useActivityTypeInDependencyTracking;
+        },
+        set: function(useActivityTypeInDependencyTracking) {
+            this._data.settings.useActivityTypeInDependencyTracking = useActivityTypeInDependencyTracking;
+            this.SaveSettings();
+        }
+    });
+
     this.GetValueInExtensionDataPerUser = function(key){
         this._data.dataService.getValue(key, {scopeType: "User"}).then(function(c) {
             c=c || "modern";
@@ -215,6 +235,8 @@ function VSSSettingsRepository() {
             this._data.settings={
                     highlightPlanningIssues: true,
                     usePBILevelForTasks: false,
+                    allowSimultaneousSubsequentActivities: true,
+                    useActivityTypeInDependencyTracking: false,
                     activityOrder: [
                         ["Requirements"],
                         ["Design"],

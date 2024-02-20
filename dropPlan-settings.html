@@ -12,10 +12,16 @@
             <h3>Task planning sequence issues</h3>
             <div>
                 <p>Highlight and warn when either activities are in the wrong order, or when tasks do not match their parent preceding/succeeding sequence.<br/>
-                E.g., QA completing prior to Development starting.<br/>
+                E.g., Testing completing prior to Development starting.<br/>
                 E.g., Story 1 should be completed before Story 2, but the tasks for Story 2 are planned prior to the tasks for Story 1.</p>
                 <input id="showPlanningIssues" type="checkbox" onclick="switchPlanningIssues(($('#showPlanningIssues').prop('checked')));" checked/>
-                <label for="showPlanningIssues">Highlight out of order tasks</label>
+                <label for="showPlanningIssues">Highlight out of order tasks.</label><br/><br/>
+                <input id="allowSimultaneousSubsequentActivities" type="checkbox" onclick="switchAllowSimultaneousSubsequentActivities(($('#allowSimultaneousSubsequentActivities').prop('checked')));" checked/>
+                <label for="allowSimultaneousSubsequentActivities">Allow later activity to start on the same day as earlier activity ends</label><br/>
+                e.g., Testing can start on the same day as Development ends.<br/><br/>
+                <input id="useActivityTypeInDependencyTracking" type="checkbox" onclick="switchUseActivityTypeInDependencyTracking(($('#useActivityTypeInDependencyTracking').prop('checked')));" checked/>
+                <label for="useActivityTypeInDependencyTracking">Allow tasks of two dependant stories to happen simultaneously as long as it's a later activity type.</label><br/>
+                e.g., Development on Story 2 can start after Development of Story 1 has finished, but before Testing on Story 1 has completed.<br/>
             </div>
             <p>Set the activity order for your project.  Any activities that you do not wish to be in a strict sequence can be moved to the "Not In Use" area.<br/>
             If you have two activities that can happen at the same time, place them on the same line.<br/>

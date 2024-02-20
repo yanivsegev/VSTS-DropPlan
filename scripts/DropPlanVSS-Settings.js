@@ -42,6 +42,14 @@ function switchUsePBILevelForTasks(enabled){
     repository.usePBILevelForTasks = enabled;
 }
 
+function switchUseActivityTypeInDependencyTracking(enabled){
+    repository.useActivityTypeInDependencyTracking = enabled;
+}
+
+function switchAllowSimultaneousSubsequentActivities(enabled){
+    repository.allowSimultaneousSubsequentActivities = enabled;
+}
+
 try{
 	repository.reportProgress = reportProgress;
 	repository.reportFailure = reportProgress;
@@ -57,6 +65,8 @@ try{
 		}
         $('#showPlanningIssues').prop('checked', repository.highlightPlanningIssues);
         $('#usePBILevelForTasks').prop('checked', repository.usePBILevelForTasks);
+        $('#useActivityTypeInDependencyTracking').prop('checked', repository.useActivityTypeInDependencyTracking);
+        $('#allowSimultaneousSubsequentActivities').prop('checked', repository.allowSimultaneousSubsequentActivities);
 		$("#settingsRoot").css("display","block");
 		$(".messageBoxContainer").remove();
 	});

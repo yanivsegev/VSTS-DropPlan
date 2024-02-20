@@ -44,7 +44,7 @@ Happy coding :-)
 
 ## Change Log ##
 
-### 2.1.1 -> 2.1.8 ###
+### 2.1.1 -> 2.1.9 ###
 
 BugFixes:
 
@@ -53,6 +53,12 @@ BugFixes:
 3. Related tasks with more than 11 siblings spill the status outside the item.
 4. Warnings weren't hiding if the settings was switched off.
 5. Fixed issue with users in negative timezones being unable to place tasks on the first day of the sprint. (#118)
+6. Only include users with matching items when filtering.
+7. Stop Non-working day indicator floating over tasks.
+
+New features:
+
+1. Additional settings to control when warnings appear for different activity types.
 
 ### 2.1.0 ###
 
