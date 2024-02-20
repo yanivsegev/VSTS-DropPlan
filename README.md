@@ -54,6 +54,7 @@ BugFixes:
 4. Warnings weren't hiding if the settings was switched off.
 5. Fixed issue with users in negative timezones being unable to place tasks on the first day of the sprint. (#118)
 6. Only include users with matching items when filtering.
+7. Stop Non-working day indicator floating over tasks.
 
 New features:
 
