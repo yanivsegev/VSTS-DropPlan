@@ -87,7 +87,7 @@ function BuildDropPlan() {
         repository.WorkItemsLoaded = WorkItemsLoaded;
         repository.Init();
     } catch (error) {
-        alertUser(error);
+        alertUser(undefined, error);
     }
 }
 
@@ -119,16 +119,18 @@ function processWorkItems(workItems, isSaving) {
     try {
         
         sprint = new SprintData(workItems, repository, sprint);
-        
+
         container = document.getElementById("grid-container");
 
         const data = sprint.GetData();
-        
+        console.log("Sprint Data loaded.");
+
         dettachEvents();
-
         render(isSaving, data);
-
         attachEvents();
+
+        console.log("Render done.");
+        
         drawRelations();
         AlignTitlesToView();
 
@@ -146,7 +148,7 @@ function processWorkItems(workItems, isSaving) {
         SetAutoRefresh();
     
     } catch (error) {
-        alertUser(error);
+        alertUser(undefined, error);
     }
 }
 
@@ -310,8 +312,13 @@ function failToCallVss(reason, shouldNotPauseAutoRefresh) {
 }
 
 function alertUser(msg, e){
+    
+    if (!msg){
+        msg = e?.serverError?.value?.Message || e?.message || "Unknown error";
+    }
+
     var logMsg = "Alert User: [" + msg + "]";
-    if (!(e?.message?.indexOf('Rule Error') > 0)) // don't log "rule validation" errors
+        if (!(e?.message?.indexOf('Rule Error') > 0)) // don't log "rule validation" errors
     {
         console.error(logMsg, e);
     }else{

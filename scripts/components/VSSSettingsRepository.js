@@ -114,11 +114,11 @@ function VSSSettingsRepository() {
                                 })
                                 console.log(_this._data.activityAllowedValues)
                             }).catch((error) => {
-                                console.error(error);
+                                console.error(error, "on tasksActivityPromises");
                             }),
                             _this.LoadSettings()
                         ]).then(()=>_this._ready()).catch((error) => {
-                            console.error(error);
+                            console.error(error, "on tasksActivityPromises and ready");
                         });;
 
                         VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],

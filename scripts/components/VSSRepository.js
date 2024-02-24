@@ -161,11 +161,11 @@ function VSSRepository() {
                                         _this.WorkItemTypes[index].color=taskTypeConfig.color;
                                         _this.WorkItemTypes[index].cssName=cssName
                                         SetWorkItemTypeCss(_this.WorkItemTypes[index]);
-                                        SetCssVariable(`${cssName}IconUrl`, taskTypeConfig.icon.url);
+                                        SetCssVariable(`${cssName}IconUrl`, taskTypeConfig.icon?.url);
                                         SetCssVariable(`${cssName}IconColor`, taskTypeConfig.color);
                                     });
                                 }).catch((error) => {
-                                    console.error(error);
+                                    console.error(error, "on taskConfigPromises");
                                 });
                                 const pbiConfigPromises = _this.WorkItemPBITypes.map(
                                     function (itemType) {
@@ -180,11 +180,11 @@ function VSSRepository() {
                                         _this.WorkItemPBITypes[index].color=pbiTypeConfig.color
                                         _this.WorkItemPBITypes[index].cssName=cssName
                                         SetWorkItemTypeCss(_this.WorkItemPBITypes[index]);
-                                        SetCssVariable(`${cssName}IconUrl`, pbiTypeConfig.icon.url);
+                                        SetCssVariable(`${cssName}IconUrl`, pbiTypeConfig.icon?.url);
                                         SetCssVariable(`${cssName}IconColor`, pbiTypeConfig.color);
                                     });
                                 }).catch((error) => {
-                                    console.error(error);
+                                    console.error(error, "on pbiConfigPromises");
                                 });
                                 VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
                                     function (VSS_Service, TFS_Wit_WebApi) {

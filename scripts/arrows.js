@@ -45,6 +45,10 @@ function drawArrowByXY(ctx, can, sx,sy,c1x,c1y,c2x,c2y, ex,ey, fillStyle, includ
 function drawArrow(ctx, can, elm1, elm2, fillStyle, includeArrow){
     var sx = elm1.offset().left;
     var sy = elm1.offset().top;
+    if (!elm2.offset()){
+        console.error("drawArrow failed.");
+        return;
+    }
     var ex = elm2.offset().left;
     var ey = elm2.offset().top;
     var c1x,c1y,c2x,c2y;
