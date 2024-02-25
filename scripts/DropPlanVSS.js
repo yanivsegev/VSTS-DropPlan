@@ -3,7 +3,7 @@ var repository = new VSSRepository();
 var sprint, container;
 var _scrollToToday = true;
 var autoRefresh;
-var showFailAlearts = true;
+var showFailAlerts = true;
 var dropPlanLoaded = false;
 
 window.addEventListener("message", receiveMessage, false);
@@ -15,7 +15,7 @@ document.addEventListener("visibilitychange", () => {
             PauseAutoRefresh();
             /*// Reduce the number of refreshes if the tab is in the background to once every 7 minutes (prime number)
             ResumeAutoRefresh(420000);*/
-            showFailAlearts = false;
+            showFailAlerts = false;
         } else {
             console.log("foreground refresh")
             SetAutoRefresh()
@@ -103,7 +103,7 @@ function WorkItemsLoaded(workItems){
 
 
 function autoRefreshPlan() {
-    showFailAlearts = false;
+    showFailAlerts = false;
     refreshPlan();
 }
 
@@ -155,7 +155,7 @@ function processWorkItems(workItems, isSaving) {
 function SetAutoRefresh(){
     PauseAutoRefresh();
     ResumeAutoRefresh();
-    showFailAlearts = true;
+    showFailAlerts = true;
 }
 
 function PauseAutoRefresh(){
@@ -286,29 +286,10 @@ function ResetTasks() {
 }
 
 function failToCallVss(reason, shouldNotPauseAutoRefresh) {
-    const failure = reason?.serverError?.value?.Message || reason?.message || "";
     
     if (shouldNotPauseAutoRefresh != true) PauseAutoRefresh();
     
-    if (showFailAlearts){
-        if (failure != ""){
-            if (!(reason?.message?.indexOf('Status code 0:') > 0)){
-                alertUser(failure, reason);
-            }
-            else{
-                console.log("Call to server failed! " + failure, JSON.stringify(reason));
-            }
-
-        }
-        else{
-            alertUser("Call to server failed! please refresh the page.", reason);
-        }
-    }else{
-        if (!(reason?.message?.indexOf('Status code 0:') > 0)
-            && !(reason?.message?.indexOf('Rule Error') > 0)){
-            console.error("Call to server failed! " + failure, JSON.stringify(reason));
-        }
-    }
+    alertUser(failure, reason);
 }
 
 function alertUser(msg, e){
@@ -318,13 +299,21 @@ function alertUser(msg, e){
     }
 
     var logMsg = "Alert User: [" + msg + "]";
-        if (!(e?.message?.indexOf('Rule Error') > 0)) // don't log "rule validation" errors
+    
+    if (
+            !(e?.message?.indexOf('Rule Error') > 0) // don't log "rule validation" errors
+            && !(reason?.message?.indexOf('Status code 0:') > 0) //don't log "server unavailable" errors 
+        ) 
     {
         console.error(logMsg, e);
     }else{
         console.log(logMsg, e);
     }
-    alert(msg);
+    if (showFailAlerts){
+        if (!(reason?.message?.indexOf('Status code 0:') > 0)){
+            alert(msg);
+        }
+    }
 }
 
 BuildDropPlan();

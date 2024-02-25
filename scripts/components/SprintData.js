@@ -303,7 +303,10 @@ function SprintData(workitems, repository, existingSprint) {
                     selectedRow = selectedRow + 1;
                     for (const element of dates) {
                         const date = element.yyyymmdd();
-                        if (personRow[date].length > selectedRow) {
+                        if (!personRow[date]){
+                            console.error("date not found", date, workItem.StartDate, workItem.FinishDate, 
+                            sprint.FirstWorkingDay, sprint.LastWorkingDay);
+                        }else if (personRow[date].length > selectedRow) {
                             if (personRow[date][selectedRow].Type != 0) {
                                 found = false;
                             }
