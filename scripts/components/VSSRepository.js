@@ -335,26 +335,19 @@ function VSSRepository() {
 
     this.IsTeamDayOff = (dateToCheck) => {
         const gmtDateToCheck=dateToCheck.getGMT(), date=gmtDateToCheck.yyyymmdd(), day=gmtDateToCheck.getDay()
-        var dayOff = false;
 
-        if (isDayInRange(this._data.daysOff.daysOff, date)) dayOff = true;
+        if (isDayInRange(this._data.daysOff.daysOff, date)) return true;
 
-        if ($.inArray(day, this._data.teamSettings.workingDays) == -1) dayOff = true;
+        if ($.inArray(day, this._data.teamSettings.workingDays) == -1) return true;
 
-        return dayOff;
+        return false;
     }
 
     this.IncludeDayOnPlan = (dateToCheck) => {
         if (this._data.userSettings.ShowTeamNonWorkingDays){
             return true;
         }
-        const gmtDateToCheck=dateToCheck.getGMT(), date=gmtDateToCheck.yyyymmdd(), day=gmtDateToCheck.getDay()
-
-        if (isDayInRange(this._data.daysOff.daysOff, date)) return false;
-
-        if ($.inArray(day, this._data.teamSettings.workingDays) == -1) return false;
-
-        return true;
+        return !this.IsTeamDayOff(dateToCheck);
     }
 
     this.GetMemberImage = function (member) {

@@ -304,9 +304,14 @@ function SprintData(workitems, repository, existingSprint) {
                     for (const element of dates) {
                         const date = element.yyyymmdd();
                         if (!personRow[date]){
-                            console.error("date not found", date, workItem.StartDate, workItem.FinishDate, 
-                            sprint.FirstWorkingDay, sprint.LastWorkingDay);
-                        }else if (personRow[date].length > selectedRow) {
+                            console.error("date not found", date, dates, personRow.Days, workItem.StartDate, workItem.FinishDate, 
+                            sprint.FirstWorkingDay, sprint.LastWorkingDay, 
+                            repository._data.userSettings.ShowTeamNonWorkingDays,
+                            repository._data.teamSettings.workingDays,
+                            repository._data.daysOff.daysOff, element.getDay(), element.getGMT().getDay()
+                            );
+                        }
+                        if (personRow[date].length > selectedRow) {
                             if (personRow[date][selectedRow].Type != 0) {
                                 found = false;
                             }
@@ -364,6 +369,7 @@ function SprintData(workitems, repository, existingSprint) {
                 assignedToId: result.length,
                 hasItems: false,
                 hasEndsOnNonWorkingDay: false,
+                Days: [],
             };
             for (var colIndex = 0; colIndex < this.Dates.length; colIndex++) {
                 var currentDate = this.Dates[colIndex];
@@ -372,6 +378,7 @@ function SprintData(workitems, repository, existingSprint) {
                 newName[currentDate.yyyymmdd()] = [];
                 newName[currentDate.yyyymmdd()].isDayOff = isDayOff;
                 newName[currentDate.yyyymmdd()].isTeamDayOff = isTeamDayOff;
+                newName.Days[currentDate.yyyymmdd()] = {};
 
                 if (currentDate >= _today && !isDayOff) {
                     newName.TotalCapacity = newName.TotalCapacity + newName.Capacity;
