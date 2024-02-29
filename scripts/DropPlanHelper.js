@@ -131,7 +131,7 @@ function render(isSaving, data) {
                                         result = result + " taskOutOfSequence ";
                                     }
                                 }
-                                
+
                                 const predecessors = sprint.GetWorkitemsByIdsFromAll(parentWit.GetPredecessorIds());
                                 for(const predecessor of predecessors){
                                     const lastChild=predecessor.GetLastChild(useActivityTypeInDependencyTracking ? task.workItem.Activity : undefined);
@@ -170,18 +170,22 @@ function render(isSaving, data) {
                         } else {
                             result = result + ` TaskType${task.workItem.workItemConfig.cssName}`;
                         }
-
+                        result = result + ` Task${task.workItem.workItemConfig.cssName}Status${toCssName(task.workItem.State)}`;
 
                         result = result + " taskAreaPath" + task.areaPath.id + " ";
+                        result = result + ` taskParent${task.workItem.ParentIndex % 10} taskParent${Math.trunc(task.workItem.ParentIndex / 10)}0 `;
                         var contentWidth = (colWidth * task.total - 26);
                         result = result + "' style='width:" + contentWidth + "px; ";
 
+                        // use a cool tick with a css variable to be able to optionally override the background-image being applied here.
+                        result = `${result}background-image: var(--backgroundImage, `
                         if (task.isWitTask){
                             var remain = task.workItem.RemainingWork;
                             //grab the percentage, but don't let it go over 90% so that it's visually obvious that the ticket isn't complete
                             const percentComplete = Math.min(Math.floor((task.workItem.CompletedWork / task.workItem.TotalWork) *100), 90);
-                            if (remain != undefined && remain != "") result = `${result}background-image: linear-gradient(90deg, color-mix(in srgb, var(--taskDone), transparent 50%) calc(${percentComplete}% + 6px), #FFFFFF00 0);`;
+                            if (remain != undefined && remain != "") result = `${result}linear-gradient(90deg, color-mix(in srgb, var(--taskDone), transparent 50%) calc(${percentComplete}% + 6px), #FFFFFF00 0)`;
                         }
+                        result = `${result});`
 
                         result = result + "'>";
 
@@ -206,14 +210,13 @@ function render(isSaving, data) {
 
                         result = result + "<div class='taskTitle'><div class='taskTypeIcon'></div>"
                         if (warnings.length){
-                            // style='width: min(" + (colWidth*2.5) + "px, max(" + contentWidth + "px, " + (colWidth * 1.5) + "px))'
                             result = result + "<div class='taskWarning'><div class='taskWarningIcon'>⚠</div><div class='taskWarningTooltip' >";
                             warnings.forEach(function (warning){
                                 result = result + "<p>" + warning +"</p>";
                             });
                             result = result + "</div></div>"
                         }
-                        
+
                         result = result + "<span class='openWit'>" + task.workItem.Title + "</span></div>";
                         if (parentWit){
                             let relatedItems = [];
@@ -432,9 +435,8 @@ function attachEvents() {
             let menuItems = [];
             
             var member = sprint.GetAssignToNameById($(this).closest('tr')[0].cells[0].attributes["assignedtoid"].value)?.OriginalAssignedTo;
-            const memberCapacity = repository._data.teamMemberCapacities.find((e)=>e.teamMember.id == member?.id);
         
-            if(memberCapacity){
+            if(member?.id){
                 const currentCell=$(this).closest('td');
                 var date = new Date(currentCell[0].attributes["cellDate"].value);
                 if (currentCell.hasClass("taskDayOff") && !currentCell.hasClass("taskTeamDayOff")) {
@@ -637,3 +639,6 @@ function updateWorkItemAssignTo(witId, assignedTo) {
     }
 }
 
+function toCssName(name){
+    return name.replace(/[^a-zA-Z0-9-_]/ig,'');
+}

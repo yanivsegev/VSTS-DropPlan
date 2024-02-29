@@ -44,7 +44,11 @@ Happy coding :-)
 
 ## Change Log ##
 
-### 2.1.1 -> 2.1.9 ###
+### 2.2.0 ###
+
+Now able to Highlight on either Status colour, or Parent in addition to the existing Area path.
+
+### 2.1.1 -> 2.1.12 ###
 
 BugFixes:
 

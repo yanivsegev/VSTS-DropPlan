@@ -1,5 +1,5 @@
 var repository = new VSSSettingsRepository();
-
+var showFailAlerts = true;
 window.addEventListener("message", receiveMessage, false);
 
 function receiveMessage(event) {
@@ -27,11 +27,26 @@ function reportProgress(msg){
 }
 
 function alertUser(msg, e){
+    if (!msg){
+        msg = e?.serverError?.value?.Message || e?.message || "Unknown error";
+    }
+
     var logMsg = "Alert User: [" + msg + "]";
-    console.log(msg);
-    if (e) console.log(e);
-    if (window._trackJs && typeof trackJs != "undefined") { trackJs.track(logMsg); }
-    alert(msg);
+
+    if (
+            !(e?.message?.indexOf('Rule Error') > 0) // don't log "rule validation" errors
+            && !(e?.message?.indexOf('Status code 0:') > 0) //don't log "server unavailable" errors
+        )
+    {
+        console.error(logMsg, e);
+    } else {
+        console.log(logMsg, e);
+    }
+    if (showFailAlerts){
+        if (!(e?.message?.indexOf('Status code 0:') > 0)){
+            alert(msg);
+        }
+    }
 }
 
 function switchPlanningIssues(enabled){
@@ -71,5 +86,5 @@ try{
 		$(".messageBoxContainer").remove();
 	});
 } catch (error) {
-	alertUser(error);
+	alertUser(undefined, error);
 }

@@ -1,5 +1,15 @@
 /// <reference types="vss-web-extension-sdk" />
 
+/**
+ * @typedef UserSettings
+ * @prop {string} DropPlanTheme
+ * @prop {boolean} ShowTeamNonWorkingDays
+ *
+ * @typedef RepoData
+ * @prop t0 {number}
+ * @prop userSettings {UserSettings}
+ * @prop workClient {WorkHttpClient}
+ */
 function VSSRepository() {
 
     this.reportProgress;
@@ -7,12 +17,15 @@ function VSSRepository() {
     this.failToCallVss;
     this.WorkItemsLoaded;
     // Add defaults for userSettings here.
-    this._data = { 
-        t0: performance.now(), 
+    /**
+     * @type {RepoData}
+     */
+    this._data = {
+        t0: performance.now(),
         userSettings:{
             DropPlanTheme:'modern',
             ShowTeamNonWorkingDays: true
-        }
+        },
     };
     this.LoadWorkItems = function () { OnLoadWorkItems(this) };
 
@@ -155,8 +168,8 @@ function VSSRepository() {
                                 );
                                 Promise.all(taskConfigPromises).then(function(taskTypeConfigs){
                                     taskTypeConfigs.forEach(function(taskTypeConfig, index, arr) {
-                                        const cssName=_this.WorkItemTypes[index].name.replace(/([^a-zA-Z0-9-_])/ig,'');
-                                        _this.WorkItemTypes[index].states=taskTypeConfig.states;
+                                        const cssName=toCssName(_this.WorkItemTypes[index].name);
+                                        _this.WorkItemTypes[index].states=taskTypeConfig.states.map((state)=>({...state, cssName: toCssName(state.name)}));
                                         _this.WorkItemTypes[index].iconUrl=taskTypeConfig.icon?.url;
                                         _this.WorkItemTypes[index].color=taskTypeConfig.color;
                                         _this.WorkItemTypes[index].cssName=cssName
@@ -174,7 +187,7 @@ function VSSRepository() {
                                 );
                                 Promise.all(pbiConfigPromises).then(function(pbiTypeConfigs){
                                     pbiTypeConfigs.forEach(function(pbiTypeConfig, index, arr) {
-                                        const cssName=_this.WorkItemPBITypes[index].name.replace(/([^a-zA-Z0-9-_])/ig,'');
+                                        const cssName=toCssName(_this.WorkItemPBITypes[index].name);
                                         _this.WorkItemPBITypes[index].states=pbiTypeConfig.states
                                         _this.WorkItemPBITypes[index].iconUrl=pbiTypeConfig.icon?.url
                                         _this.WorkItemPBITypes[index].color=pbiTypeConfig.color
@@ -301,6 +314,9 @@ function VSSRepository() {
             if (styleSheet.href?.includes("dropPlan.css")){
                 styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName}:before {background:#${WorkItem.color};}`);
                 styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName} .taskTypeIcon {background-image:url(${WorkItem.iconUrl};}`);
+                WorkItem.states.forEach((state)=>{
+                    styleSheet.insertRule(`.showStatus .Task${WorkItem.cssName}Status${state.cssName} {background:#${state.color};}`);
+                });
                 return;
             }
         }
@@ -309,7 +325,7 @@ function VSSRepository() {
     this.GetCapacity = function (member) {
         var result = 0;
         const teamMember = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id);
-        if (teamMember?.activities.length > 0 ){
+        if (teamMember?.activities?.length > 0 ){
             result = teamMember.activities.reduce(
                 function (runningTotal, current){
                     return runningTotal + current.capacityPerDay;
@@ -430,7 +446,11 @@ function VSSRepository() {
 
     this.SetMemberDayOff = function(member, date){
         const teamContext = { projectId: this._data.VssContext.project.id, teamId: this._data.VssContext.team.id, project: "", team: "" };
-        const memberCapacity = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id);
+        let memberCapacity = this._data.teamMemberCapacities.find((e) => e.teamMember.id == member?.id);
+        if (!memberCapacity){
+            memberCapacity = {teamMember: member, daysOff:[]};
+            this._data.teamMemberCapacities.push(memberCapacity);
+        }
         memberCapacity.daysOff.push({start: date, end: date});
 
         return this._data.workClient.updateCapacity(memberCapacity, teamContext, this._data.iteration.id, member.id);

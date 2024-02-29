@@ -52,6 +52,14 @@ function switchViewNonWorkingTeamDays(showNonWorkingTeamDays){
     });
 }
 
+function changeHighlight(newHighlight){
+    $('body').removeClass(`show${sprint.Highlight}`);
+    sprint.Highlight = newHighlight;
+    if(sprint.Highlight){
+        $('body').addClass(`show${sprint.Highlight}`);
+    }
+}
+
 
 var timerid;
 $("#filterBy").on("input", function(e) {
@@ -302,15 +310,15 @@ function alertUser(msg, e){
     
     if (
             !(e?.message?.indexOf('Rule Error') > 0) // don't log "rule validation" errors
-            && !(reason?.message?.indexOf('Status code 0:') > 0) //don't log "server unavailable" errors 
-        ) 
+            && !(e?.message?.indexOf('Status code 0:') > 0) //don't log "server unavailable" errors
+        )
     {
         console.error(logMsg, e);
     }else{
         console.log(logMsg, e);
     }
     if (showFailAlerts){
-        if (!(reason?.message?.indexOf('Status code 0:') > 0)){
+        if (!(e?.message?.indexOf('Status code 0:') > 0)){
             alert(msg);
         }
     }
