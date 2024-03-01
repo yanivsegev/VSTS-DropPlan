@@ -31,6 +31,14 @@ Sprint Drop Plan is an organizational tool that helps team members to sync their
 
 ![Plan showing a user without tasks, and with the weekend hidden](images/DropPlanHiddenWeekendCustomItemTypeRightClickMenu.png)
 
+### Highlight tasks ###
+
+- Highlight tasks with your configured status colours:  
+![Tasks showing the status colour as the background, but also with the progress of an individual task](images/TasksHighlightingStatusColour.png)
+
+- Highlight tasks by their parent ticket:  
+![Tasks showing the parent ticket highlight](images/TasksHighlightingParentItem.png)
+
 ## Quick steps to get started ##
 
 1. Navigate to your sprint.
@@ -44,9 +52,15 @@ Happy coding :-)
 
 ## Change Log ##
 
+### 2.2.1 ###
+
+Bugfixes:
+
+1. Styles for #59 and #121 failing to insert, but only in production. (#124)
+
 ### 2.2.0 ###
 
-Now able to Highlight on either Status colour, or Parent in addition to the existing Area path.
+Now able to Highlight either the Status colour of the task, or by Parent in addition to the existing Area path (#121).
 
 ### 2.1.1 -> 2.1.12 ###
 
