@@ -72,6 +72,18 @@
                 "uri": "dropPlan-settings.html",
                 "icon": "images/logo.png"
             }
+        },
+        {
+            "id": "dropPlan-workItemGroup#{testing-flag}",
+            "type": "ms.vss-work-web.work-item-form-group",
+            "targets": [
+                "ms.vss-work-web.work-item-form"
+            ],
+            "properties": {
+                "name": "Drop Plan #{testing-flag}",
+                "uri": "dropPlan-workItemGroup.html",
+                "height": 16
+            }
         }
     ],
     "files": [
@@ -93,6 +105,10 @@
         },
         {
             "path": "dropPlan-settings.html",
+            "addressable": true
+        },
+        {
+            "path": "dropPlan-workItemGroup.html",
             "addressable": true
         }
     ],

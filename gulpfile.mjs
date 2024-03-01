@@ -76,6 +76,16 @@ let js = {
             ,"scripts/DropPlanVSS-Settings.js"
         ],
         fileName: 'dropPlan-settings',
+    },{
+        sourceFiles: [
+            //"scripts/Promise.js"
+            //,"scripts/Polyfill.js"
+            "node_modules/trackjs/t.js"
+            ,"node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"
+            ,"scripts/DateHealpers.js"
+            ,"scripts/dropPlan-workItemGroup.js"
+        ],
+        fileName: 'dropPlan-workItemGroup',
     }],
     environment: {
         dev: {
@@ -224,7 +234,7 @@ function copyNodeScripts(env){
 
 function copyDynamicFiles(env, templateData){
     return function BuildAndCopyDynamicFiles(){
-        let task = gulp.src(['index.html', 'dropPlan-settings.html','vss-extension.json'])
+        let task = gulp.src(['index.html', 'dropPlan-settings.html','dropPlan-workItemGroup.html','vss-extension.json'])
 
         templateData.forEach(function(data, index){
             task.pipe(replace(data.Key, data.Value));
@@ -248,6 +258,7 @@ let watch = function(done){
             {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
             {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
             {Key: '"uri": "dropPlan-settings.html"', Value: '"uri": "https://localhost:8080/dropPlan-settings.html"'},
+            {Key: '"uri": "dropPlan-workItemGroup.html"', Value: '"uri": "https://localhost:8080/dropPlan-workItemGroup.html"'},
             {Key: '#{isMinified}', Value: ''}
         ]));
 
@@ -282,6 +293,7 @@ let build = gulp.series(
             {Key: '"yanivsegev"', Value: '"' + publisherId + '"'},
             {Key: '"uri": "index.html"', Value: '"uri": "https://localhost:8080"'},
             {Key: '"uri": "dropPlan-settings.html"', Value: '"uri": "https://localhost:8080/dropPlan-settings.html"'},
+            {Key: '"uri": "dropPlan-workItemGroup.html"', Value: '"uri": "https://localhost:8080/dropPlan-workItemGroup.html"'},
             {Key: '#{isMinified}', Value: ''}
         ]),
         copyDynamicFiles(QA.Env, [
