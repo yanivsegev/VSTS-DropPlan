@@ -307,19 +307,21 @@ function VSSRepository() {
     }
 
     SetWorkItemTypeCss = function(WorkItem){
-        const styleSheets = document.styleSheets;
-
-        for (let i = 0; i < styleSheets.length; i++) {
-            const styleSheet = styleSheets[i];
-            if (styleSheet.href?.includes("dropPlan.css")){
-                styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName}:before {background:#${WorkItem.color};}`);
-                styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName} .taskTypeIcon {background-image:url(${WorkItem.iconUrl};}`);
-                WorkItem.states.forEach((state)=>{
-                    styleSheet.insertRule(`.showStatus .Task${WorkItem.cssName}Status${state.cssName} {background:#${state.color};}`);
-                });
+        if(!this.SetWorkItemTypeCss.styleSheet){
+            // Needs to find both dropPlan.css and dropPlan.min.css
+            this.SetWorkItemTypeCss.styleSheet = [...document.styleSheets].find((styleSheet)=>styleSheet.href?.includes("dropPlan"));
+            if(!this.SetWorkItemTypeCss.styleSheet){
+                //Unable to find stylesheet.
+                console.error("Unable to find dropPlan.css or dropPlan.min.css");
                 return;
             }
         }
+        const styleSheet = this.SetWorkItemTypeCss.styleSheet;
+        styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName}:before {background:#${WorkItem.color};}`);
+        styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName} .taskTypeIcon {background-image:url(${WorkItem.iconUrl};}`);
+        WorkItem.states.forEach((state)=>{
+            styleSheet.insertRule(`.showStatus .Task${WorkItem.cssName}Status${state.cssName} {background:#${state.color};}`);
+        });
     }
 
     this.GetCapacity = function (member) {
