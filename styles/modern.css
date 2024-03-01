@@ -134,6 +134,65 @@ input::placeholder {
     background:#F0808077;
 }
 
+.showParent .task.taskParent1 {
+    background-color:#E0FFFF77;
+}
+.showParent .task.taskParent2 {
+    background-color:#FAFAD277;
+}
+.showParent .task.taskParent3 {
+    background-color:#90EE9077;
+}
+.showParent .task.taskParent4 {
+    background-color:#87CEFA77;
+}
+.showParent .task.taskParent5 {
+    background-color:#98FB9877;
+}
+.showParent .task.taskParent6 {
+    background-color:#D8BFD877;
+}
+.showParent .task.taskParent7 {
+    background-color:#FFC0CB77;
+}
+.showParent .task.taskParent8 {
+    background-color:#7FFFD477;
+}
+.showParent .task.taskParent9 {
+    background-color:#ADD8E677;
+}
+.showParent .task.taskParent0 {
+    background-color:#F0808077;
+}
+
+.showParent .task.taskParent10 {
+    --backgroundImage: linear-gradient(45deg, var(--background-color) 25%, transparent 25%, transparent 75%, var(--background-color) 75%, var(--background-color)),
+                        linear-gradient(45deg, var(--background-color) 25%, transparent 25%, transparent 75%, var(--background-color) 75%, var(--background-color));
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+}
+.showParent .task.taskParent20 {
+    --backgroundImage: linear-gradient(115deg, transparent 75%, var(--background-color) 75%),
+                        linear-gradient(245deg, transparent 75%, var(--background-color) 75%),
+                        linear-gradient(115deg, transparent 75%, var(--background-color) 75%),
+                        linear-gradient(245deg, transparent 75%, var(--background-color) 75%) ;
+    background-size: 15px 30px;
+    background-position: 0 0, 0 0,  7px -15px, 7px -15px;
+}
+.showParent .task.taskParent30 {
+    --backgroundImage: linear-gradient(90deg, transparent 50%, var(--background-color) 50%);
+    background-size: 20px 20px;
+}
+.showParent .task.taskParent40 {
+    --backgroundImage: linear-gradient(transparent 50%, var(--background-color) 50%);
+    background-size: 20px 20px;
+}
+.showParent .task.taskParent50 {
+    --backgroundImage: linear-gradient(90deg, rgba(127,127,127,.5) 50%, transparent 50%),
+                        linear-gradient(rgba(127,127,127,.5) 50%, transparent 50%);
+    background-size:20px 20px;
+}
+
 /* Style for the right-click menu */
 .right-click-menu {
     background-color: var(--background-color,rgba(255, 255, 255, 1));

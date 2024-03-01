@@ -476,37 +476,103 @@ canvas {
 
 
 .showareapath .taskAreaPath1 {
-    background:#E0FFFF; 
+    background:#E0FFFF;
 }
 .showareapath .taskAreaPath2 {
-    background:#FAFAD2; 
+    background:#FAFAD2;
 }
 .showareapath .taskAreaPath3 {
-    background:#90EE90; 
+    background:#90EE90;
 }
 .showareapath .taskAreaPath4 {
-    background:#87CEFA; 
+    background:#87CEFA;
 }
 .showareapath .taskAreaPath5 {
-    background:#98FB98; 
+    background:#98FB98;
 }
 .showareapath .taskAreaPath6 {
-    background:#D8BFD8; 
+    background:#D8BFD8;
 }
 .showareapath .taskAreaPath7 {
-    background:#FFC0CB; 
+    background:#FFC0CB;
 }
 
 .showareapath .taskAreaPath8 {
-    background:#7FFFD4; 
+    background:#7FFFD4;
 }
 
 .showareapath .taskAreaPath9 {
-    background:#ADD8E6; 
+    background:#ADD8E6;
 }
 
 .showareapath .taskAreaPath10 {
-    background:#F08080; 
+    background:#F08080;
+}
+
+.showParent .task.taskParent1 {
+    background-color:#E0FFFF;
+}
+.showParent .task.taskParent2 {
+    background-color:#FAFAD2;
+}
+.showParent .task.taskParent3 {
+    background-color:#90EE90;
+}
+.showParent .task.taskParent4 {
+    background-color:#87CEFA;
+}
+.showParent .task.taskParent5 {
+    background-color:#98FB98;
+}
+.showParent .task.taskParent6 {
+    background-color:#D8BFD8;
+}
+.showParent .task.taskParent7 {
+    background-color:#FFC0CB;
+}
+
+.showParent .task.taskParent8 {
+    background-color:#7FFFD4;
+}
+
+.showParent .task.taskParent9 {
+    background-color:#ADD8E6;
+}
+
+.showParent .task.taskParent0 {
+    background-color:#F08080;
+}
+
+.showParent .task.taskParent00 {
+    --backgroundImage: none
+}
+
+.showParent .task.taskParent10 {
+    --backgroundImage: linear-gradient(45deg, white 25%, transparent 25%, transparent 75%, white 75%, white),
+                        linear-gradient(45deg, white 25%, transparent 25%, transparent 75%, white 75%, white);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+}
+.showParent .task.taskParent20 {
+    --backgroundImage: linear-gradient(115deg, transparent 75%, white 75%),
+                        linear-gradient(245deg, transparent 75%, white 75%),
+                        linear-gradient(115deg, transparent 75%, white 75%),
+                        linear-gradient(245deg, transparent 75%, white 75%) ;
+    background-size: 15px 30px;
+    background-position: 0 0, 0 0,  7px -15px, 7px -15px;
+}
+.showParent .task.taskParent30 {
+    --backgroundImage: linear-gradient(90deg, transparent 50%, white 50%);
+    background-size: 20px 20px;
+}
+.showParent .task.taskParent40 {
+    --backgroundImage: linear-gradient(transparent 50%, white 50%);
+    background-size: 20px 20px;
+}
+.showParent .task.taskParent50 {
+    --backgroundImage: linear-gradient(90deg, rgba(127,127,127,.5) 50%, transparent 50%),
+                        linear-gradient(rgba(127,127,127,.5) 50%, transparent 50%);
+    background-size:20px 20px;
 }
 
 #tasksTable .sameParent{

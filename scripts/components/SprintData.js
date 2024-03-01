@@ -2,6 +2,7 @@ function SprintData(workitems, repository, existingSprint) {
     this.RawWits = workitems;
     this.Wits = [];
     this.AllWits = [];
+    ParentIndex = [];
 
     this.Repository = repository;
     this.StartDate = new Date(repository.IterationStartDate.toISOString()).getGMT();
@@ -75,6 +76,7 @@ function SprintData(workitems, repository, existingSprint) {
                         parent.childActivities[activity]={MinStart: item.StartDate, MaxFinish: item.FinishDate};
                     }
                 }
+                item.ParentIndex=getIndexOrAdd(parentId);
             }
         });
 
@@ -388,5 +390,16 @@ function SprintData(workitems, repository, existingSprint) {
             result.push(newName);
             this.nameById[names[AssignedToComboName].id] = { OriginalAssignedTo: {...OriginalAssignedTo, displayName:OriginalAssignedTo?.displayName?.split("<")[0].trim() || ""} };
         }
+    }
+
+    function getIndexOrAdd(parentId) {
+        let index = ParentIndex.indexOf(parentId);
+    
+        if (index === -1) {
+            ParentIndex.push(parentId);
+            index = ParentIndex.length - 1;
+        }
+    
+        return index;
     }
 }

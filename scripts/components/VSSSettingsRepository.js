@@ -5,8 +5,28 @@
  * @typedef {import("TFS/WorkItemTracking/RestClient")} WITRestClient
  * @typedef {import("TFS/Work/RestClient")} WorkRestClient
  * @typedef {import("VSS/Service")} VSSService
- * @typedef{import("TFS/WorkItemTracking/Contracts")} WITContracts
+ * @typedef {import("TFS/WorkItemTracking/Contracts")} WITContracts
+ * @typedef {import("TFS/Core/RestClient")} CoreRestClient
+ * @typedef {import("TFS/Work/RestClient").WorkHttpClient } WorkHttpClient
  */
+
+/**
+ * @typedef RepoSettingsData
+ * @prop t0 {number}
+ * @prop [settings] {any}
+ * @prop [backlogConfigurations] {import("TFS/Work/Contracts").BacklogConfiguration}
+ * @prop activityAllowedValues {string[]}
+ * @prop VssContext {import("VSS/Common/Contracts/Platform").WebContext}
+ * @prop [WitClient] {import("TFS/WorkItemTracking/RestClient")}
+ * @prop dataService {IExtensionDataService}
+ * @prop [failToCallVss] {function(Error):void}
+ * @prop [WorkItemTypes] {import("TFS/WorkItemTracking/Contracts").WorkItemTypeReference}
+ */
+/**
+ * @typedef WorkItemTypeOptional
+ * @prop name {string}
+ * @prop [url] {string}
+*/
 
 function VSSSettingsRepository() {
 
@@ -20,10 +40,25 @@ function VSSSettingsRepository() {
         this._ready = resolve;
         this._fail = reject;
     });
-    this._data = { t0: performance.now() };
+    /**
+     * @type {RepoSettingsData}
+     */
+
+    // @ts-ignore
+    this._data = { 
+        t0: performance.now(),
+        activityAllowedValues: []
+    };
+    /** @type {WorkItemTypeOptional[]} */
+    this.WorkItemTypes = [];
+    /** @type {WorkItemTypeOptional[]} */
+    this.WorkItemPBITypes = [];
 
     this.Init = function () { _init(this); }
 
+    /**
+     * @param {VSSSettingsRepository} _this
+     */
     function _init(_this) {
 
         console.log("Starting. (" + (performance.now() - _this._data.t0) + " ms.)");
@@ -44,31 +79,33 @@ function VSSSettingsRepository() {
         _startVSS(_this);
     }
 
+    /**
+     * @param {VSSSettingsRepository} _this
+     */
     function _startVSS(_this) {
         console.log("start VSS. (" + (performance.now() - _this._data.t0) + " ms.)");
-        VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient", "TFS/WorkItemTracking/Contracts"],
+        VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient", "TFS/Work/RestClient", "TFS/WorkItemTracking/Contracts","TFS/Core/RestClient"],
 
             function (/** @type VSSService */ VSS_Service, /** @type WITRestClient */ TFS_Wit_WebApi, /** @type  WorkRestClient */ TFS_Work, /** @type WITContracts */ TFS_Wit_Contracts) {
                 console.log("start Settings VSSrequire. (" + (performance.now() - _this._data.t0) + " ms.)");
                 try {
                     var extVersion = VSS.getExtensionContext().version;
                     _this._data.VssContext = VSS.getWebContext();
-                    
+
                     console.log("VSS loaded V " + extVersion + " VssSDKRestVersion:" + VSS.VssSDKRestVersion + " VssSDKVersion:" + VSS.VssSDKVersion + " user: " + _this._data.VssContext.user.uniqueName + ". (" + (performance.now() - _this._data.t0) + " ms.)");
                     _this.reportProgress("Framework loaded.");
-
 
                     let workClient = TFS_Work.getClient();
                     let otherClient = TFS_Wit_WebApi.getClient();
 
                     var teamContext = { projectId: _this._data.VssContext.project.id, teamId: _this._data.VssContext.team.id, project: "", team: "" };
                     console.log("Team context ", teamContext);
-                    const extensionDataReady = /** @type {Promise<void>} */(new Promise(function(resolve,reject){
+                    const extensionDataReady = /** @type {Promise<void>} */new Promise(function(resolve,reject){
                         VSS.getService(VSS.ServiceIds.ExtensionData).then(function (res){
                             _this._data.dataService = res;
-                            resolve();
+                            resolve(undefined);
                         });
-                    }));
+                    });
 
                     /** @type {(Promise<void>|IPromise<import("TFS/Work/Contracts").BacklogConfiguration>)[]} */
                     var promisesList = [
@@ -83,8 +120,7 @@ function VSSSettingsRepository() {
 
                         console.log("Team data loaded. (" + (performance.now() - _this._data.t0) + " ms.)");
                         _this.reportProgress("Team settings loaded.");
-                        if (values.length > 1) {
-                            /** @type {import("TFS/Work/Contracts").BacklogConfiguration} */
+                        if (values.length > 1 && values[1]) {
                             _this._data.backlogConfigurations = values[1];
                             _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
                             _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
@@ -98,7 +134,7 @@ function VSSSettingsRepository() {
                                 return otherClient.getWorkItemTypeFieldWithReferences(teamContext.projectId, itemType.name, "Microsoft.VSTS.Common.Activity", TFS_Wit_Contracts.WorkItemTypeFieldsExpandLevel.All);
                             }
                         );
-                        _this._data.activityAllowedValues = [];
+
                         Promise.allSettled([
                             Promise.all(tasksActivityPromises).then(function(taskActivityAllowedValues){
                                 taskActivityAllowedValues.forEach(function(taskTypeState, index, arr) {
@@ -117,7 +153,7 @@ function VSSSettingsRepository() {
                                 console.error(error, "on tasksActivityPromises");
                             }),
                             _this.LoadSettings()
-                        ]).then(()=>_this._ready()).catch((error) => {
+                        ]).then(()=>_this._ready(undefined)).catch((error) => {
                             console.error(error, "on tasksActivityPromises and ready");
                         });;
 
@@ -127,7 +163,12 @@ function VSSSettingsRepository() {
                             });
 
 
-                    }, _this._data.failToCallVss);
+                    }, _this._data.failToCallVss)
+                    .catch((e) => {
+                        var msg = 'Unknown error occurred.';
+                        alertUser(msg, e)
+                        _this.reportFailure(msg);
+                    });
                 }
                 catch (e) {
                     var msg = 'Unknown error occurred.';
