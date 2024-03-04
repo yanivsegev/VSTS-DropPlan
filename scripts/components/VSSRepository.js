@@ -67,18 +67,7 @@ function VSSRepository() {
                     if (window._trackJs && typeof trackJs != "undefined") {
                         trackJs.addMetadata("VssSDKRestVersion", VSS.VssSDKRestVersion);
                         trackJs.addMetadata("VssSDKVersion", VSS.VssSDKVersion);
-                        trackJs.configure({
-                            userId: _this._data.VssContext.user.uniqueName,
-                            onError: function (payload, error){
-                            
-                                if (error?.message?.startsWith('400 : PATCH')){
-                                    console.log('Ignore 400 : PATCH error', error);
-                                    // ignore update errors as they are logged with the detailed error later.
-                                    return false;
-                                }
-                                return true; // Ensure error gets sent
-                            }
-                        });
+                        trackJs.configure({ userId: _this._data.VssContext.user.uniqueName });
                     }
 
 
@@ -169,7 +158,7 @@ function VSSRepository() {
                                 Promise.all(taskConfigPromises).then(function(taskTypeConfigs){
                                     taskTypeConfigs.forEach(function(taskTypeConfig, index, arr) {
                                         const cssName=toCssName(_this.WorkItemTypes[index].name);
-                                        _this.WorkItemTypes[index].states=taskTypeConfig.states.map((state)=>({...state, cssName: toCssName(state.name)}));
+                                        _this.WorkItemTypes[index].states=taskTypeConfig.states?.map((state)=>({...state, cssName: toCssName(state.name)}));
                                         _this.WorkItemTypes[index].iconUrl=taskTypeConfig.icon?.url;
                                         _this.WorkItemTypes[index].color=taskTypeConfig.color;
                                         _this.WorkItemTypes[index].cssName=cssName
@@ -188,7 +177,7 @@ function VSSRepository() {
                                 Promise.all(pbiConfigPromises).then(function(pbiTypeConfigs){
                                     pbiTypeConfigs.forEach(function(pbiTypeConfig, index, arr) {
                                         const cssName=toCssName(_this.WorkItemPBITypes[index].name);
-                                        _this.WorkItemPBITypes[index].states=pbiTypeConfig.states
+                                        _this.WorkItemPBITypes[index].states=pbiTypeConfig.states?.map((state)=>({...state, cssName: toCssName(state.name)}));
                                         _this.WorkItemPBITypes[index].iconUrl=pbiTypeConfig.icon?.url
                                         _this.WorkItemPBITypes[index].color=pbiTypeConfig.color
                                         _this.WorkItemPBITypes[index].cssName=cssName
@@ -319,7 +308,7 @@ function VSSRepository() {
         const styleSheet = this.SetWorkItemTypeCss.styleSheet;
         styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName}:before {background:#${WorkItem.color};}`);
         styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName} .taskTypeIcon {background-image:url(${WorkItem.iconUrl};}`);
-        WorkItem.states.forEach((state)=>{
+        WorkItem.states?.forEach((state)=>{
             styleSheet.insertRule(`.showStatus .Task${WorkItem.cssName}Status${state.cssName} {background:#${state.color};}`);
         });
     }

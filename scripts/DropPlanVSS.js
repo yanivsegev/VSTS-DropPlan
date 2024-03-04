@@ -6,6 +6,11 @@ var autoRefresh;
 var showFailAlerts = true;
 var dropPlanLoaded = false;
 
+$( document ).on( "ajaxError", function( event, jqxhr, settings, thrownError ) {
+    console.error( jqxhr.status + " " + jqxhr.statusText + ": " + settings.type + " " + settings.url ,
+    jqxhr.responseJSON, settings.data);
+});
+
 window.addEventListener("message", receiveMessage, false);
 
 document.addEventListener("visibilitychange", () => {
@@ -297,7 +302,7 @@ function failToCallVss(reason, shouldNotPauseAutoRefresh) {
     
     if (shouldNotPauseAutoRefresh != true) PauseAutoRefresh();
     
-    alertUser(failure, reason);
+    alertUser(undefined, reason);
 }
 
 function alertUser(msg, e){

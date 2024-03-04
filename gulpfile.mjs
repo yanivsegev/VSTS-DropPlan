@@ -87,8 +87,8 @@ let js = {
             path: './dist/qa/scripts/',
             extension: '.min.js',
             sourceFiles: [
-                /*"scripts/ga.js",
-                "scripts/trackjs.js"*/
+                /*"scripts/ga.js",*/
+                "scripts/trackjs.js"
             ]
         },
         prod: {
