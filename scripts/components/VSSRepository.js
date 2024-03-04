@@ -296,16 +296,14 @@ function VSSRepository() {
     }
 
     SetWorkItemTypeCss = function(WorkItem){
-        if(!this.SetWorkItemTypeCss.styleSheet){
-            // Needs to find both dropPlan.css and dropPlan.min.css
-            this.SetWorkItemTypeCss.styleSheet = [...document.styleSheets].find((styleSheet)=>styleSheet.href?.includes("dropPlan"));
-            if(!this.SetWorkItemTypeCss.styleSheet){
-                //Unable to find stylesheet.
-                console.error("Unable to find dropPlan.css or dropPlan.min.css");
-                return;
-            }
+        let styleSheet = this.SetWorkItemTypeCss.styleSheet;
+        if (!styleSheet) {
+            // First time in create a new stylesheet.
+            let style = document.createElement('style');
+            document.head.appendChild(style);
+            styleSheet = style.sheet;
+            this.SetWorkItemTypeCss.styleSheet = styleSheet;
         }
-        const styleSheet = this.SetWorkItemTypeCss.styleSheet;
         styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName}:before {background:#${WorkItem.color};}`);
         styleSheet.insertRule(`.taskDiv > .TaskType${WorkItem.cssName} .taskTypeIcon {background-image:url(${WorkItem.iconUrl};}`);
         WorkItem.states?.forEach((state)=>{
