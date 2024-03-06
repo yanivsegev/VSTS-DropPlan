@@ -117,6 +117,9 @@ function VSSRepository() {
 
                         extensionDataReady.then(()=>{
                             Date.useNewTimeManagement = _this._data.settings.useNewTimeManagement;
+                            if (window._trackJs && typeof trackJs != "undefined") {
+                                trackJs.addMetadata("useNewTimeManagement", Date.useNewTimeManagement);
+                            }        
                             return Promise.all(promisesList).then(function (values) {
                                 try{
                                     

@@ -96,12 +96,14 @@ function reportProgress(msg){
 
 function reportFailure(msg, submsg){
     var messages = document.getElementById("messageBoxInner");
-    if (submsg){
-        messages.innerHTML = "<div><h1>" + msg + "</h1><h2>" + submsg + "</h2></div>";    
-    }else{
-        messages.innerHTML = "<h1>" + msg + "</h1>";
+    if(messages){
+        if (submsg){
+            messages.innerHTML = "<div><h1>" + msg + "</h1><h2>" + submsg + "</h2></div>";    
+        }else{
+            messages.innerHTML = "<h1>" + msg + "</h1>";
+        }
+        console.log(msg, submsg);
     }
-    console.log(msg, submsg);
 }
 
 function BuildDropPlan() {
