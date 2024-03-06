@@ -7,7 +7,15 @@ var showFailAlerts = true;
 var dropPlanLoaded = false;
 
 $( document ).on( "ajaxError", function( event, jqxhr, settings, thrownError ) {
-    console.error( jqxhr.status + " " + jqxhr.statusText + ": " + settings.type + " " + settings.url ,
+    var logFunc = console.error;
+    if (jqxhr.responseJSON?.message?.include("Rule Error") ||
+        jqxhr.responseJSON?.message?.include("Status code 0:") ||
+        jqxhr.status == 0)
+    {
+        logFunc = console.log;
+    }
+
+    logFunc( jqxhr.status + " " + jqxhr.statusText + ": " + settings.type + " " + settings.url ,
     jqxhr.responseJSON, settings.data);
 });
 
@@ -86,10 +94,14 @@ function reportProgress(msg){
     }
 }
 
-function reportFailure(msg){
+function reportFailure(msg, submsg){
     var messages = document.getElementById("messageBoxInner");
-    messages.innerHTML = "<h1>" + msg + "</h1>";
-    console.log(msg);
+    if (submsg){
+        messages.innerHTML = "<div><h1>" + msg + "</h1><h2>" + submsg + "</h2></div>";    
+    }else{
+        messages.innerHTML = "<h1>" + msg + "</h1>";
+    }
+    console.log(msg, submsg);
 }
 
 function BuildDropPlan() {
@@ -100,7 +112,7 @@ function BuildDropPlan() {
         repository.WorkItemsLoaded = WorkItemsLoaded;
         repository.Init();
     } catch (error) {
-        alertUser(undefined, error);
+        alertUser(error);
     }
 }
 
@@ -161,7 +173,7 @@ function processWorkItems(workItems, isSaving) {
         SetAutoRefresh();
     
     } catch (error) {
-        alertUser(undefined, error);
+        alertUser(error);
     }
 }
 
@@ -302,15 +314,12 @@ function failToCallVss(reason, shouldNotPauseAutoRefresh) {
     
     if (shouldNotPauseAutoRefresh != true) PauseAutoRefresh();
     
-    alertUser(undefined, reason);
+    alertUser(reason);
 }
 
-function alertUser(msg, e){
+function alertUser(e){
     
-    if (!msg){
-        msg = e?.serverError?.value?.Message || e?.message || "Unknown error";
-    }
-
+    var msg = e?.serverError?.value?.Message || e?.message || "Unknown error";
     var logMsg = "Alert User: [" + msg + "]";
     
     if (
@@ -327,6 +336,9 @@ function alertUser(msg, e){
             alert(msg);
         }
     }
+
+    repository.reportFailure('Unknown error occurred.', msg);
+
 }
 
 BuildDropPlan();

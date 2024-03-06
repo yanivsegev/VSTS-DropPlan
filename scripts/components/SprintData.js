@@ -305,18 +305,25 @@ function SprintData(workitems, repository, existingSprint) {
                     selectedRow = selectedRow + 1;
                     for (const element of dates) {
                         const date = element.yyyymmdd();
-                        if (!personRow[date]){
-                            console.error("date not found", date, dates, personRow.Days, workItem.StartDate, workItem.FinishDate, 
-                            sprint.FirstWorkingDay, sprint.LastWorkingDay, 
-                            repository._data.userSettings.ShowTeamNonWorkingDays,
-                            repository._data.teamSettings.workingDays,
-                            repository._data.daysOff.daysOff, element.getDay(), element.getGMT().getDay()
-                            );
-                        }
-                        if (personRow[date].length > selectedRow) {
-                            if (personRow[date][selectedRow].Type != 0) {
-                                found = false;
+                        try
+                        {
+                            if (personRow[date].length > selectedRow) {
+                                if (personRow[date][selectedRow].Type != 0) {
+                                    found = false;
+                                }
                             }
+                        }catch(e){
+                            console.error("date not found", e,
+                                date, dates, personRow.Days, 
+                                workItem.StartDate, workItem.FinishDate, 
+                                sprint.FirstWorkingDay, sprint.LastWorkingDay, 
+                                repository._data.userSettings.ShowTeamNonWorkingDays,
+                                repository._data.teamSettings.workingDays,
+                                repository._data.daysOff.daysOff, 
+                                element.getDay(), element.getGMT().getDay()
+                            );
+
+                            throw e;
                         }
                     }
                 }

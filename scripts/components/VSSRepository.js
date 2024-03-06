@@ -62,7 +62,7 @@ function VSSRepository() {
                     _this._data.VssContext = VSS.getWebContext();
                     
                     console.log("VSS loaded V " + extVersion + " VssSDKRestVersion:" + VSS.VssSDKRestVersion + " VssSDKVersion:" + VSS.VssSDKVersion + " user: " + _this._data.VssContext.user.uniqueName + ". (" + (performance.now() - _this._data.t0) + " ms.)");
-                    _this.reportProgress("Framework loaded.");
+                    _this.reportProgress("Framework loaded. (V" + extVersion + ")" );
 
                     if (window._trackJs && typeof trackJs != "undefined") {
                         trackJs.addMetadata("VssSDKRestVersion", VSS.VssSDKRestVersion);
@@ -205,9 +205,7 @@ function VSSRepository() {
                     }
                 }
                 catch (e) {
-                    var msg = 'Unknown error occurred.';
-                    alertUser(msg, e)
-                    _this.reportFailure(msg);
+                    alertUser(e)
                 }
             });
     }
