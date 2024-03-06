@@ -99,7 +99,7 @@ function VSSRepository() {
                                 Promise.all(userSettingsPromises).then(()=>{
                                     _this.reportProgress("User settings loaded.");
                                     _this.LoadSettings().then(resolve);
-                                }, _this._data.failToCallVss)
+                                }, _this.failToCallVss)
                             });
                         })
 
@@ -116,88 +116,93 @@ function VSSRepository() {
                         }
 
                         extensionDataReady.then(()=>{
+                            Date.useNewTimeManagement = _this._data.settings.useNewTimeManagement;
                             return Promise.all(promisesList).then(function (values) {
+                                try{
+                                    
+                                    console.log("Team data loaded. (" + (performance.now() - _this._data.t0) + " ms.)");
+                                    _this.reportProgress("Team settings loaded.");
+                                    _this._data.daysOff = values[0];
+                                    _this._data.teamSettings = values[1];
+                                    _this._data.teamMemberCapacities = values[2];
+                                    _this._data.iteration = values[3];
+                                    _this.IterationStartDate = _this._data.iteration.attributes.startDate;
+                                    _this.IterationFinishDate = _this._data.iteration.attributes.finishDate;
 
-                                console.log("Team data loaded. (" + (performance.now() - _this._data.t0) + " ms.)");
-                                _this.reportProgress("Team settings loaded.");
-                                _this._data.daysOff = values[0];
-                                _this._data.teamSettings = values[1];
-                                _this._data.teamMemberCapacities = values[2];
-                                _this._data.iteration = values[3];
-                                _this.IterationStartDate = _this._data.iteration.attributes.startDate;
-                                _this.IterationFinishDate = _this._data.iteration.attributes.finishDate;
+                                    _this.IterationFirstWorkingDate = new Date(_this._data.iteration.attributes.startDate);
+                                    while (_this.IterationFirstWorkingDate<_this.IterationFinishDate && _this.IsTeamDayOff(_this.IterationFirstWorkingDate)){
+                                        _this.IterationFirstWorkingDate = _this.IterationFirstWorkingDate.addDays(1);
+                                    }
+                                    _this.IterationLastWorkingDate = new Date(_this._data.iteration.attributes.finishDate);
+                                    while (_this.IterationFinishDate > _this.IterationFirstWorkingDate && _this.IsTeamDayOff(_this.IterationLastWorkingDate)){
+                                        _this.IterationLastWorkingDate = _this.IterationLastWorkingDate.addDays(-1);
+                                    }
 
-                                _this.IterationFirstWorkingDate = new Date(_this._data.iteration.attributes.startDate);
-                                while (_this.IterationFirstWorkingDate<_this.IterationFinishDate && _this.IsTeamDayOff(_this.IterationFirstWorkingDate)){
-                                    _this.IterationFirstWorkingDate = _this.IterationFirstWorkingDate.addDays(1);
-                                }
-                                _this.IterationLastWorkingDate = new Date(_this._data.iteration.attributes.finishDate);
-                                while (_this.IterationFinishDate > _this.IterationFirstWorkingDate && _this.IsTeamDayOff(_this.IterationLastWorkingDate)){
-                                    _this.IterationLastWorkingDate = _this.IterationLastWorkingDate.addDays(-1);
-                                }
-
-                                _this._data.teamValues = values[4];
-                                if (values.length > 5) {
-                                    _this._data.backlogConfigurations = values[5];
-                                    if (!_this._data.settings.usePBILevelForTasks){
-                                        _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
-                                        _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+                                    _this._data.teamValues = values[4];
+                                    if (values.length > 5) {
+                                        _this._data.backlogConfigurations = values[5];
+                                        if (!_this._data.settings.usePBILevelForTasks){
+                                            _this.WorkItemTypes = _this._data.backlogConfigurations.taskBacklog.workItemTypes;
+                                            _this.WorkItemPBITypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+                                        } else {
+                                            _this.WorkItemTypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
+                                            _this.WorkItemPBITypes = _this._data.backlogConfigurations.portfolioBacklogs.map((PBIType)=>PBIType.workItemTypes).flat();
+                                        }
                                     } else {
-                                        _this.WorkItemTypes = _this._data.backlogConfigurations.requirementBacklog.workItemTypes;
-                                        _this.WorkItemPBITypes = _this._data.backlogConfigurations.portfolioBacklogs.map((PBIType)=>PBIType.workItemTypes).flat();
+                                        _this.WorkItemTypes = [{ name: "Task" }];
+                                        _this.WorkItemPBITypes = [{ name: 'Product Backlog Item' }, { name: 'Bug' }];
                                     }
-                                } else {
-                                    _this.WorkItemTypes = [{ name: "Task" }];
-                                    _this.WorkItemPBITypes = [{ name: 'Product Backlog Item' }, { name: 'Bug' }];
+                                    const taskConfigPromises = _this.WorkItemTypes.map(
+                                        function (itemType) {
+                                            return otherClient.getWorkItemType(teamContext.projectId, itemType.name);
+                                        }
+                                    );
+                                    Promise.all(taskConfigPromises).then(function(taskTypeConfigs){
+                                        taskTypeConfigs.forEach(function(taskTypeConfig, index, arr) {
+                                            const cssName=toCssName(_this.WorkItemTypes[index].name);
+                                            _this.WorkItemTypes[index].states=taskTypeConfig.states?.map((state)=>({...state, cssName: toCssName(state.name)}));
+                                            _this.WorkItemTypes[index].iconUrl=taskTypeConfig.icon?.url;
+                                            _this.WorkItemTypes[index].color=taskTypeConfig.color;
+                                            _this.WorkItemTypes[index].cssName=cssName
+                                            SetWorkItemTypeCss(_this.WorkItemTypes[index]);
+                                            SetCssVariable(`${cssName}IconUrl`, taskTypeConfig.icon?.url);
+                                            SetCssVariable(`${cssName}IconColor`, taskTypeConfig.color);
+                                        });
+                                    }).catch((error) => {
+                                        console.error(error, "on taskConfigPromises");
+                                    });
+                                    const pbiConfigPromises = _this.WorkItemPBITypes.map(
+                                        function (itemType) {
+                                            return otherClient.getWorkItemType(teamContext.projectId, itemType.name);
+                                        }
+                                    );
+                                    Promise.all(pbiConfigPromises).then(function(pbiTypeConfigs){
+                                        pbiTypeConfigs.forEach(function(pbiTypeConfig, index, arr) {
+                                            const cssName=toCssName(_this.WorkItemPBITypes[index].name);
+                                            _this.WorkItemPBITypes[index].states=pbiTypeConfig.states?.map((state)=>({...state, cssName: toCssName(state.name)}));
+                                            _this.WorkItemPBITypes[index].iconUrl=pbiTypeConfig.icon?.url
+                                            _this.WorkItemPBITypes[index].color=pbiTypeConfig.color
+                                            _this.WorkItemPBITypes[index].cssName=cssName
+                                            SetWorkItemTypeCss(_this.WorkItemPBITypes[index]);
+                                            SetCssVariable(`${cssName}IconUrl`, pbiTypeConfig.icon?.url);
+                                            SetCssVariable(`${cssName}IconColor`, pbiTypeConfig.color);
+                                        });
+                                    }).catch((error) => {
+                                        console.error(error, "on pbiConfigPromises");
+                                    });
+                                    VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
+                                        function (VSS_Service, TFS_Wit_WebApi) {
+
+                                            _this._data.WitClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
+
+                                            OnLoadWorkItems(_this);
+                                        }
+                                    );
+                                }catch(e){
+                                    _this.failToCallVss(e);
                                 }
-                                const taskConfigPromises = _this.WorkItemTypes.map(
-                                    function (itemType) {
-                                        return otherClient.getWorkItemType(teamContext.projectId, itemType.name);
-                                    }
-                                );
-                                Promise.all(taskConfigPromises).then(function(taskTypeConfigs){
-                                    taskTypeConfigs.forEach(function(taskTypeConfig, index, arr) {
-                                        const cssName=toCssName(_this.WorkItemTypes[index].name);
-                                        _this.WorkItemTypes[index].states=taskTypeConfig.states?.map((state)=>({...state, cssName: toCssName(state.name)}));
-                                        _this.WorkItemTypes[index].iconUrl=taskTypeConfig.icon?.url;
-                                        _this.WorkItemTypes[index].color=taskTypeConfig.color;
-                                        _this.WorkItemTypes[index].cssName=cssName
-                                        SetWorkItemTypeCss(_this.WorkItemTypes[index]);
-                                        SetCssVariable(`${cssName}IconUrl`, taskTypeConfig.icon?.url);
-                                        SetCssVariable(`${cssName}IconColor`, taskTypeConfig.color);
-                                    });
-                                }).catch((error) => {
-                                    console.error(error, "on taskConfigPromises");
-                                });
-                                const pbiConfigPromises = _this.WorkItemPBITypes.map(
-                                    function (itemType) {
-                                        return otherClient.getWorkItemType(teamContext.projectId, itemType.name);
-                                    }
-                                );
-                                Promise.all(pbiConfigPromises).then(function(pbiTypeConfigs){
-                                    pbiTypeConfigs.forEach(function(pbiTypeConfig, index, arr) {
-                                        const cssName=toCssName(_this.WorkItemPBITypes[index].name);
-                                        _this.WorkItemPBITypes[index].states=pbiTypeConfig.states?.map((state)=>({...state, cssName: toCssName(state.name)}));
-                                        _this.WorkItemPBITypes[index].iconUrl=pbiTypeConfig.icon?.url
-                                        _this.WorkItemPBITypes[index].color=pbiTypeConfig.color
-                                        _this.WorkItemPBITypes[index].cssName=cssName
-                                        SetWorkItemTypeCss(_this.WorkItemPBITypes[index]);
-                                        SetCssVariable(`${cssName}IconUrl`, pbiTypeConfig.icon?.url);
-                                        SetCssVariable(`${cssName}IconColor`, pbiTypeConfig.color);
-                                    });
-                                }).catch((error) => {
-                                    console.error(error, "on pbiConfigPromises");
-                                });
-                                VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
-                                    function (VSS_Service, TFS_Wit_WebApi) {
-
-                                        _this._data.WitClient = VSS_Service.getCollectionClient(TFS_Wit_WebApi.WorkItemTrackingHttpClient);
-
-                                        OnLoadWorkItems(_this);
-                                    }
-                                );
-                            }, _this._data.failToCallVss)
-                        }, _this._data.failToCallVss);
+                            }, _this.failToCallVss)
+                        }, _this.failToCallVss);
                     }
                     else
                     {
@@ -409,6 +414,7 @@ function VSSRepository() {
             this._data.settings={
                     highlightPlanningIssues: true,
                     usePBILevelForTasks: false,
+                    useNewTimeManagement: false,
                     allowSimultaneousSubsequentActivities: true,
                     useActivityTypeInDependencyTracking: false,
                     activityOrder: [

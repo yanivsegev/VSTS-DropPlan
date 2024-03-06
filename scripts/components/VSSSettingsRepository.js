@@ -220,6 +220,16 @@ function VSSSettingsRepository() {
         }
     });
 
+    Object.defineProperty(this, 'useNewTimeManagement', {
+        get: function() {
+            return this._data.settings.useNewTimeManagement;
+        },
+        set: function(useNewTimeManagement) {
+            this._data.settings.useNewTimeManagement = useNewTimeManagement;
+            this.SaveSettings();
+        }
+    });
+
     Object.defineProperty(this, 'allowSimultaneousSubsequentActivities', {
         get: function() {
             return this._data.settings.allowSimultaneousSubsequentActivities;
@@ -276,6 +286,7 @@ function VSSSettingsRepository() {
             this._data.settings={
                     highlightPlanningIssues: true,
                     usePBILevelForTasks: false,
+                    useNewTimeManagement: false,
                     allowSimultaneousSubsequentActivities: true,
                     useActivityTypeInDependencyTracking: false,
                     activityOrder: [

@@ -246,7 +246,7 @@ function updateWorkItemInVSS() {
                         wijson.push({
                             "op": "add",
                             "path": "/fields/Microsoft.VSTS.Scheduling.StartDate",
-                            "value": workItem.StartDate?.yyyy_mm_dd() || ""
+                            "value": workItem.StartDate?.tfsFormat() || ""
                         });
                     }
                 }
@@ -262,7 +262,7 @@ function updateWorkItemInVSS() {
                         wijson.push({
                             "op": "add",
                             "path": "/fields/Microsoft.VSTS.Scheduling.FinishDate",
-                            "value": workItem.FinishDate?.yyyy_mm_dd() || ""
+                            "value": workItem.FinishDate?.tfsFormat() || ""
                         });
                     }
                 }

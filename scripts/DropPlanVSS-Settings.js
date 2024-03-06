@@ -57,6 +57,10 @@ function switchUsePBILevelForTasks(enabled){
     repository.usePBILevelForTasks = enabled;
 }
 
+function switchUseNewTimeManagement(enabled){
+    repository.useNewTimeManagement = enabled;
+}
+
 function switchUseActivityTypeInDependencyTracking(enabled){
     repository.useActivityTypeInDependencyTracking = enabled;
 }
@@ -80,6 +84,7 @@ try{
 		}
         $('#showPlanningIssues').prop('checked', repository.highlightPlanningIssues);
         $('#usePBILevelForTasks').prop('checked', repository.usePBILevelForTasks);
+        $('#useNewTimeManagement').prop('checked', repository.useNewTimeManagement);
         $('#useActivityTypeInDependencyTracking').prop('checked', repository.useActivityTypeInDependencyTracking);
         $('#allowSimultaneousSubsequentActivities').prop('checked', repository.allowSimultaneousSubsequentActivities);
 		$("#settingsRoot").css("display","block");

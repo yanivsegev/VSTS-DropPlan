@@ -1,8 +1,10 @@
+Date.prototype.useNewTimeManagement = false;
+
 Date.prototype.addDays = function(days) {
     var z = this.getTimezoneOffset()
     var x = new Date(this.valueOf() + days * 24 * 60 * 60000);
     var diff = z - x.getTimezoneOffset();
-    if (diff != 0){
+    if (!Date.useNewTimeManagement && diff != 0){
         return new Date(x.valueOf() - (diff * 60000));
     }
     return x;
@@ -70,6 +72,8 @@ Date.prototype.tfsFormat = function() {
 
 Date.prototype.getGMT = function() {
 
+    if (Date.useNewTimeManagement) return this;
+
     return new Date(
         this.getUTCFullYear(),
         this.getUTCMonth(),
@@ -90,7 +94,8 @@ Date.prototype.ConvertGMTToServerTimeZone = function() {
         }
     }
 
-
+    if (Date.useNewTimeManagement) this._serverToGMTDiff = 0;
+    
     return new Date(this.getTime() - this._serverToGMTDiff);
 };
 
