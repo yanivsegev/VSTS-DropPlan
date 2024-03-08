@@ -8,8 +8,8 @@ var dropPlanLoaded = false;
 
 $( document ).on( "ajaxError", function( event, jqxhr, settings, thrownError ) {
     var logFunc = console.error;
-    if (jqxhr.responseJSON?.message?.include("Rule Error") ||
-        jqxhr.responseJSON?.message?.include("Status code 0:") ||
+    if (jqxhr.responseJSON?.message?.includes("Rule Error") ||
+        jqxhr.responseJSON?.message?.includes("Status code 0:") ||
         jqxhr.status == 0)
     {
         logFunc = console.log;
@@ -325,8 +325,8 @@ function alertUser(e){
     var logMsg = "Alert User: [" + msg + "]";
     
     if (
-            !(e?.message?.indexOf('Rule Error') > 0) // don't log "rule validation" errors
-            && !(e?.message?.indexOf('Status code 0:') > 0) //don't log "server unavailable" errors
+            !(e?.message?.includes('Rule Error')) // don't log "rule validation" errors
+            && !(e?.message?.includes("Status code 0:")) //don't log "server unavailable" errors
         )
     {
         console.error(logMsg, e);
@@ -334,7 +334,7 @@ function alertUser(e){
         console.log(logMsg, e);
     }
     if (showFailAlerts){
-        if (!(e?.message?.indexOf('Status code 0:') > 0)){
+        if (!(e?.message?.includes('Status code 0:'))){
             alert(msg);
         }
     }

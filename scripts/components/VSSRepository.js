@@ -172,7 +172,9 @@ function VSSRepository() {
                                             SetCssVariable(`${cssName}IconColor`, taskTypeConfig.color);
                                         });
                                     }).catch((error) => {
-                                        console.error(error, "on taskConfigPromises");
+                                        if (!(error?.message?.includes('Status code 0:'))){
+                                            console.error(error, "on taskConfigPromises");
+                                        }
                                     });
                                     const pbiConfigPromises = _this.WorkItemPBITypes.map(
                                         function (itemType) {
@@ -191,7 +193,9 @@ function VSSRepository() {
                                             SetCssVariable(`${cssName}IconColor`, pbiTypeConfig.color);
                                         });
                                     }).catch((error) => {
-                                        console.error(error, "on pbiConfigPromises");
+                                        if (!(error?.message?.includes('Status code 0:'))){
+                                            console.error(error, "on pbiConfigPromises");
+                                        }
                                     });
                                     VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
                                         function (VSS_Service, TFS_Wit_WebApi) {
@@ -417,7 +421,7 @@ function VSSRepository() {
             this._data.settings={
                     highlightPlanningIssues: true,
                     usePBILevelForTasks: false,
-                    useNewTimeManagement: false,
+                    useNewTimeManagement: true,
                     allowSimultaneousSubsequentActivities: true,
                     useActivityTypeInDependencyTracking: false,
                     activityOrder: [

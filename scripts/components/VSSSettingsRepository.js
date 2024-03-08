@@ -116,7 +116,7 @@ function VSSSettingsRepository() {
                         promisesList.push(workClient.getBacklogConfigurations(teamContext));
                     }
 
-                    var serverAnswer = Promise.all(promisesList).then(function (values) {
+                    Promise.all(promisesList).then(function (values) {
 
                         console.log("Team data loaded. (" + (performance.now() - _this._data.t0) + " ms.)");
                         _this.reportProgress("Team settings loaded.");
@@ -150,11 +150,15 @@ function VSSSettingsRepository() {
                                 })
                                 console.log(_this._data.activityAllowedValues)
                             }).catch((error) => {
-                                console.error(error, "on tasksActivityPromises");
+                                if (!(error?.message?.includes('Status code 0:'))){
+                                    console.error(error, "on tasksActivityPromises");
+                                }
                             }),
                             _this.LoadSettings()
                         ]).then(()=>_this._ready(undefined)).catch((error) => {
-                            console.error(error, "on tasksActivityPromises and ready");
+                            if (!(error?.message?.includes('Status code 0:'))){
+                                console.error(error, "on tasksActivityPromises and ready");
+                            }
                         });;
 
                         VSS.require(["VSS/Service", "TFS/WorkItemTracking/RestClient"],
@@ -286,7 +290,7 @@ function VSSSettingsRepository() {
             this._data.settings={
                     highlightPlanningIssues: true,
                     usePBILevelForTasks: false,
-                    useNewTimeManagement: false,
+                    useNewTimeManagement: true,
                     allowSimultaneousSubsequentActivities: true,
                     useActivityTypeInDependencyTracking: false,
                     activityOrder: [

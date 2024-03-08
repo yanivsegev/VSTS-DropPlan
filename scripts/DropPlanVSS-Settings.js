@@ -1,23 +1,5 @@
 var repository = new VSSSettingsRepository();
 var showFailAlerts = true;
-window.addEventListener("message", receiveMessage, false);
-
-function receiveMessage(event) {
-    try {
-		console.log("message received")
-        var result = JSON.parse(event.data);
-        if (result.result.fields) {
-            console.log("Refresh.");
-        }
-        if (result.error)
-        {
-            console.log("Error in receiveMessage: " + result.error);
-        }
-
-    } catch (error) {
-
-    }
-}
 
 function reportProgress(msg){
     var messages = document.getElementById("messages");
