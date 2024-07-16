@@ -21,7 +21,11 @@
                 e.g., Testing can start on the same day as Development ends.<br/><br/>
                 <input id="useActivityTypeInDependencyTracking" type="checkbox" onclick="switchUseActivityTypeInDependencyTracking(($('#useActivityTypeInDependencyTracking').prop('checked')));" checked/>
                 <label for="useActivityTypeInDependencyTracking">Allow tasks of two dependant stories to happen simultaneously as long as it's a later activity type.</label><br/>
-                e.g., Development on Story 2 can start after Development of Story 1 has finished, but before Testing on Story 1 has completed.<br/>
+                e.g., Development on Story 2 can start after Development of Story 1 has finished, but before Testing on Story 1 has completed.<br/><br/>
+                <input id="warnAboutParentsWithoutTasks" type="checkbox" onclick="switchWarnAboutParentsWithoutTasks(($('#warnAboutParentsWithoutTasks').prop('checked')));" checked/>
+                <label for="warnAboutParentsWithoutTasks">Display a Warning when there are parent work items in the sprint which do not have any child tasks in the sprint.</label><br/>
+                e.g., Story 3 is in the sprint, but either has no child tasks, or the child tasks are not in this sprint - this will not show on the Drop Plan and may be missed.<br/>
+                This warning will indicate that you have work items in the sprint which are not visible on the Drop Plan due to the missing child tasks.<br/>
             </div>
             <p>Set the activity order for your project.  Any activities that you do not wish to be in a strict sequence can be moved to the "Not In Use" area.<br/>
             If you have two activities that can happen at the same time, place them on the same line.<br/>

@@ -16,6 +16,7 @@ function SprintData(workitems, repository, existingSprint) {
 
     this.ViewByTasks = true;
     this.PlanningIssues = this.Repository.GetSettings().highlightPlanningIssues;
+    this.warnAboutParentsWithoutTasks = this.Repository.GetSettings().warnAboutParentsWithoutTasks;
     this.allowSimultaneousSubsequentActivities = this.Repository.GetSettings().allowSimultaneousSubsequentActivities;
     this.useActivityTypeInDependencyTracking = this.Repository.GetSettings().useActivityTypeInDependencyTracking;
     this.nameById = [];
@@ -169,7 +170,7 @@ function SprintData(workitems, repository, existingSprint) {
 
         repository.GetMembersWithCapacity().forEach(
             (member)=>{
-            AddPersonToResults.call(this, names, member.name, member.displayName, member, result);
+                AddPersonToResults.call(this, names, member.name, member.displayName, member, result);
             }
         );
 
@@ -188,7 +189,10 @@ function SprintData(workitems, repository, existingSprint) {
                 remainingWork = workItem.RemainingWork;
                 personRow.TatalTasks = personRow.TatalTasks + remainingWork;
             }
-
+            if (this.ViewByTasks && this.warnAboutParentsWithoutTasks && workItem.isPBIWit && workItem.GetFirstChild()==undefined){
+                personRow.errors=(personRow.errors || []);
+                personRow.errors.push({message: `Work item ${workItem.Id} - "${workItem.Title}" is in the sprint but has no tasks`});
+            }
             if ((!this.ViewByTasks && workItem.isPBIWit) || (this.ViewByTasks && workItem.isTaskWit)) {
                 if (!areaPaths[workItem.AreaPath]) {
                     areaPaths[workItem.AreaPath] = { id: areaPathsId };
