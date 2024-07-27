@@ -10,6 +10,11 @@ $( document ).on( "ajaxError", function( event, jqxhr, settings, thrownError ) {
     var logFunc = console.error;
     if (jqxhr.responseJSON?.message?.includes("Rule Error") ||
         jqxhr.responseJSON?.message?.includes("Status code 0:") ||
+        jqxhr.responseJSON?.typeKey == "PermissionDeniedException" ||
+        jqxhr.responseJSON?.typeKey == "RuleValidationException" ||
+        jqxhr.responseJSON?.typeKey == "WorkItemRevisionMismatchException" ||
+        jqxhr.responseJSON?.typeKey == "WorkItemUnauthorizedAccessException" ||
+        jqxhr.responseJSON?.typeKey == "VssPropertyValidationException" ||
         jqxhr.status == 0)
     {
         logFunc = console.log;
@@ -119,7 +124,19 @@ function BuildDropPlan() {
 }
 
 function WorkItemsLoaded(workItems){
-    $("#updateTime").html(new Date().HHmmss());
+    
+    var d = new Date();
+    var HH = d.getHours();
+    var mm = d.getMinutes();
+    var ss = d.getSeconds();
+  
+    var updateTime = [
+        (HH>9 ? '' : '0') + HH,
+        (mm>9 ? '' : '0') + mm,
+        (ss>9 ? '' : '0') + ss
+    ].join(':');
+
+    $("#updateTime").html(updateTime);
     if (sprint && sprint.IsSameWorkItems(workItems)) {
         console.info("No changes detected.")
     }
@@ -237,7 +254,7 @@ function updateWorkItemInVSS() {
                     });
                 }
 
-                if (workItem.StartDate?.yyyy_mm_dd() != workItem.InitialStartDate?.yyyy_mm_dd()){
+                if (workItem.StartDate?.yyyymmdd() != workItem.InitialStartDate?.yyyymmdd()){
                     if (!workItem.StartDate) {
                         wijson.push({
                             "op": "remove",
@@ -253,7 +270,7 @@ function updateWorkItemInVSS() {
                     }
                 }
 
-                if (workItem.FinishDate?.yyyy_mm_dd() != workItem.InitialFinishDate?.yyyy_mm_dd()){
+                if (workItem.FinishDate?.yyyymmdd() != workItem.InitialFinishDate?.yyyymmdd()){
                     if (!workItem.FinishDate) {
                         wijson.push({
                             "op": "remove",
@@ -325,13 +342,18 @@ function alertUser(e){
     var logMsg = "Alert User: [" + msg + "]";
     
     if (
-            !(e?.message?.includes('Rule Error')) // don't log "rule validation" errors
-            && !(e?.message?.includes("Status code 0:")) //don't log "server unavailable" errors
+            e?.message?.includes('Rule Error') || // don't log "rule validation" errors
+            e?.message?.includes("Status code 0:") ||//don't log "server unavailable" errors
+            e?.typeKey == "PermissionDeniedException" ||
+            e?.typeKey == "RuleValidationException" ||
+            e?.typeKey == "WorkItemRevisionMismatchException" ||
+            e?.typeKey == "WorkItemUnauthorizedAccessException" ||
+            e?.typeKey == "VssPropertyValidationException" 
         )
     {
-        console.error(logMsg, e);
-    }else{
         console.log(logMsg, e);
+    }else{
+        console.error(logMsg, e);
     }
     if (showFailAlerts){
         if (!(e?.message?.includes('Status code 0:'))){

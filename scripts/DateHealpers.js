@@ -18,42 +18,7 @@ Date.prototype.yyyymmdd = function() {
         this.getFullYear(),
         (mm>9 ? '' : '0') + mm,
         (dd>9 ? '' : '0') + dd
-    ].join('');
-};
-
-Date.prototype.yyyy_mm_dd = function() {
-    var mm = this.getMonth() + 1; // getMonth() is zero-based
-    var dd = this.getDate();
-
-    return [
-        this.getFullYear(),
-        (mm>9 ? '' : '0') + mm,
-        (dd>9 ? '' : '0') + dd
     ].join('/');
-};
-
-Date.prototype.mmdd = function() {
-    var mm = this.getMonth() + 1; // getMonth() is zero-based
-    var dd = this.getDate();
-
-    return [
-        (mm>9 ? '' : '0') + mm,
-        (dd>9 ? '' : '0') + dd
-    ].join('/');
-};
-
-
-
-Date.prototype.HHmmss = function() {
-    var HH = this.getHours();
-    var mm = this.getMinutes();
-    var ss = this.getSeconds();
-  
-    return [
-        (HH>9 ? '' : '0') + HH,
-        (mm>9 ? '' : '0') + mm,
-        (ss>9 ? '' : '0') + ss
-    ].join(':');
 };
 
 
@@ -86,6 +51,8 @@ Date.prototype.getGMT = function() {
 
 Date.prototype.ConvertGMTToServerTimeZone = function() {
 
+    if (Date.useNewTimeManagement) return this;
+    
     if (!this._serverToGMTDiff){
         this._serverToGMTDiff = (new Date(VSS.Core.convertValueToDisplayString(new Date("2000-01-01"), 'u')).getTime() - new Date("2000-01-01").getTime()) + (new Date().getTimezoneOffset() * 60000);
 
@@ -94,12 +61,8 @@ Date.prototype.ConvertGMTToServerTimeZone = function() {
         }
     }
 
-    if (Date.useNewTimeManagement) this._serverToGMTDiff = 0;
-    
     return new Date(this.getTime() - this._serverToGMTDiff);
 };
-
-
 
 function getDates(startDate, stopDate, includeDateFunction) {
     var dateArray = new Array();

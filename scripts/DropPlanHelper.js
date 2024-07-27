@@ -1,8 +1,7 @@
 ﻿var colWidth = 180;
 var _witToSave = [];
 var _witInUpdate = [];
-
-var _today = new Date(new Date().yyyy_mm_dd());
+var _today = new Date(new Date().yyyymmdd());
 
 function render(isSaving, data) {
     const activityTypeOrder=repository.getActivityOrder();
