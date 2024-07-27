@@ -52,12 +52,17 @@ Happy coding :-)
 
 ## Change Log ##
 
-### 2.2.1 -> 2.2.2 ###
+### 2.3.0 ###
+
+New warning which shows when you have a work item in the sprint which doesn't have visible child tasks on the Drop Plan.
+
+### 2.2.1 -> 2.2.4 ###
 
 Bugfixes:
 
 1. Styles for #59 and #121 failing to insert, but only in production. (#124)
 2. Possible that browser extensions like ad-blockers are interfering with style insert. (#126)
+3. Fixes for Azure timezone changes.
 
 ### 2.2.0 ###
 

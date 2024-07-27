@@ -244,6 +244,17 @@ function VSSSettingsRepository() {
         }
     });
 
+
+    Object.defineProperty(this, 'warnAboutParentsWithoutTasks', {
+        get: function() {
+            return this._data.settings.warnAboutParentsWithoutTasks;
+        },
+        set: function(warnAboutParentsWithoutTasks) {
+            this._data.settings.warnAboutParentsWithoutTasks = warnAboutParentsWithoutTasks;
+            this.SaveSettings();
+        }
+    });
+
     Object.defineProperty(this, 'useActivityTypeInDependencyTracking', {
         get: function() {
             return this._data.settings.useActivityTypeInDependencyTracking;
@@ -293,6 +304,7 @@ function VSSSettingsRepository() {
                     useNewTimeManagement: true,
                     allowSimultaneousSubsequentActivities: true,
                     useActivityTypeInDependencyTracking: false,
+                    warnAboutParentsWithoutTasks: true,
                     activityOrder: [
                         ["Requirements"],
                         ["Design"],
