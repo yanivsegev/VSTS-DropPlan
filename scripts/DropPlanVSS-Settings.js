@@ -51,6 +51,11 @@ function switchAllowSimultaneousSubsequentActivities(enabled){
     repository.allowSimultaneousSubsequentActivities = enabled;
 }
 
+function switchWarnAboutParentsWithoutTasks(enabled){
+    repository.warnAboutParentsWithoutTasks = enabled;
+}
+
+
 try{
 	repository.reportProgress = reportProgress;
 	repository.reportFailure = reportProgress;
@@ -69,6 +74,7 @@ try{
         $('#useNewTimeManagement').prop('checked', repository.useNewTimeManagement);
         $('#useActivityTypeInDependencyTracking').prop('checked', repository.useActivityTypeInDependencyTracking);
         $('#allowSimultaneousSubsequentActivities').prop('checked', repository.allowSimultaneousSubsequentActivities);
+        $('#warnAboutParentsWithoutTasks').prop('checked', repository.warnAboutParentsWithoutTasks);
 		$("#settingsRoot").css("display","block");
 		$(".messageBoxContainer").remove();
 	});

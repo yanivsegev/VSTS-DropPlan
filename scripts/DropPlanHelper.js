@@ -19,16 +19,24 @@ function render(isSaving, data) {
     result = result + "</tr><tbody>"
 
     for (const personRow of data) {
-        if (personRow.hasItems || (personRow.Capacity && sprint.FilterTerm=="")) {
-            var personWarnings="";
+        if (personRow.hasItems || ((personRow.Capacity || personRow.errors) && sprint.FilterTerm=="")) {
+            let personWarningsHtml="";
+            let personWarnings=[...personRow.errors || []];
+            
 
             result = result + "<tr class='taskTr taskTrSpace'><td class='row_class_name'><div class='assignToColumn rowHeaderSpace'/></td><td colspan='" + (sprint.Dates.length) + "'/></tr>";
             result = result + "<tr class='taskTr taskTrContent' >";
 
             if(personRow.hasEndsOnNonWorkingDay && !repository.GetUserSettings().ShowTeamNonWorkingDays){
-                personWarnings = personWarnings +  "<div class='taskWarning'><div class='taskWarningIcon'>⚠</div><div class='taskWarningTooltip taskWarningAlignRight' >";
-                personWarnings = personWarnings + "<p>Some tasks may not show as they are scheduled on a team non-working day!</p>"
-                personWarnings = personWarnings + "</div></div>"
+                personWarnings.push({message:"Some tasks may not show as they are scheduled on a team non-working day!"});
+            }
+            if (personWarnings.length){
+                personWarningsHtml = personWarningsHtml +  "<div class='taskWarning'><div class='taskWarningIcon'>⚠</div><div class='taskWarningTooltip taskWarningAlignRight' >";
+                personWarningsHtml = personWarningsHtml + personWarnings.reduce(
+                    (existingWarnings, row)=> `${existingWarnings}<p>${row.message}</p>`,
+                    ""
+                );
+                personWarningsHtml = personWarningsHtml + "</div></div>"
             }
 
             if (personRow.assignedTo) {
@@ -37,7 +45,7 @@ function render(isSaving, data) {
                 if (personRow.avatar) {
                     result = result +  "<img class='assignedToAvatar' src='" + personRow.avatar + "'/>"
                 }
-                result = result + personWarnings;
+                result = result + personWarningsHtml;
                 result = result + "<div class='assignedToName'>" + personRow.assignedTo + "</div>"
 
                 if (personRow.TotalCapacity > 0) {
@@ -57,7 +65,7 @@ function render(isSaving, data) {
                 }
             } else {
                 result = result + "<td class='row_class_name' assignedToId=" + personRow.assignedToId + "><div class='assignToColumn rowHeader'><div class='assignedToName'>Unassigned</div>"
-                result = result + personWarnings;
+                result = result + personWarningsHtml;
                 result = result + "</div></td>";
             }
             var previousDate;

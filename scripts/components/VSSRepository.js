@@ -424,6 +424,7 @@ function VSSRepository() {
                     useNewTimeManagement: true,
                     allowSimultaneousSubsequentActivities: true,
                     useActivityTypeInDependencyTracking: false,
+                    warnAboutParentsWithoutTasks: true,
                     activityOrder: [
                         ["Requirements"],
                         ["Design"],
